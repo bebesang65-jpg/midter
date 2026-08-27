@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Store & Uniform Inventory System</title>
+    <title>Book Store Inventory System</title>
     <style>
         :root {
-            --primary: #1e293b;
-            --secondary: #334155;
-            --accent: #2563eb;
-            --danger: #ef4444;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --bg-light: #f8fafc;
-            --card-bg: #ffffff;
-            --text-dark: #0f172a;
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
         }
 
         * {
@@ -25,12 +23,11 @@
         }
 
         body {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            height: 100vh;
+            background-color: #f5f7fa;
+            color: #333;
         }
 
-        /* --- SCREEN SWITCHING --- */
+        /* --- LOGIN SCREEN --- */
         #login-screen {
             display: flex;
             justify-content: center;
@@ -40,24 +37,28 @@
         }
 
         .login-card {
-            background: var(--card-bg);
+            background: white;
             padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             width: 100%;
-            max-width: 380px;
+            max-width: 400px;
             text-align: center;
         }
 
-        .login-card h2 { margin-bottom: 1.5rem; color: var(--primary); }
+        .login-card h2 {
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
 
+        /* --- MAIN SYSTEM LAYOUT --- */
         #app-screen {
             display: none;
             height: 100vh;
-            grid-template-columns: 260px 1fr;
+            grid-template-columns: 240px 1fr;
         }
 
-        /* --- SIDEBAR NAV --- */
+        /* Sidebar */
         aside {
             background-color: var(--primary);
             color: white;
@@ -67,29 +68,33 @@
             justify-content: space-between;
         }
 
-        .brand-title {
-            font-size: 1.1rem;
-            font-weight: bold;
+        aside h2 {
+            font-size: 1.2rem;
             margin-bottom: 2rem;
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 1rem;
         }
 
-        .nav-links { list-style: none; }
-        .nav-links li { margin-bottom: 0.5rem; }
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 0.5rem;
+        }
+
         .nav-links a {
-            color: #94a3b8;
+            color: #bdc3c7;
             text-decoration: none;
             display: block;
             padding: 0.8rem 1rem;
-            border-radius: 6px;
-            transition: 0.2s;
-            font-size: 0.95rem;
+            border-radius: 4px;
+            transition: 0.3s;
         }
 
         .nav-links a:hover, .nav-links a.active {
-            background-color: var(--accent);
+            background-color: var(--secondary);
             color: white;
         }
 
@@ -98,69 +103,54 @@
             color: white;
             border: none;
             padding: 0.8rem;
-            border-radius: 6px;
+            border-radius: 4px;
             cursor: pointer;
             width: 100%;
             font-weight: bold;
         }
 
-        /* --- MAIN CONTENT --- */
+        /* Main Content */
         main {
             padding: 2rem;
             overflow-y: auto;
         }
 
-        .page { display: none; }
-        .page.active { display: block; }
-
-        h1 { margin-bottom: 1.5rem; color: var(--primary); }
-
-        /* --- DASHBOARD CARDS --- */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
+        .page {
+            display: none;
         }
 
-        .dash-card {
-            background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            border-left: 5px solid var(--accent);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+        .page.active {
+            display: block;
         }
 
-        .dash-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        /* UI Elements */
+        h1 {
+            margin-bottom: 1.5rem;
+            color: var(--dark);
         }
 
-        .dash-card p { font-size: 0.9rem; color: #64748b; font-weight: 600; }
-        .dash-card h3 { font-size: 2.2rem; color: var(--primary); margin-top: 0.5rem; }
-
-        /* --- UI COMPONENTS & TABLES --- */
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1.2rem;
-            gap: 1rem;
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
         }
 
-        .input-field {
-            padding: 0.6rem 0.8rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
             width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
-
-        .search-input { width: 300px; }
 
         .btn {
             padding: 0.6rem 1.2rem;
             border: none;
-            border-radius: 6px;
+            border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
             transition: 0.2s;
@@ -169,28 +159,78 @@
         .btn-primary { background-color: var(--accent); color: white; }
         .btn-success { background-color: var(--success); color: white; }
         .btn-danger { background-color: var(--danger); color: white; }
-        .btn-warning { background-color: var(--warning); color: white; }
-        .btn-secondary { background-color: #64748b; color: white; }
+        .btn-secondary { background-color: #7f8c8d; color: white; }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .card h3 { font-size: 2rem; color: var(--accent); margin-top: 0.5rem;}
+
+        /* Controls & Tables */
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .search-input {
+            width: 300px;
+            padding: 0.6rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: var(--card-bg);
+            background: white;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         th, td {
             padding: 0.8rem 1rem;
             text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 0.95rem;
+            border-bottom: 1px solid #eee;
         }
 
         th { background-color: var(--secondary); color: white; }
 
-        /* --- MODAL --- */
+        /* Tabs */
+        .tab-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            background: #e0e0e0;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -198,330 +238,302 @@
             background: rgba(0,0,0,0.5);
             justify-content: center;
             align-items: center;
-            z-index: 100;
         }
 
         .modal-content {
             background: white;
             padding: 2rem;
-            border-radius: 10px;
+            border-radius: 8px;
             width: 100%;
-            max-width: 480px;
+            max-width: 500px;
         }
 
         .modal-actions {
             display: flex;
             justify-content: flex-end;
             gap: 0.5rem;
-            margin-top: 1.5rem;
+            margin-top: 1rem;
         }
-
-        .form-group { margin-bottom: 1rem; text-align: left; }
-        .form-group label { display: block; margin-bottom: 0.3rem; font-weight: 600; font-size: 0.85rem;}
     </style>
 </head>
 <body>
 
-    <!-- 1. LOGIN SCREEN FEATURE -->
+    <!-- 1. LOGIN SCREEN -->
     <div id="login-screen">
         <div class="login-card">
-            <h2>📚 System Login</h2>
-            <form onsubmit="handleLogin(event)">
+            <h2>📚 Book Store Login</h2>
+            <form id="login-form">
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" class="input-field" value="admin" required>
+                    <input type="text" id="username" required value="admin">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" class="input-field" value="admin" required>
+                    <input type="password" id="password" required value="admin">
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
             </form>
         </div>
     </div>
 
-    <!-- MAIN APP SCREEN -->
+    <!-- 2. MAIN APPLICATION -->
     <div id="app-screen">
-        <!-- SIDEBAR -->
+        <!-- Sidebar Navigation -->
         <aside>
             <div>
-                <div class="brand-title">📚 BOOKSTORE INVENTORY</div>
+                <h2>📚 Book Store</h2>
                 <ul class="nav-links">
-                    <li><a href="#" id="nav-dashboard" class="active" onclick="switchPage('dashboard', this)">1. Dashboard</a></li>
-                    <li><a href="#" id="nav-books" onclick="switchPage('books', this)">2. Books Inventory</a></li>
-                    <li><a href="#" id="nav-boys" onclick="switchPage('boys', this)">3. Boys Uniforms</a></li>
-                    <li><a href="#" id="nav-girls" onclick="switchPage('girls', this)">4. Girls Uniforms</a></li>
-                    <li><a href="#" id="nav-reports" onclick="switchPage('reports', this)">5. Reports & Stats</a></li>
+                    <li><a href="#" class="active" onclick="switchPage('dashboard', this)">Dashboard</a></li>
+                    <li><a href="#" onclick="switchPage('books', this)">Books</a></li>
+                    <li><a href="#" onclick="switchPage('uniforms', this)">Uniform Inventory</a></li>
                 </ul>
             </div>
-            <!-- 6. LOGOUT FEATURE -->
-            <button class="btn-logout" onclick="logout()">6. Logout</button>
+            <button class="btn-logout" onclick="logout()">Logout</button>
         </aside>
 
-        <!-- CONTENT AREA -->
+        <!-- Dynamic Content Area -->
         <main>
-            <!-- FEATURE 1: DASHBOARD -->
+            <!-- DASHBOARD PAGE -->
             <section id="dashboard" class="page active">
-                <h1>System Overview</h1>
-                <p style="margin-bottom: 1.5rem; color: #64748b;">E-click ang kard aron direktang moadto sa imbentaryo.</p>
-                <div class="dashboard-grid">
-                    <div class="dash-card" onclick="switchPage('books', document.getElementById('nav-books'))">
+                <h1>Dashboard</h1>
+                <div class="dashboard-cards">
+                    <div class="card">
                         <p>Total Books</p>
-                        <h3 id="dash-books-count">0</h3>
+                        <h3 id="dash-total-books">0</h3>
                     </div>
-                    <div class="dash-card" style="border-left-color: #3b82f6;" onclick="switchPage('boys', document.getElementById('nav-boys'))">
-                        <p>Boys Uniform Stock</p>
-                        <h3 id="dash-boys-count">0</h3>
+                    <div class="card">
+                        <p>Boys Uniforms Stock</p>
+                        <h3 id="dash-boys-uniforms">0</h3>
                     </div>
-                    <div class="dash-card" style="border-left-color: #ec4899;" onclick="switchPage('girls', document.getElementById('nav-girls'))">
-                        <p>Girls Uniform Stock</p>
-                        <h3 id="dash-girls-count">0</h3>
+                    <div class="card">
+                        <p>Girls Uniforms Stock</p>
+                        <h3 id="dash-girls-uniforms">0</h3>
                     </div>
                 </div>
             </section>
 
-            <!-- FEATURE 2: BOOKS INVENTORY (CRUD + SEARCH) -->
+            <!-- BOOKS MANAGEMENT PAGE -->
             <section id="books" class="page">
                 <h1>Books Management</h1>
-                <div class="controls">
-                    <input type="text" id="book-search" class="input-field search-input" placeholder="Search title or author..." onkeyup="renderBooks()">
-                    <button class="btn btn-success" onclick="openBookModal()">+ Add New Book</button>
+                <div class="table-controls">
+                    <input type="text" class="search-input" id="book-search" placeholder="Search by title or author..." onkeyup="renderBooks()">
+                    <button class="btn btn-success" onclick="openBookModal()">+ Add Book</button>
                 </div>
                 <table>
                     <thead>
                         <tr>
-                            <th>Book Title</th>
+                            <th>Title</th>
                             <th>Author</th>
-                            <th>Total Quantity</th>
+                            <th>Stock</th>
+                            <th>Price</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="books-table-body"></tbody>
+                    <tbody id="books-table-body">
+                        <!-- Book Items Rendered via JS -->
+                    </tbody>
                 </table>
             </section>
 
-            <!-- FEATURE 3: BOYS UNIFORM INVENTORY (TYPE A, B, PE) -->
-            <section id="boys" class="page">
-                <h1>Boys Uniform Inventory</h1>
-                <div class="controls" style="justify-content: flex-end;">
-                    <button class="btn btn-success" onclick="openUniformModal('Boys')">+ Add Boys Item</button>
+            <!-- UNIFORM INVENTORY PAGE -->
+            <section id="uniforms" class="page">
+                <h1>Uniform Inventory</h1>
+                <div class="tab-container">
+                    <button class="tab-btn active" onclick="switchUniformTab('boys', this)">Boys Uniforms</button>
+                    <button class="tab-btn" onclick="switchUniformTab('girls', this)">Girls Uniforms</button>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Uniform Type</th>
-                            <th>Size</th>
-                            <th>Total Quantity</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="boys-table-body"></tbody>
-                </table>
-            </section>
 
-            <!-- FEATURE 4: GIRLS UNIFORM INVENTORY (TYPE A, B, PE) -->
-            <section id="girls" class="page">
-                <h1>Girls Uniform Inventory</h1>
-                <div class="controls" style="justify-content: flex-end;">
-                    <button class="btn btn-success" onclick="openUniformModal('Girls')">+ Add Girls Item</button>
+                <!-- Boys Uniform Section -->
+                <div id="boys-uniform-section">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Size</th>
+                                <th>Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody id="boys-table-body">
+                            <!-- Boys uniforms rendered via JS -->
+                        </tbody>
+                    </table>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Uniform Type</th>
-                            <th>Size</th>
-                            <th>Total Quantity</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="girls-table-body"></tbody>
-                </table>
-            </section>
 
-            <!-- FEATURE 5: REPORTS & SYSTEM SUMMARY -->
-            <section id="reports" class="page">
-                <h1>Inventory Summary & Reports</h1>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Unique Items</th>
-                            <th>Total Items Stock</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reports-table-body"></tbody>
-                </table>
+                <!-- Girls Uniform Section -->
+                <div id="girls-uniform-section" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Size</th>
+                                <th>Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody id="girls-table-body">
+                            <!-- Girls uniforms rendered via JS -->
+                        </tbody>
+                    </table>
+                </div>
             </section>
         </main>
     </div>
 
-    <!-- BOOK MODAL (ADD / EDIT) -->
+    <!-- BOOK ADD / EDIT MODAL -->
     <div id="book-modal" class="modal">
         <div class="modal-content">
-            <h3 id="book-modal-title">Add Book</h3>
+            <h2 id="modal-title">Add New Book</h2>
             <form id="book-form" onsubmit="saveBook(event)">
                 <input type="hidden" id="book-id">
                 <div class="form-group">
-                    <label>Book Title</label>
-                    <input type="text" id="book-title" class="input-field" required>
+                    <label>Title</label>
+                    <input type="text" id="book-title" required>
                 </div>
                 <div class="form-group">
                     <label>Author</label>
-                    <input type="text" id="book-author" class="input-field" required>
+                    <input type="text" id="book-author" required>
                 </div>
                 <div class="form-group">
-                    <label>Total Quantity</label>
-                    <input type="number" id="book-qty" class="input-field" min="0" required>
+                    <label>Stock</label>
+                    <input type="number" id="book-stock" required min="0">
+                </div>
+                <div class="form-group">
+                    <label>Price ($)</label>
+                    <input type="number" step="0.01" id="book-price" required min="0">
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('book-modal')">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeBookModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Book</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- UNIFORM MODAL (ADD / EDIT) -->
-    <div id="uniform-modal" class="modal">
-        <div class="modal-content">
-            <h3 id="uniform-modal-title">Add Uniform Item</h3>
-            <form id="uniform-form" onsubmit="saveUniform(event)">
-                <input type="hidden" id="uniform-id">
-                <input type="hidden" id="uniform-category">
-                <div class="form-group">
-                    <label>Uniform Type</label>
-                    <select id="uniform-type" class="input-field" required>
-                        <option value="Type A Uniform">Type A Uniform</option>
-                        <option value="Type B Uniform">Type B Uniform</option>
-                        <option value="PE Uniform">PE Uniform</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Size</label>
-                    <select id="uniform-size" class="input-field" required>
-                        <option value="Small">Small</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Large">Large</option>
-                        <option value="XL">XL</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Total Quantity</label>
-                    <input type="number" id="uniform-qty" class="input-field" min="0" required>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('uniform-modal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Item</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- VIEW DETAILS MODAL -->
+    <!-- BOOK VIEW DETAILS MODAL -->
     <div id="view-modal" class="modal">
         <div class="modal-content">
-            <h3>Item Details</h3>
+            <h2>Book Details</h2>
             <br>
-            <div id="view-details-content"></div>
+            <p><strong>Title:</strong> <span id="view-title"></span></p>
+            <p><strong>Author:</strong> <span id="view-author"></span></p>
+            <p><strong>Stock:</strong> <span id="view-stock"></span></p>
+            <p><strong>Price:</strong> $<span id="view-price"></span></p>
             <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('view-modal')">Close</button>
+                <button type="button" class="btn btn-secondary" onclick="closeViewModal()">Close</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- 3 EXAMPLE BOOKS IN INITIAL DATA ---
+        // --- IN-MEMORY DATA STATE ---
         let books = [
-            { id: 1, title: 'To Kill a Mockingbird', author: 'Harper Lee', qty: 12 },
-            { id: 2, title: '1984', author: 'George Orwell', qty: 25 },
-            { id: 3, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', qty: 8 }
+            { id: 1, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', stock: 15, price: 10.99 },
+            { id: 2, title: 'To Kill a Mockingbird', author: 'Harper Lee', stock: 8, price: 12.50 }
         ];
 
-        // --- UNIFORMS DATA (BOYS & GIRLS) ---
-        let uniforms = [
-            { id: 101, category: 'Boys', type: 'Type A Uniform', size: 'Medium', qty: 20 },
-            { id: 102, category: 'Boys', type: 'Type B Uniform', size: 'Large', qty: 15 },
-            { id: 103, category: 'Boys', type: 'PE Uniform', size: 'Medium', qty: 30 },
-            { id: 201, category: 'Girls', type: 'Type A Uniform', size: 'Small', qty: 18 },
-            { id: 202, category: 'Girls', type: 'Type B Uniform', size: 'Medium', qty: 22 },
-            { id: 203, category: 'Girls', type: 'PE Uniform', size: 'Small', qty: 25 }
-        ];
+        let uniforms = {
+            boys: [
+                { name: 'Polo Shirt', size: 'Medium', stock: 30 },
+                { name: 'Pants', size: '30', stock: 20 }
+            ],
+            girls: [
+                { name: 'Blouse', size: 'Small', stock: 25 },
+                { name: 'Skirt', size: 'Medium', stock: 18 }
+            ]
+        };
 
-        // Auth
-        function handleLogin(e) {
+        // --- AUTHENTICATION ---
+        document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'grid';
-            refreshSystem();
-        }
+            updateDashboard();
+            renderBooks();
+            renderUniforms();
+        });
 
         function logout() {
             document.getElementById('app-screen').style.display = 'none';
             document.getElementById('login-screen').style.display = 'flex';
         }
 
-        // Navigation
-        function switchPage(pageId, linkEl) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+        // --- NAVIGATION ---
+        function switchPage(pageId, linkElement) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            
             document.getElementById(pageId).classList.add('active');
-            if(linkEl) linkEl.classList.add('active');
-            refreshSystem();
+            linkElement.classList.add('active');
         }
 
-        function refreshSystem() {
-            updateDashboard();
-            renderBooks();
-            renderUniforms('Boys', 'boys-table-body');
-            renderUniforms('Girls', 'girls-table-body');
-            renderReports();
+        function switchUniformTab(gender, btnElement) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            if (gender === 'boys') {
+                document.getElementById('boys-uniform-section').style.display = 'block';
+                document.getElementById('girls-uniform-section').style.display = 'none';
+            } else {
+                document.getElementById('boys-uniform-section').style.display = 'none';
+                document.getElementById('girls-uniform-section').style.display = 'block';
+            }
         }
 
-        // Dashboard calculation
+        // --- DASHBOARD UPDATES ---
         function updateDashboard() {
-            document.getElementById('dash-books-count').innerText = books.reduce((acc, b) => acc + Number(b.qty), 0);
-            document.getElementById('dash-boys-count').innerText = uniforms.filter(u => u.category === 'Boys').reduce((acc, u) => acc + Number(u.qty), 0);
-            document.getElementById('dash-girls-count').innerText = uniforms.filter(u => u.category === 'Girls').reduce((acc, u) => acc + Number(u.qty), 0);
+            document.getElementById('dash-total-books').innerText = books.reduce((acc, b) => acc + Number(b.stock), 0);
+            document.getElementById('dash-boys-uniforms').innerText = uniforms.boys.reduce((acc, u) => acc + Number(u.stock), 0);
+            document.getElementById('dash-girls-uniforms').innerText = uniforms.girls.reduce((acc, u) => acc + Number(u.stock), 0);
         }
 
-        // --- CRUD BOOKS ---
+        // --- BOOKS CRUD & SEARCH ---
         function renderBooks() {
-            const query = document.getElementById('book-search').value.toLowerCase();
+            const searchQuery = document.getElementById('book-search').value.toLowerCase();
             const tbody = document.getElementById('books-table-body');
             tbody.innerHTML = '';
 
-            const filtered = books.filter(b => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query));
+            const filteredBooks = books.filter(b => 
+                b.title.toLowerCase().includes(searchQuery) || 
+                b.author.toLowerCase().includes(searchQuery)
+            );
 
-            filtered.forEach(b => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${b.title}</strong></td>
-                        <td>${b.author}</td>
-                        <td>${b.qty} units</td>
-                        <td>
-                            <button class="btn btn-secondary" onclick="viewItem('Book', ${b.id})">View</button>
-                            <button class="btn btn-warning" onclick="openBookModal(${b.id})">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteBook(${b.id})">Delete</button>
-                        </td>
-                    </tr>
+            filteredBooks.forEach(book => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.stock}</td>
+                    <td>$${Number(book.price).toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="viewBook(${book.id})">View</button>
+                        <button class="btn btn-primary" onclick="openBookModal(${book.id})">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteBook(${book.id})">Delete</button>
+                    </td>
                 `;
+                tbody.appendChild(tr);
             });
         }
 
         function openBookModal(id = null) {
-            document.getElementById('book-modal').style.display = 'flex';
-            if(id) {
-                const b = books.find(x => x.id === id);
-                document.getElementById('book-modal-title').innerText = 'Edit Book';
-                document.getElementById('book-id').value = b.id;
-                document.getElementById('book-title').value = b.title;
-                document.getElementById('book-author').value = b.author;
-                document.getElementById('book-qty').value = b.qty;
+            const modal = document.getElementById('book-modal');
+            modal.style.display = 'flex';
+
+            if (id) {
+                const book = books.find(b => b.id === id);
+                document.getElementById('modal-title').innerText = 'Edit Book';
+                document.getElementById('book-id').value = book.id;
+                document.getElementById('book-title').value = book.title;
+                document.getElementById('book-author').value = book.author;
+                document.getElementById('book-stock').value = book.stock;
+                document.getElementById('book-price').value = book.price;
             } else {
-                document.getElementById('book-modal-title').innerText = 'Add Book';
+                document.getElementById('modal-title').innerText = 'Add New Book';
                 document.getElementById('book-form').reset();
                 document.getElementById('book-id').value = '';
             }
+        }
+
+        function closeBookModal() {
+            document.getElementById('book-modal').style.display = 'none';
         }
 
         function saveBook(e) {
@@ -529,146 +541,57 @@
             const id = document.getElementById('book-id').value;
             const title = document.getElementById('book-title').value;
             const author = document.getElementById('book-author').value;
-            const qty = parseInt(document.getElementById('book-qty').value);
+            const stock = parseInt(document.getElementById('book-stock').value);
+            const price = parseFloat(document.getElementById('book-price').value);
 
-            if(id) {
-                const idx = books.findIndex(b => b.id == id);
-                books[idx] = { id: Number(id), title, author, qty };
+            if (id) {
+                // Edit
+                const index = books.findIndex(b => b.id == id);
+                books[index] = { id: parseInt(id), title, author, stock, price };
             } else {
-                books.push({ id: Date.now(), title, author, qty });
+                // Add
+                const newBook = { id: Date.now(), title, author, stock, price };
+                books.push(newBook);
             }
 
-            closeModal('book-modal');
-            refreshSystem();
+            closeBookModal();
+            renderBooks();
+            updateDashboard();
         }
 
-        function deleteBook(id) {
-            if(confirm('Sigurado ka nga gusto nimo i-delete kini nga libro?')) {
-                books = books.filter(b => b.id !== id);
-                refreshSystem();
-            }
-        }
-
-        // --- CRUD UNIFORMS (BOYS & GIRLS) ---
-        function renderUniforms(category, targetTbodyId) {
-            const tbody = document.getElementById(targetTbodyId);
-            tbody.innerHTML = '';
-
-            const list = uniforms.filter(u => u.category === category);
-            list.forEach(u => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${u.type}</strong></td>
-                        <td>${u.size}</td>
-                        <td>${u.qty} units</td>
-                        <td>
-                            <button class="btn btn-secondary" onclick="viewItem('Uniform', ${u.id})">View</button>
-                            <button class="btn btn-warning" onclick="openUniformModal('${u.category}', ${u.id})">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteUniform(${u.id})">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function openUniformModal(category, id = null) {
-            document.getElementById('uniform-modal').style.display = 'flex';
-            document.getElementById('uniform-category').value = category;
-
-            if(id) {
-                const u = uniforms.find(x => x.id === id);
-                document.getElementById('uniform-modal-title').innerText = `Edit ${category} Uniform`;
-                document.getElementById('uniform-id').value = u.id;
-                document.getElementById('uniform-type').value = u.type;
-                document.getElementById('uniform-size').value = u.size;
-                document.getElementById('uniform-qty').value = u.qty;
-            } else {
-                document.getElementById('uniform-modal-title').innerText = `Add ${category} Uniform`;
-                document.getElementById('uniform-form').reset();
-                document.getElementById('uniform-id').value = '';
-                document.getElementById('uniform-category').value = category;
-            }
-        }
-
-        function saveUniform(e) {
-            e.preventDefault();
-            const id = document.getElementById('uniform-id').value;
-            const category = document.getElementById('uniform-category').value;
-            const type = document.getElementById('uniform-type').value;
-            const size = document.getElementById('uniform-size').value;
-            const qty = parseInt(document.getElementById('uniform-qty').value);
-
-            if(id) {
-                const idx = uniforms.findIndex(u => u.id == id);
-                uniforms[idx] = { id: Number(id), category, type, size, qty };
-            } else {
-                uniforms.push({ id: Date.now(), category, type, size, qty });
-            }
-
-            closeModal('uniform-modal');
-            refreshSystem();
-        }
-
-        function deleteUniform(id) {
-            if(confirm('Sigurado ka nga gusto nimo i-delete kini nga uniform?')) {
-                uniforms = uniforms.filter(u => u.id !== id);
-                refreshSystem();
-            }
-        }
-
-        // --- VIEW DETAILS MODAL ---
-        function viewItem(kind, id) {
-            const container = document.getElementById('view-details-content');
-            if(kind === 'Book') {
-                const b = books.find(x => x.id === id);
-                container.innerHTML = `
-                    <p><strong>Item Type:</strong> Book</p>
-                    <p><strong>Title:</strong> ${b.title}</p>
-                    <p><strong>Author:</strong> ${b.author}</p>
-                    <p><strong>Total Quantity:</strong> ${b.qty} pcs</p>
-                `;
-            } else {
-                const u = uniforms.find(x => x.id === id);
-                container.innerHTML = `
-                    <p><strong>Category:</strong> ${u.category} Uniform</p>
-                    <p><strong>Uniform Type:</strong> ${u.type}</p>
-                    <p><strong>Size:</strong> ${u.size}</p>
-                    <p><strong>Total Quantity:</strong> ${u.qty} pcs</p>
-                `;
-            }
+        function viewBook(id) {
+            const book = books.find(b => b.id === id);
+            document.getElementById('view-title').innerText = book.title;
+            document.getElementById('view-author').innerText = book.author;
+            document.getElementById('view-stock').innerText = book.stock;
+            document.getElementById('view-price').innerText = Number(book.price).toFixed(2);
             document.getElementById('view-modal').style.display = 'flex';
         }
 
-        // --- REPORTS FEATURE ---
-        function renderReports() {
-            const tbody = document.getElementById('reports-table-body');
-            const totalBookItems = books.length;
-            const totalBookStock = books.reduce((a, b) => a + Number(b.qty), 0);
-
-            const boysItems = uniforms.filter(u => u.category === 'Boys');
-            const girlsItems = uniforms.filter(u => u.category === 'Girls');
-
-            tbody.innerHTML = `
-                <tr>
-                    <td>Books Inventory</td>
-                    <td>${totalBookItems} Titles</td>
-                    <td>${totalBookStock} units</td>
-                </tr>
-                <tr>
-                    <td>Boys Uniforms</td>
-                    <td>${boysItems.length} Sizes/Types</td>
-                    <td>${boysItems.reduce((a, u) => a + Number(u.qty), 0)} units</td>
-                </tr>
-                <tr>
-                    <td>Girls Uniforms</td>
-                    <td>${girlsItems.length} Sizes/Types</td>
-                    <td>${girlsItems.reduce((a, u) => a + Number(u.qty), 0)} units</td>
-                </tr>
-            `;
+        function closeViewModal() {
+            document.getElementById('view-modal').style.display = 'none';
         }
 
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
+        function deleteBook(id) {
+            if (confirm('Sigurado ka nga gusto nimo i-delete kini nga libro?')) {
+                books = books.filter(b => b.id !== id);
+                renderBooks();
+                updateDashboard();
+            }
+        }
+
+        // --- UNIFORMS DISPLAY ---
+        function renderUniforms() {
+            const boysTbody = document.getElementById('boys-table-body');
+            const girlsTbody = document.getElementById('girls-table-body');
+
+            boysTbody.innerHTML = uniforms.boys.map(u => `
+                <tr><td>${u.name}</td><td>${u.size}</td><td>${u.stock}</td></tr>
+            `).join('');
+
+            girlsTbody.innerHTML = uniforms.girls.map(u => `
+                <tr><td>${u.name}</td><td>${u.size}</td><td>${u.stock}</td></tr>
+            `).join('');
         }
     </script>
 </body>
