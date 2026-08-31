@@ -240,7 +240,7 @@
 
     <div id="loading-overlay">Syncing with Google Sheets...</div>
 
-    <!-- 1. LOGIN SCREEN -->
+    <!-- LOGIN SCREEN -->
     <div id="login-screen">
         <div class="login-card">
             <h2>📚 System Login</h2>
@@ -275,7 +275,7 @@
         </aside>
 
         <main>
-            <!-- FEATURE 1: DASHBOARD -->
+            <!-- DASHBOARD -->
             <section id="dashboard" class="page active">
                 <h1>System Overview</h1>
                 <p style="margin-bottom: 1.5rem; color: #64748b;">Live data connected to Google Sheets.</p>
@@ -295,7 +295,7 @@
                 </div>
             </section>
 
-            <!-- FEATURE 2: BOOKS INVENTORY -->
+            <!-- BOOKS INVENTORY -->
             <section id="books" class="page">
                 <h1>Books Management</h1>
                 <div class="controls">
@@ -318,7 +318,7 @@
                 </table>
             </section>
 
-            <!-- FEATURE 3: BOYS UNIFORM INVENTORY -->
+            <!-- BOYS UNIFORM INVENTORY -->
             <section id="boys" class="page">
                 <h1>Boys Uniform Inventory</h1>
                 <div class="controls" style="justify-content: flex-end;">
@@ -340,7 +340,7 @@
                 </table>
             </section>
 
-            <!-- FEATURE 4: GIRLS UNIFORM INVENTORY -->
+            <!-- GIRLS UNIFORM INVENTORY -->
             <section id="girls" class="page">
                 <h1>Girls Uniform Inventory</h1>
                 <div class="controls" style="justify-content: flex-end;">
@@ -362,7 +362,7 @@
                 </table>
             </section>
 
-            <!-- FEATURE 5: REPORTS -->
+            <!-- REPORTS -->
             <section id="reports" class="page">
                 <h1>Inventory Summary & Reports</h1>
                 <table>
@@ -463,8 +463,8 @@
     </div>
 
     <script>
-        // --- GI-ADD DINHI ANG IMONG GOOGLE APPS SCRIPT WEB APP URL ---
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMNh0kElbc14rKF913wWTxWjUXS6IYdV-h7HQRf__pij9FAf3PZOdcCP5O3abCnMFkiA/exec";
+        // Updated AppScript Link
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvj5J40gQI3pch0NZI9kqYSg8d1GQs6PvwdA_yI8IPeNXt67mx0Wi9K1Csnexflr8p-g/exec";
 
         let books = [];
         let uniforms = [];
@@ -473,7 +473,6 @@
             document.getElementById('loading-overlay').style.display = show ? 'block' : 'none';
         }
 
-        // Fetch Data from Google Sheets via Apps Script
         async function fetchAllDataFromSheets() {
             showLoading(true);
             try {
@@ -764,27 +763,28 @@
             }
         }
 
-        function viewItem(kind, id) {
+        function viewItem(type, id) {
             const container = document.getElementById('view-details-content');
-            if(kind === 'Book') {
+            if (type === 'Book') {
                 const b = books.find(x => x.id === id);
                 container.innerHTML = `
-                    <p><strong>Item Type:</strong> Book</p>
+                    <p><strong>ID:</strong> ${b.id}</p>
                     <p><strong>Title:</strong> ${b.title}</p>
                     <p><strong>Author:</strong> ${b.author}</p>
-                    <p><strong>Total Added (In):</strong> ${b.added} pcs</p>
-                    <p><strong>Total Taken (Out):</strong> ${b.taken} pcs</p>
-                    <p><strong>Available Stock:</strong> ${b.added - b.taken} pcs</p>
+                    <p><strong>Total Added:</strong> ${b.added}</p>
+                    <p><strong>Total Taken:</strong> ${b.taken}</p>
+                    <p><strong>Available:</strong> ${b.added - b.taken}</p>
                 `;
             } else {
                 const u = uniforms.find(x => x.id === id);
                 container.innerHTML = `
-                    <p><strong>Category:</strong> ${u.category} Uniform</p>
-                    <p><strong>Uniform Type:</strong> ${u.type}</p>
+                    <p><strong>ID:</strong> ${u.id}</p>
+                    <p><strong>Category:</strong> ${u.category}</p>
+                    <p><strong>Type:</strong> ${u.type}</p>
                     <p><strong>Size:</strong> ${u.size}</p>
-                    <p><strong>Total Added (In):</strong> ${u.added} pcs</p>
-                    <p><strong>Total Taken (Out):</strong> ${u.taken} pcs</p>
-                    <p><strong>Available Stock:</strong> ${u.added - u.taken} pcs</p>
+                    <p><strong>Total Added:</strong> ${u.added}</p>
+                    <p><strong>Total Taken:</strong> ${u.taken}</p>
+                    <p><strong>Available:</strong> ${u.added - u.taken}</p>
                 `;
             }
             document.getElementById('view-modal').style.display = 'flex';
@@ -793,41 +793,41 @@
         function renderReports() {
             const tbody = document.getElementById('reports-table-body');
             
-            const bAdded = books.reduce((a, b) => a + Number(b.added), 0);
-            const bTaken = books.reduce((a, b) => a + Number(b.taken), 0);
+            const bAdded = books.reduce((acc, b) => acc + b.added, 0);
+            const bTaken = books.reduce((acc, b) => acc + b.taken, 0);
 
             const boys = uniforms.filter(u => u.category === 'Boys');
-            const boysAdded = boys.reduce((a, u) => a + Number(u.added), 0);
-            const boysTaken = boys.reduce((a, u) => a + Number(u.taken), 0);
+            const boysAdded = boys.reduce((acc, u) => acc + u.added, 0);
+            const boysTaken = boys.reduce((acc, u) => acc + u.taken, 0);
 
             const girls = uniforms.filter(u => u.category === 'Girls');
-            const girlsAdded = girls.reduce((a, u) => a + Number(u.added), 0);
-            const girlsTaken = girls.reduce((a, u) => a + Number(u.taken), 0);
+            const girlsAdded = girls.reduce((acc, u) => acc + u.added, 0);
+            const girlsTaken = girls.reduce((acc, u) => acc + u.taken, 0);
 
             tbody.innerHTML = `
                 <tr>
-                    <td><strong>Books Inventory</strong></td>
-                    <td>${bAdded} units</td>
-                    <td>${bTaken} units</td>
-                    <td><strong>${bAdded - bTaken} units</strong></td>
+                    <td><strong>Books</strong></td>
+                    <td>${bAdded}</td>
+                    <td>${bTaken}</td>
+                    <td><span class="badge-stock">${bAdded - bTaken} units</span></td>
                 </tr>
                 <tr>
                     <td><strong>Boys Uniforms</strong></td>
-                    <td>${boysAdded} units</td>
-                    <td>${boysTaken} units</td>
-                    <td><strong>${boysAdded - boysTaken} units</strong></td>
+                    <td>${boysAdded}</td>
+                    <td>${boysTaken}</td>
+                    <td><span class="badge-stock">${boysAdded - boysTaken} units</span></td>
                 </tr>
                 <tr>
                     <td><strong>Girls Uniforms</strong></td>
-                    <td>${girlsAdded} units</td>
-                    <td>${girlsTaken} units</td>
-                    <td><strong>${girlsAdded - girlsTaken} units</strong></td>
+                    <td>${girlsAdded}</td>
+                    <td>${girlsTaken}</td>
+                    <td><span class="badge-stock">${girlsAdded - girlsTaken} units</span></td>
                 </tr>
             `;
         }
 
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
     </script>
 </body>
