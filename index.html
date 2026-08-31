@@ -82,7 +82,7 @@
       </div>
       <div class="form-group">
         <label>Quantity</label>
-        <input type="number" id="bookQty" value="0" min="0" oninput="calculateStock('book')" required>
+        <input type="number" id="bookQty" value="0" min="1" oninput="calculateStock('book')" required>
       </div>
       <div class="form-group">
         <label>Total Added (Auto)</label>
@@ -152,7 +152,7 @@
       </div>
       <div class="form-group">
         <label>Quantity</label>
-        <input type="number" id="boysQty" value="0" min="0" oninput="calculateStock('boys')" required>
+        <input type="number" id="boysQty" value="0" min="1" oninput="calculateStock('boys')" required>
       </div>
       <div class="form-group">
         <label>Total Added (Auto)</label>
@@ -222,7 +222,7 @@
       </div>
       <div class="form-group">
         <label>Quantity</label>
-        <input type="number" id="girlsQty" value="0" min="0" oninput="calculateStock('girls')" required>
+        <input type="number" id="girlsQty" value="0" min="1" oninput="calculateStock('girls')" required>
       </div>
       <div class="form-group">
         <label>Total Added (Auto)</label>
@@ -308,7 +308,6 @@
     }
   }
 
-  // AUTOMATIC CALCULATION FUNCTION (Add vs Deduct)
   function calculateStock(prefix) {
     const actionType = document.getElementById(`${prefix}ActionType`).value;
     const qty = parseInt(document.getElementById(`${prefix}Qty`).value) || 0;
@@ -329,7 +328,31 @@
 
     document.getElementById(`${prefix}Added`).value = finalAdded;
     document.getElementById(`${prefix}Taken`).value = finalTaken;
-    document.getElementById(`${prefix}Available`).value = available >= 0 ? available : 0;
+    document.getElementById(`${prefix}Available`).value = available;
+  }
+
+  // VALIDATION FUNCTION BEFORE SAVING
+  function validateInput(prefix) {
+    const qty = parseInt(document.getElementById(`${prefix}Qty`).value) || 0;
+    const actionType = document.getElementById(`${prefix}ActionType`).value;
+
+    const baseAdded = parseInt(document.getElementById(`${prefix}OriginalAdded`).value) || 0;
+    const baseTaken = parseInt(document.getElementById(`${prefix}OriginalTaken`).value) || 0;
+    const currentAvailable = baseAdded - baseTaken;
+
+    // 1. Check if quantity is 0 or less
+    if (qty <= 0) {
+      alert("⚠️ Palihug i-input ang sakto nga Quantity (dapat labaw sa 0).");
+      return false;
+    }
+
+    // 2. Check if deducting more than current available stock
+    if (actionType === "deduct" && qty > currentAvailable) {
+      alert(`⚠️ Dili pwede mag-deduct og ${qty}! Ang natabilin nga Available Stock kay ${currentAvailable} ra.`);
+      return false;
+    }
+
+    return true;
   }
 
   function loadAllData() {
@@ -387,6 +410,10 @@
 
   document.getElementById("bookForm").addEventListener("submit", function(e) {
     e.preventDefault();
+
+    // Check validation first
+    if (!validateInput('book')) return;
+
     const id = document.getElementById("bookId").value;
     const isNew = !id;
     const bookId = isNew ? "BOOK-" + Date.now() : id;
@@ -480,6 +507,10 @@
 
     document.getElementById(`${prefix}Form`).addEventListener("submit", function(e) {
       e.preventDefault();
+
+      // Check validation first
+      if (!validateInput(prefix)) return;
+
       const id = document.getElementById(`${prefix}Id`).value;
       const isNew = !id;
       const uniformId = isNew ? (isBoys ? "BOY-" : "GIRL-") + Date.now() : id;
