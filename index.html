@@ -463,7 +463,6 @@
     </div>
 
     <script>
-        // Updated AppScript Link
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvj5J40gQI3pch0NZI9kqYSg8d1GQs6PvwdA_yI8IPeNXt67mx0Wi9K1Csnexflr8p-g/exec";
 
         let books = [];
@@ -473,16 +472,21 @@
             document.getElementById('loading-overlay').style.display = show ? 'block' : 'none';
         }
 
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
         async function fetchAllDataFromSheets() {
             showLoading(true);
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: 'readAll' })
                 });
                 const res = await response.json();
                 if (res.status === 'success') {
-                    books = res.books.map(b => ({
+                    books = (res.books || []).map(b => ({
                         id: b.ID,
                         title: b.Title,
                         author: b.Author,
@@ -490,7 +494,7 @@
                         taken: Number(b.Taken || 0)
                     }));
 
-                    const boysData = res.boys.map(u => ({
+                    const boysData = (res.boys || []).map(u => ({
                         id: u.ID,
                         category: 'Boys',
                         type: u.Type,
@@ -499,7 +503,7 @@
                         taken: Number(u.Taken || 0)
                     }));
 
-                    const girlsData = res.girls.map(u => ({
+                    const girlsData = (res.girls || []).map(u => ({
                         id: u.ID,
                         category: 'Girls',
                         type: u.Type,
@@ -638,6 +642,7 @@
             try {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: 'saveBook', data: bookData })
                 });
                 await fetchAllDataFromSheets();
@@ -654,6 +659,7 @@
                 try {
                     await fetch(SCRIPT_URL, {
                         method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({ action: 'deleteItem', sheetName: 'Books', id: id })
                     });
                     await fetchAllDataFromSheets();
@@ -735,6 +741,7 @@
             try {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: 'saveUniform', data: uniformData })
                 });
                 await fetchAllDataFromSheets();
@@ -752,6 +759,7 @@
                 try {
                     await fetch(SCRIPT_URL, {
                         method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({ action: 'deleteItem', sheetName: sheetName, id: id })
                     });
                     await fetchAllDataFromSheets();
@@ -792,6 +800,7 @@
 
         function renderReports() {
             const tbody = document.getElementById('reports-table-body');
+            tbody.innerHTML = '';
             
             const bAdded = books.reduce((acc, b) => acc + b.added, 0);
             const bTaken = books.reduce((acc, b) => acc + b.taken, 0);
@@ -804,30 +813,22 @@
             const girlsAdded = girls.reduce((acc, u) => acc + u.added, 0);
             const girlsTaken = girls.reduce((acc, u) => acc + u.taken, 0);
 
-            tbody.innerHTML = `
-                <tr>
-                    <td><strong>Books</strong></td>
-                    <td>${bAdded}</td>
-                    <td>${bTaken}</td>
-                    <td><span class="badge-stock">${bAdded - bTaken} units</span></td>
-                </tr>
-                <tr>
-                    <td><strong>Boys Uniforms</strong></td>
-                    <td>${boysAdded}</td>
-                    <td>${boysTaken}</td>
-                    <td><span class="badge-stock">${boysAdded - boysTaken} units</span></td>
-                </tr>
-                <tr>
-                    <td><strong>Girls Uniforms</strong></td>
-                    <td>${girlsAdded}</td>
-                    <td>${girlsTaken}</td>
-                    <td><span class="badge-stock">${girlsAdded - girlsTaken} units</span></td>
-                </tr>
-            `;
-        }
+            const rows = [
+                { category: 'Books Inventory', added: bAdded, taken: bTaken },
+                { category: 'Boys Uniforms', added: boysAdded, taken: boysTaken },
+                { category: 'Girls Uniforms', added: girlsAdded, taken: girlsTaken }
+            ];
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+            rows.forEach(r => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${r.category}</strong></td>
+                        <td>${r.added}</td>
+                        <td>${r.taken}</td>
+                        <td><span class="badge-stock">${r.added - r.taken} units</span></td>
+                    </tr>
+                `;
+            });
         }
     </script>
 </body>
