@@ -3,120 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inventory Management System</title>
+  <title>Bookstore Inventory System</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: #f4f6f9; padding: 20px; color: #333; }
+    body { background-color: #f4f6f9; color: #333; display: flex; min-height: 100vh; }
 
     /* LOGIN SCREEN STYLES */
     #loginSection {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 80vh;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #f4f6f9; display: flex; justify-content: center; align-items: center; z-index: 999;
     }
     .login-card {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 380px;
-      text-align: center;
+      background: white; padding: 35px; border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 380px; text-align: center;
     }
-    .login-card h2 { margin-bottom: 20px; color: #2c3e50; }
-    .login-input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 14px;
-    }
-    .btn-login {
-      width: 100%;
-      padding: 10px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    .btn-login:hover { background-color: #2980b9; }
+    .login-card h2 { margin-bottom: 20px; color: #1e293b; }
+    .login-input { width: 100%; padding: 11px; margin-bottom: 15px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; }
+    .btn-login { width: 100%; padding: 11px; background-color: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; }
+    .btn-login:hover { background-color: #1d4ed8; }
 
-    /* TOP BAR & LOGOUT */
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .btn-logout {
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .btn-logout:hover { background-color: #c0392b; }
-
-    /* MAIN SYSTEM CONTENT */
-    #mainSystem { display: none; }
-
-    /* DASHBOARD CARDS STYLES */
-    .dashboard { display: flex; justify-content: center; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; }
-    .card { background: white; padding: 20px; border-radius: 10px; width: 220px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border-left: 5px solid #3498db; }
-    .card:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
-    .card.boys-card { border-left-color: #2ecc71; }
-    .card.girls-card { border-left-color: #e74c3c; }
-    .card h3 { font-size: 13px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 10px; }
-    .card .count { font-size: 28px; font-weight: bold; color: #2c3e50; }
-
-    /* TABS */
-    .tabs { display: flex; justify-content: center; margin-bottom: 20px; gap: 10px; }
-    .tab-btn { padding: 10px 20px; font-size: 16px; border: none; background-color: #e0e0e0; cursor: pointer; border-radius: 5px; font-weight: bold; transition: 0.3s; }
-    .tab-btn.active { background-color: #3498db; color: white; }
+    /* LAYOUT & SIDEBAR */
+    #mainSystem { display: none; width: 100%; }
+    .app-container { display: flex; min-height: 100vh; }
     
-    /* CONTENT CONTAINERS */
-    .tab-content { display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .tab-content.active { display: block; }
+    .sidebar { width: 250px; background-color: #1e293b; color: white; display: flex; flex-direction: column; justify-content: space-between; padding: 20px 0; flex-shrink: 0; }
+    .brand { padding: 0 20px 20px 20px; font-size: 18px; font-weight: bold; border-bottom: 1px solid #334155; letter-spacing: 0.5px; }
+    .nav-menu { list-style: none; margin-top: 15px; }
+    .nav-item { padding: 12px 20px; font-size: 15px; color: #94a3b8; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
+    .nav-item:hover, .nav-item.active { background-color: #2563eb; color: white; font-weight: 600; }
+    .btn-logout-sidebar { margin: 20px; padding: 12px; background-color: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-align: center; }
+    .btn-logout-sidebar:hover { background-color: #dc2626; }
+
+    /* MAIN CONTENT AREA */
+    .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+    .page-header { margin-bottom: 25px; }
+    .page-header h1 { font-size: 26px; color: #0f172a; margin-bottom: 5px; }
+    .page-header p { color: #64748b; font-size: 14px; }
+
+    /* DASHBOARD CARDS */
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
+    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #2563eb; }
+    .card.boys-card { border-left-color: #10b981; }
+    .card.girls-card { border-left-color: #ec4899; }
+    .card h3 { font-size: 13px; color: #64748b; text-transform: uppercase; margin-bottom: 8px; }
+    .card .count { font-size: 32px; font-weight: bold; color: #0f172a; }
+
+    /* CONTENT PANELS */
+    .view-panel { display: none; }
+    .view-panel.active { display: block; }
 
     /* CLEAN FORM STYLES */
-    .form-container { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-bottom: 20px; background: #f8f9fa; padding: 18px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .form-container { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-bottom: 20px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
     .form-group { display: flex; flex-direction: column; flex: 1; min-width: 140px; }
-    .form-group label { font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #4a5568; }
-    .form-group input, .form-group select { padding: 9px 12px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 14px; outline: none; transition: border-color 0.2s; }
-    .form-group input:focus, .form-group select:focus { border-color: #3498db; }
+    .form-group label { font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #475569; }
+    .form-group input, .form-group select { padding: 9px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; outline: none; }
+    .form-group input:focus, .form-group select:focus { border-color: #2563eb; }
     
-    .editing-banner { width: 100%; background: #ebf8ff; border-left: 4px solid #3182ce; padding: 8px 12px; font-size: 13px; color: #2b6cb0; border-radius: 4px; display: none; margin-bottom: 5px; }
+    .editing-banner { width: 100%; background: #eff6ff; border-left: 4px solid #2563eb; padding: 8px 12px; font-size: 13px; color: #1e40af; border-radius: 4px; display: none; margin-bottom: 5px; }
 
     /* SEARCH BAR */
     .search-container { margin-bottom: 15px; display: flex; justify-content: flex-end; }
-    .search-input { padding: 8px 12px; border: 1px solid #cbd5e0; border-radius: 5px; width: 280px; font-size: 14px; outline: none; }
-    .search-input:focus { border-color: #3498db; box-shadow: 0 0 5px rgba(52, 152, 219, 0.3); }
+    .search-input { padding: 9px 12px; border: 1px solid #cbd5e0; border-radius: 6px; width: 280px; font-size: 14px; outline: none; }
+    .search-input:focus { border-color: #2563eb; }
 
     /* BUTTONS */
-    .btn { padding: 9px 18px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; color: white; height: 38px; display: inline-flex; align-items: center; justify-content: center; }
-    .btn-save { background-color: #2ecc71; }
-    .btn-save:hover { background-color: #27ae60; }
-    .btn-cancel { background-color: #95a5a6; }
-    .btn-cancel:hover { background-color: #7f8c8d; }
-    .btn-edit { background-color: #f39c12; padding: 4px 10px; font-size: 12px; border-radius: 3px; }
-    .btn-delete { background-color: #e74c3c; padding: 4px 10px; font-size: 12px; border-radius: 3px; }
+    .btn { padding: 9px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; height: 38px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-save { background-color: #10b981; }
+    .btn-save:hover { background-color: #059669; }
+    .btn-cancel { background-color: #94a3b8; }
+    .btn-cancel:hover { background-color: #64748b; }
+    .btn-edit { background-color: #f59e0b; padding: 4px 10px; font-size: 12px; border-radius: 4px; }
+    .btn-delete { background-color: #ef4444; padding: 4px 10px; font-size: 12px; border-radius: 4px; }
 
     /* TABLES */
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #e2e8f0; padding: 11px; text-align: left; font-size: 14px; }
-    th { background-color: #2c3e50; color: white; font-weight: 600; }
+    .table-card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 15px; text-align: left; font-size: 14px; border-bottom: 1px solid #e2e8f0; }
+    th { background-color: #1e293b; color: white; font-weight: 600; }
     tr:nth-child(even) { background-color: #f8fafc; }
     
     .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; color: white; font-size: 12px; }
-    .bg-green { background-color: #2ecc71; }
-    .bg-red { background-color: #e74c3c; }
+    .bg-green { background-color: #10b981; }
+    .bg-red { background-color: #ef4444; }
   </style>
 </head>
 <body>
@@ -133,253 +101,280 @@
     </div>
   </div>
 
-  <!-- MAIN INVENTORY SYSTEM SECTION -->
+  <!-- MAIN APP CONTAINER -->
   <div id="mainSystem">
-    
-    <div class="top-bar">
-      <h1>Inventory Management System</h1>
-      <button class="btn-logout" onclick="logout()">Logout 🚪</button>
-    </div>
-
-    <!-- DASHBOARD OVERVIEW -->
-    <div class="dashboard">
-      <div class="card" onclick="openTab('books')">
-        <h3>📚 Total Books Stock</h3>
-        <div class="count" id="dashTotalBooks">0</div>
-      </div>
-      <div class="card boys-card" onclick="openTab('boys')">
-        <h3>👦 Boys Uniforms Stock</h3>
-        <div class="count" id="dashTotalBoys">0</div>
-      </div>
-      <div class="card girls-card" onclick="openTab('girls')">
-        <h3>👧 Girls Uniforms Stock</h3>
-        <div class="count" id="dashTotalGirls">0</div>
-      </div>
-    </div>
-
-    <!-- NAVIGATION TABS -->
-    <div class="tabs">
-      <button class="tab-btn active" id="btn-books" onclick="openTab('books')">📚 Books</button>
-      <button class="tab-btn" id="btn-boys" onclick="openTab('boys')">👦 Boys Uniforms</button>
-      <button class="tab-btn" id="btn-girls" onclick="openTab('girls')">👧 Girls Uniforms</button>
-    </div>
-
-    <!-- BOOKS SECTION -->
-    <div id="books" class="tab-content active">
-      <h2>Books Inventory</h2>
-
-      <form id="bookForm" class="form-container">
-        <!-- Hidden Auto Fields -->
-        <input type="hidden" id="bookId">
-        <input type="hidden" id="bookOriginalAdded" value="0">
-        <input type="hidden" id="bookOriginalTaken" value="0">
-
-        <div id="bookEditBanner" class="editing-banner">✏️ Currently Editing Item ID: <b id="bookEditIdLbl"></b></div>
-
-        <div class="form-group" style="flex: 2;">
-          <label>Title</label>
-          <input type="text" id="bookTitle" placeholder="e.g. Mathematics 101" required>
+    <div class="app-container">
+      
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <div>
+          <div class="brand">📚 BOOKSTORE INVENTORY</div>
+          <ul class="nav-menu">
+            <li class="nav-item active" onclick="switchView('dashboard', this)">1. Dashboard</li>
+            <li class="nav-item" onclick="switchView('books', this)">2. Books Inventory</li>
+            <li class="nav-item" onclick="switchView('boys', this)">3. Boys Uniforms</li>
+            <li class="nav-item" onclick="switchView('girls', this)">4. Girls Uniforms</li>
+          </ul>
         </div>
-        <div class="form-group" style="flex: 1.5;">
-          <label>Author</label>
-          <input type="text" id="bookAuthor" placeholder="e.g. John Doe" required>
-        </div>
-        <div class="form-group">
-          <label>Price (₱)</label>
-          <input type="number" step="0.01" id="bookPrice" placeholder="0.00" required>
-        </div>
-        <div class="form-group">
-          <label>Action</label>
-          <select id="bookActionType">
-            <option value="add">➕ Add Stock</option>
-            <option value="deduct">➖ Deduct Stock</option>
-          </select>
-        </div>
-        <div class="form-group" style="max-width: 110px;">
-          <label>Quantity</label>
-          <input type="number" id="bookQty" value="1" min="1" required>
-        </div>
-
-        <button type="submit" class="btn btn-save" id="saveBookBtn">Save Book</button>
-        <button type="button" class="btn btn-cancel" id="cancelBookBtn" style="display:none;" onclick="resetBookForm()">Cancel</button>
-      </form>
-
-      <div class="search-container">
-        <input type="text" id="searchBook" class="search-input" placeholder="🔍 Search ID, Title or Author..." onkeyup="renderBooksTable()">
+        <button class="btn-logout-sidebar" onclick="logout()">Logout 🚪</button>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Price</th>
-            <th>Date & Time Added</th>
-            <th>Total Added</th>
-            <th>Taken</th>
-            <th>Available Stock</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="booksTableBody">
-          <tr><td colspan="9">Loading data...</td></tr>
-        </tbody>
-      </table>
-    </div>
+      <!-- MAIN CONTENT -->
+      <div class="main-content">
+        
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboard" class="view-panel active">
+          <div class="page-header">
+            <h1>System Overview</h1>
+            <p>Live data connected to Google Sheets.</p>
+          </div>
 
-    <!-- BOYS UNIFORMS SECTION -->
-    <div id="boys" class="tab-content">
-      <h2>Boys Uniforms</h2>
-
-      <form id="boysForm" class="form-container">
-        <!-- Hidden Auto Fields -->
-        <input type="hidden" id="boysId">
-        <input type="hidden" id="boysOriginalAdded" value="0">
-        <input type="hidden" id="boysOriginalTaken" value="0">
-
-        <div id="boysEditBanner" class="editing-banner">✏️ Currently Editing Item ID: <b id="boysEditIdLbl"></b></div>
-
-        <div class="form-group">
-          <label>Type</label>
-          <select id="boysType" required>
-            <option value="">-- Select Type --</option>
-            <option value="Type A">Type A</option>
-            <option value="Type B">Type B</option>
-            <option value="PE Uniform">PE Uniform</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Size</label>
-          <select id="boysSize" required>
-            <option value="">-- Select Size --</option>
-            <option value="S">Small (S)</option>
-            <option value="M">Medium (M)</option>
-            <option value="L">Large (L)</option>
-            <option value="XL">Extra Large (XL)</option>
-            <option value="XXL">Double Extra Large (XXL)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Price (₱)</label>
-          <input type="number" step="0.01" id="boysPrice" placeholder="0.00" required>
-        </div>
-        <div class="form-group">
-          <label>Action</label>
-          <select id="boysActionType">
-            <option value="add">➕ Add Stock</option>
-            <option value="deduct">➖ Deduct Stock</option>
-          </select>
-        </div>
-        <div class="form-group" style="max-width: 110px;">
-          <label>Quantity</label>
-          <input type="number" id="boysQty" value="1" min="1" required>
+          <div class="dashboard-grid">
+            <div class="card">
+              <h3>Total Books Available</h3>
+              <div class="count" id="dashTotalBooks">0</div>
+            </div>
+            <div class="card boys-card">
+              <h3>Boys Uniform Stock</h3>
+              <div class="count" id="dashTotalBoys">0</div>
+            </div>
+            <div class="card girls-card">
+              <h3>Girls Uniform Stock</h3>
+              <div class="count" id="dashTotalGirls">0</div>
+            </div>
+          </div>
         </div>
 
-        <button type="submit" class="btn btn-save">Save Uniform</button>
-        <button type="button" class="btn btn-cancel" id="cancelBoysBtn" style="display:none;" onclick="resetUniformForm('Boys')">Cancel</button>
-      </form>
+        <!-- BOOKS VIEW -->
+        <div id="books" class="view-panel">
+          <div class="page-header">
+            <h1>Books Inventory</h1>
+            <p>Manage book stock levels and details.</p>
+          </div>
 
-      <div class="search-container">
-        <input type="text" id="searchBoys" class="search-input" placeholder="🔍 Search ID, Type or Size..." onkeyup="renderUniformTable('Boys')">
+          <form id="bookForm" class="form-container">
+            <input type="hidden" id="bookId">
+            <input type="hidden" id="bookOriginalAdded" value="0">
+            <input type="hidden" id="bookOriginalTaken" value="0">
+
+            <div id="bookEditBanner" class="editing-banner">✏️ Currently Editing Item ID: <b id="bookEditIdLbl"></b></div>
+
+            <div class="form-group" style="flex: 2;">
+              <label>Title</label>
+              <input type="text" id="bookTitle" placeholder="e.g. Mathematics 101" required>
+            </div>
+            <div class="form-group" style="flex: 1.5;">
+              <label>Author</label>
+              <input type="text" id="bookAuthor" placeholder="e.g. John Doe" required>
+            </div>
+            <div class="form-group">
+              <label>Price (₱)</label>
+              <input type="number" step="0.01" id="bookPrice" placeholder="0.00" required>
+            </div>
+            <div class="form-group">
+              <label>Action</label>
+              <select id="bookActionType">
+                <option value="add">➕ Add Stock</option>
+                <option value="deduct">➖ Deduct Stock</option>
+              </select>
+            </div>
+            <div class="form-group" style="max-width: 110px;">
+              <label>Quantity</label>
+              <input type="number" id="bookQty" value="1" min="1" required>
+            </div>
+
+            <button type="submit" class="btn btn-save" id="saveBookBtn">Save Book</button>
+            <button type="button" class="btn btn-cancel" id="cancelBookBtn" style="display:none;" onclick="resetBookForm()">Cancel</button>
+          </form>
+
+          <div class="search-container">
+            <input type="text" id="searchBook" class="search-input" placeholder="🔍 Search ID, Title or Author..." onkeyup="renderBooksTable()">
+          </div>
+
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Author</th>
+                  <th>Price</th>
+                  <th>Date & Time Added</th>
+                  <th>Total Added</th>
+                  <th>Taken</th>
+                  <th>Available Stock</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="booksTableBody">
+                <tr><td colspan="9">Loading data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- BOYS UNIFORMS VIEW -->
+        <div id="boys" class="view-panel">
+          <div class="page-header">
+            <h1>Boys Uniforms</h1>
+            <p>Manage stock levels for male uniforms.</p>
+          </div>
+
+          <form id="boysForm" class="form-container">
+            <input type="hidden" id="boysId">
+            <input type="hidden" id="boysOriginalAdded" value="0">
+            <input type="hidden" id="boysOriginalTaken" value="0">
+
+            <div id="boysEditBanner" class="editing-banner">✏️ Currently Editing Item ID: <b id="boysEditIdLbl"></b></div>
+
+            <div class="form-group">
+              <label>Type</label>
+              <select id="boysType" required>
+                <option value="">-- Select Type --</option>
+                <option value="Type A">Type A</option>
+                <option value="Type B">Type B</option>
+                <option value="PE Uniform">PE Uniform</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Size</label>
+              <select id="boysSize" required>
+                <option value="">-- Select Size --</option>
+                <option value="S">Small (S)</option>
+                <option value="M">Medium (M)</option>
+                <option value="L">Large (L)</option>
+                <option value="XL">Extra Large (XL)</option>
+                <option value="XXL">Double Extra Large (XXL)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Price (₱)</label>
+              <input type="number" step="0.01" id="boysPrice" placeholder="0.00" required>
+            </div>
+            <div class="form-group">
+              <label>Action</label>
+              <select id="boysActionType">
+                <option value="add">➕ Add Stock</option>
+                <option value="deduct">➖ Deduct Stock</option>
+              </select>
+            </div>
+            <div class="form-group" style="max-width: 110px;">
+              <label>Quantity</label>
+              <input type="number" id="boysQty" value="1" min="1" required>
+            </div>
+
+            <button type="submit" class="btn btn-save">Save Uniform</button>
+            <button type="button" class="btn btn-cancel" id="cancelBoysBtn" style="display:none;" onclick="resetUniformForm('Boys')">Cancel</button>
+          </form>
+
+          <div class="search-container">
+            <input type="text" id="searchBoys" class="search-input" placeholder="🔍 Search ID, Type or Size..." onkeyup="renderUniformTable('Boys')">
+          </div>
+
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Type</th>
+                  <th>Size</th>
+                  <th>Price</th>
+                  <th>Date & Time Added</th>
+                  <th>Total Added</th>
+                  <th>Taken</th>
+                  <th>Available Stock</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="boysTableBody">
+                <tr><td colspan="9">Loading data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- GIRLS UNIFORMS VIEW -->
+        <div id="girls" class="view-panel">
+          <div class="page-header">
+            <h1>Girls Uniforms</h1>
+            <p>Manage stock levels for female uniforms.</p>
+          </div>
+
+          <form id="girlsForm" class="form-container">
+            <input type="hidden" id="girlsId">
+            <input type="hidden" id="girlsOriginalAdded" value="0">
+            <input type="hidden" id="girlsOriginalTaken" value="0">
+
+            <div id="girlsEditBanner" class="editing-banner">✏️ Currently Editing Item ID: <b id="girlsEditIdLbl"></b></div>
+
+            <div class="form-group">
+              <label>Type</label>
+              <select id="girlsType" required>
+                <option value="">-- Select Type --</option>
+                <option value="Type A">Type A</option>
+                <option value="Type B">Type B</option>
+                <option value="PE Uniform">PE Uniform</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Size</label>
+              <select id="girlsSize" required>
+                <option value="">-- Select Size --</option>
+                <option value="S">Small (S)</option>
+                <option value="M">Medium (M)</option>
+                <option value="L">Large (L)</option>
+                <option value="XL">Extra Large (XL)</option>
+                <option value="XXL">Double Extra Large (XXL)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Price (₱)</label>
+              <input type="number" step="0.01" id="girlsPrice" placeholder="0.00" required>
+            </div>
+            <div class="form-group">
+              <label>Action</label>
+              <select id="girlsActionType">
+                <option value="add">➕ Add Stock</option>
+                <option value="deduct">➖ Deduct Stock</option>
+              </select>
+            </div>
+            <div class="form-group" style="max-width: 110px;">
+              <label>Quantity</label>
+              <input type="number" id="girlsQty" value="1" min="1" required>
+            </div>
+
+            <button type="submit" class="btn btn-save">Save Uniform</button>
+            <button type="button" class="btn btn-cancel" id="cancelGirlsBtn" style="display:none;" onclick="resetUniformForm('Girls')">Cancel</button>
+          </form>
+
+          <div class="search-container">
+            <input type="text" id="searchGirls" class="search-input" placeholder="🔍 Search ID, Type or Size..." onkeyup="renderUniformTable('Girls')">
+          </div>
+
+          <div class="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Type</th>
+                  <th>Size</th>
+                  <th>Price</th>
+                  <th>Date & Time Added</th>
+                  <th>Total Added</th>
+                  <th>Taken</th>
+                  <th>Available Stock</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="girlsTableBody">
+                <tr><td colspan="9">Loading data...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Type</th>
-            <th>Size</th>
-            <th>Price</th>
-            <th>Date & Time Added</th>
-            <th>Total Added</th>
-            <th>Taken</th>
-            <th>Available Stock</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="boysTableBody">
-          <tr><td colspan="9">Loading data...</td></tr>
-        </tbody>
-      </table>
     </div>
-
-    <!-- GIRLS UNIFORMS SECTION -->
-    <div id="girls" class="tab-content">
-      <h2>Girls Uniforms</h2>
-
-      <form id="girlsForm" class="form-container">
-        <!-- Hidden Auto Fields -->
-        <input type="hidden" id="girlsId">
-        <input type="hidden" id="girlsOriginalAdded" value="0">
-        <input type="hidden" id="girlsOriginalTaken" value="0">
-
-        <div id="girlsEditBanner" class="editing-banner">✏️ Currently Editing Item ID: <b id="girlsEditIdLbl"></b></div>
-
-        <div class="form-group">
-          <label>Type</label>
-          <select id="girlsType" required>
-            <option value="">-- Select Type --</option>
-            <option value="Type A">Type A</option>
-            <option value="Type B">Type B</option>
-            <option value="PE Uniform">PE Uniform</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Size</label>
-          <select id="girlsSize" required>
-            <option value="">-- Select Size --</option>
-            <option value="S">Small (S)</option>
-            <option value="M">Medium (M)</option>
-            <option value="L">Large (L)</option>
-            <option value="XL">Extra Large (XL)</option>
-            <option value="XXL">Double Extra Large (XXL)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Price (₱)</label>
-          <input type="number" step="0.01" id="girlsPrice" placeholder="0.00" required>
-        </div>
-        <div class="form-group">
-          <label>Action</label>
-          <select id="girlsActionType">
-            <option value="add">➕ Add Stock</option>
-            <option value="deduct">➖ Deduct Stock</option>
-          </select>
-        </div>
-        <div class="form-group" style="max-width: 110px;">
-          <label>Quantity</label>
-          <input type="number" id="girlsQty" value="1" min="1" required>
-        </div>
-
-        <button type="submit" class="btn btn-save">Save Uniform</button>
-        <button type="button" class="btn btn-cancel" id="cancelGirlsBtn" style="display:none;" onclick="resetUniformForm('Girls')">Cancel</button>
-      </form>
-
-      <div class="search-container">
-        <input type="text" id="searchGirls" class="search-input" placeholder="🔍 Search ID, Type or Size..." onkeyup="renderUniformTable('Girls')">
-      </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Type</th>
-            <th>Size</th>
-            <th>Price</th>
-            <th>Date & Time Added</th>
-            <th>Total Added</th>
-            <th>Taken</th>
-            <th>Available Stock</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="girlsTableBody">
-          <tr><td colspan="9">Loading data...</td></tr>
-        </tbody>
-      </table>
-    </div>
-
   </div>
 
 <script>
@@ -409,13 +404,13 @@
     }
   }
 
-  // TAB NAVIGATION
-  function openTab(tabName) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    
-    document.getElementById(tabName).classList.add('active');
-    document.getElementById(`btn-${tabName}`).classList.add('active');
+  // NAVIGATION VIEW SWITCHER
+  function switchView(viewId, element) {
+    document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+
+    document.getElementById(viewId).classList.add('active');
+    element.classList.add('active');
   }
 
   // TIMESTAMP GENERATOR
@@ -437,7 +432,7 @@
     return `${year}-${month}-${day} ${strHours}:${minutes}:${seconds} ${ampm}`;
   }
 
-  // CALCULATION LOGIC
+  // STOCK COMPUTATION
   function computeStock(prefix) {
     const actionType = document.getElementById(`${prefix}ActionType`).value;
     const qty = parseInt(document.getElementById(`${prefix}Qty`).value) || 0;
@@ -478,7 +473,7 @@
     return true;
   }
 
-  // FETCH ALL DATA FROM GOOGLE SHEETS
+  // LOAD DATA FROM GOOGLE SHEETS
   function loadAllData() {
     fetch(SCRIPT_URL, {
       method: "POST",
@@ -553,7 +548,7 @@
     });
   }
 
-  // BOOK FORM SUBMISSION
+  // BOOK FORM SUBMIT
   document.getElementById("bookForm").addEventListener("submit", function(e) {
     e.preventDefault();
     if (!validateInput('book')) return;
