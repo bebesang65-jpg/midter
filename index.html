@@ -1,864 +1,487 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ceb">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Store & Uniform Inventory System</title>
-    <style>
-        :root {
-            --primary: #1e293b;
-            --secondary: #334155;
-            --accent: #2563eb;
-            --danger: #ef4444;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --bg-light: #f8fafc;
-            --card-bg: #ffffff;
-            --text-dark: #0f172a;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            height: 100vh;
-        }
-
-        #login-screen {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-        }
-
-        .login-card {
-            background: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
-        }
-
-        .login-card h2 { margin-bottom: 1.5rem; color: var(--primary); }
-
-        #app-screen {
-            display: none;
-            height: 100vh;
-            grid-template-columns: 260px 1fr;
-        }
-
-        aside {
-            background-color: var(--primary);
-            color: white;
-            padding: 1.5rem 1rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .brand-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 2rem;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 1rem;
-        }
-
-        .nav-links { list-style: none; }
-        .nav-links li { margin-bottom: 0.5rem; }
-        .nav-links a {
-            color: #94a3b8;
-            text-decoration: none;
-            display: block;
-            padding: 0.8rem 1rem;
-            border-radius: 6px;
-            transition: 0.2s;
-            font-size: 0.95rem;
-        }
-
-        .nav-links a:hover, .nav-links a.active {
-            background-color: var(--accent);
-            color: white;
-        }
-
-        .btn-logout {
-            background-color: var(--danger);
-            color: white;
-            border: none;
-            padding: 0.8rem;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            font-weight: bold;
-        }
-
-        main {
-            padding: 2rem;
-            overflow-y: auto;
-        }
-
-        .page { display: none; }
-        .page.active { display: block; }
-
-        h1 { margin-bottom: 1.5rem; color: var(--primary); }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .dash-card {
-            background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            border-left: 5px solid var(--accent);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .dash-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-        }
-
-        .dash-card p { font-size: 0.9rem; color: #64748b; font-weight: 600; }
-        .dash-card h3 { font-size: 2.2rem; color: var(--primary); margin-top: 0.5rem; }
-
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1.2rem;
-            gap: 1rem;
-        }
-
-        .input-field {
-            padding: 0.6rem 0.8rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            width: 100%;
-        }
-
-        .search-input { width: 300px; }
-
-        .btn {
-            padding: 0.4rem 0.8rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-            font-size: 0.85rem;
-        }
-
-        .btn-primary { background-color: var(--accent); color: white; }
-        .btn-success { background-color: var(--success); color: white; }
-        .btn-danger { background-color: var(--danger); color: white; }
-        .btn-warning { background-color: var(--warning); color: white; }
-        .btn-secondary { background-color: #64748b; color: white; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--card-bg);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        th, td {
-            padding: 0.8rem 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 0.9rem;
-        }
-
-        th { background-color: var(--secondary); color: white; }
-
-        .badge-stock {
-            background-color: #dbeafe;
-            color: #1e40af;
-            font-weight: bold;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 480px;
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .form-group { margin-bottom: 1rem; text-align: left; }
-        .form-group label { display: block; margin-bottom: 0.3rem; font-weight: 600; font-size: 0.85rem;}
-        
-        #loading-overlay {
-            display: none;
-            position: fixed;
-            top: 10px; right: 10px;
-            background: var(--accent);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            z-index: 999;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Management System</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8f9fa; padding-bottom: 50px; }
+    .card { border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .table-container { background: #ffffff; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .badge-available { font-size: 0.9em; }
+  </style>
 </head>
 <body>
 
-    <div id="loading-overlay">Syncing with Google Sheets...</div>
+<div class="container mt-4">
+  <h2 class="text-center mb-4 text-primary">Inventory Management System</h2>
 
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen">
-        <div class="login-card">
-            <h2>📚 System Login</h2>
-            <form onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" class="input-field" value="admin" required>
+  <!-- NAVIGATION TABS -->
+  <ul class="nav nav-pills nav-justified mb-4" id="inventoryTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active fw-bold" id="books-tab" data-bs-toggle="tab" data-bs-target="#books" type="button" role="tab">📚 Books</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-bold" id="boys-tab" data-bs-toggle="tab" data-bs-target="#boys" type="button" role="tab">👦 Boys Uniforms</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-bold" id="girls-tab" data-bs-toggle="tab" data-bs-target="#girls" type="button" role="tab">👧 Girls Uniforms</button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="inventoryTabContent">
+    
+    <!-- 1. BOOKS TAB -->
+    <div class="tab-pane fade show active" id="books" role="tabpanel">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card p-3">
+            <h5 class="card-title text-primary" id="bookFormTitle">Add / Edit Book</h5>
+            <form id="bookForm">
+              <input type="hidden" id="bookId">
+              <div class="mb-2">
+                <label class="form-label mb-0">Title</label>
+                <input type="text" class="form-control" id="bookTitle" required>
+              </div>
+              <div class="mb-2">
+                <label class="form-label mb-0">Author</label>
+                <input type="text" class="form-control" id="bookAuthor" required>
+              </div>
+              <div class="row">
+                <div class="col-6 mb-2">
+                  <label class="form-label mb-0">Price (₱)</label>
+                  <input type="number" step="0.01" class="form-control" id="bookPrice" required>
                 </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" class="input-field" value="admin" required>
+                <div class="col-6 mb-2">
+                  <label class="form-label mb-0">Date Added</label>
+                  <input type="date" class="form-control" id="bookDateAdded" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.7rem;">Login</button>
+              </div>
+              <div class="row">
+                <div class="col-6 mb-2">
+                  <label class="form-label mb-0">Added Stock</label>
+                  <input type="number" class="form-control" id="bookAdded" value="0" required>
+                </div>
+                <div class="col-6 mb-2">
+                  <label class="form-label mb-0">Taken Stock</label>
+                  <input type="number" class="form-control" id="bookTaken" value="0" required>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary w-100 mt-2" id="saveBookBtn">Save Book</button>
+              <button type="button" class="btn btn-secondary w-100 mt-2 d-none" id="cancelBookBtn" onclick="resetBookForm()">Cancel</button>
             </form>
+          </div>
         </div>
-    </div>
-
-    <!-- MAIN APP SCREEN -->
-    <div id="app-screen">
-        <aside>
-            <div>
-                <div class="brand-title">📚 BOOKSTORE INVENTORY</div>
-                <ul class="nav-links">
-                    <li><a href="#" id="nav-dashboard" class="active" onclick="switchPage('dashboard', this)">1. Dashboard</a></li>
-                    <li><a href="#" id="nav-books" onclick="switchPage('books', this)">2. Books Inventory</a></li>
-                    <li><a href="#" id="nav-boys" onclick="switchPage('boys', this)">3. Boys Uniforms</a></li>
-                    <li><a href="#" id="nav-girls" onclick="switchPage('girls', this)">4. Girls Uniforms</a></li>
-                    <li><a href="#" id="nav-reports" onclick="switchPage('reports', this)">5. Reports & Stats</a></li>
-                </ul>
+        <div class="col-lg-8">
+          <div class="table-container">
+            <h5 class="card-title">Book Inventory</h5>
+            <div class="table-responsive">
+              <table class="table table-hover mt-3">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Price</th>
+                    <th>Date</th>
+                    <th>Added</th>
+                    <th>Taken</th>
+                    <th>Available</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="booksTableBody">
+                  <tr><td colspan="8" class="text-center">Loading data...</td></tr>
+                </tbody>
+              </table>
             </div>
-            <button class="btn-logout" onclick="logout()">6. Logout</button>
-        </aside>
-
-        <main>
-            <!-- DASHBOARD -->
-            <section id="dashboard" class="page active">
-                <h1>System Overview</h1>
-                <p style="margin-bottom: 1.5rem; color: #64748b;">Live data connected to Google Sheets.</p>
-                <div class="dashboard-grid">
-                    <div class="dash-card" onclick="switchPage('books', document.getElementById('nav-books'))">
-                        <p>Total Books Available</p>
-                        <h3 id="dash-books-count">0</h3>
-                    </div>
-                    <div class="dash-card" style="border-left-color: #3b82f6;" onclick="switchPage('boys', document.getElementById('nav-boys'))">
-                        <p>Boys Uniform Stock</p>
-                        <h3 id="dash-boys-count">0</h3>
-                    </div>
-                    <div class="dash-card" style="border-left-color: #ec4899;" onclick="switchPage('girls', document.getElementById('nav-girls'))">
-                        <p>Girls Uniform Stock</p>
-                        <h3 id="dash-girls-count">0</h3>
-                    </div>
-                </div>
-            </section>
-
-            <!-- BOOKS INVENTORY -->
-            <section id="books" class="page">
-                <h1>Books Management</h1>
-                <div class="controls">
-                    <input type="text" id="book-search" class="input-field search-input" placeholder="Search title or author..." onkeyup="renderBooks()">
-                    <button class="btn btn-success" style="padding: 0.6rem 1.2rem;" onclick="openBookModal()">+ Add New Book</button>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Book Title</th>
-                            <th>Author</th>
-                            <th>Total Added (In)</th>
-                            <th>Total Taken (Out)</th>
-                            <th>Available Stock</th>
-                            <th>Quick Stock</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="books-table-body"></tbody>
-                </table>
-            </section>
-
-            <!-- BOYS UNIFORM INVENTORY -->
-            <section id="boys" class="page">
-                <h1>Boys Uniform Inventory</h1>
-                <div class="controls" style="justify-content: flex-end;">
-                    <button class="btn btn-success" style="padding: 0.6rem 1.2rem;" onclick="openUniformModal('Boys')">+ Add Boys Item</button>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Uniform Type</th>
-                            <th>Size</th>
-                            <th>Total Added (In)</th>
-                            <th>Total Taken (Out)</th>
-                            <th>Available Stock</th>
-                            <th>Quick Stock</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="boys-table-body"></tbody>
-                </table>
-            </section>
-
-            <!-- GIRLS UNIFORM INVENTORY -->
-            <section id="girls" class="page">
-                <h1>Girls Uniform Inventory</h1>
-                <div class="controls" style="justify-content: flex-end;">
-                    <button class="btn btn-success" style="padding: 0.6rem 1.2rem;" onclick="openUniformModal('Girls')">+ Add Girls Item</button>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Uniform Type</th>
-                            <th>Size</th>
-                            <th>Total Added (In)</th>
-                            <th>Total Taken (Out)</th>
-                            <th>Available Stock</th>
-                            <th>Quick Stock</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="girls-table-body"></tbody>
-                </table>
-            </section>
-
-            <!-- REPORTS -->
-            <section id="reports" class="page">
-                <h1>Inventory Summary & Reports</h1>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Total Added (In)</th>
-                            <th>Total Taken (Out)</th>
-                            <th>Net Available Stock</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reports-table-body"></tbody>
-                </table>
-            </section>
-        </main>
-    </div>
-
-    <!-- BOOK MODAL -->
-    <div id="book-modal" class="modal">
-        <div class="modal-content">
-            <h3 id="book-modal-title">Add Book</h3>
-            <form id="book-form" onsubmit="saveBook(event)">
-                <input type="hidden" id="book-id">
-                <div class="form-group">
-                    <label>Book Title</label>
-                    <input type="text" id="book-title" class="input-field" required>
-                </div>
-                <div class="form-group">
-                    <label>Author</label>
-                    <input type="text" id="book-author" class="input-field" required>
-                </div>
-                <!-- Automatic computation inputs -->
-                <div class="form-group">
-                    <label>Add Stock Quantity (+)</label>
-                    <input type="number" id="book-add-qty" class="input-field" value="0" min="0">
-                </div>
-                <div class="form-group">
-                    <label>Deduct Stock Quantity (-)</label>
-                    <input type="number" id="book-deduct-qty" class="input-field" value="0" min="0">
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('book-modal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Book</button>
-                </div>
-            </form>
+          </div>
         </div>
+      </div>
     </div>
 
-    <!-- UNIFORM MODAL -->
-    <div id="uniform-modal" class="modal">
-        <div class="modal-content">
-            <h3 id="uniform-modal-title">Add Uniform Item</h3>
-            <form id="uniform-form" onsubmit="saveUniform(event)">
-                <input type="hidden" id="uniform-id">
-                <input type="hidden" id="uniform-category">
-                <div class="form-group">
-                    <label>Uniform Type</label>
-                    <select id="uniform-type" class="input-field" required>
-                        <option value="Type A Uniform">Type A Uniform</option>
-                        <option value="Type B Uniform">Type B Uniform</option>
-                        <option value="PE Uniform">PE Uniform</option>
-                    </select>
+    <!-- 2. BOYS UNIFORMS TAB -->
+    <div class="tab-pane fade" id="boys" role="tabpanel">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card p-3">
+            <h5 class="card-title text-success" id="boysFormTitle">Add / Edit Boys Uniform</h5>
+            <form id="boysForm">
+              <input type="hidden" id="boysId">
+              <div class="mb-2">
+                <label class="form-label mb-0">Type (e.g. Polo, Pants)</label>
+                <input type="text" class="form-control" id="boysType" required>
+              </div>
+              <div class="mb-2">
+                <label class="form-label mb-0">Size (e.g. S, M, L, XL)</label>
+                <input type="text" class="form-control" id="boysSize" required>
+              </div>
+              <div class="row">
+                <div class="col-6 mb-2">
+                  <label class="form-label mb-0">Price (₱)</label>
+                  <input type="number" step="0.01" class="form-control" id="boysPrice" required>
                 </div>
-                <div class="form-group">
-                    <label>Size</label>
-                    <select id="uniform-size" class="input-field" required>
-                        <option value="Small">Small</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Large">Large</option>
-                        <option value="XL">XL</option>
-                    </select>
+                <div class="col-6 mb-2">
+                  <label class="form-label mb-0">Date Added</label>
+                  <input type="date" class="form-control" id="boysDateAdded" required>
                 </div>
-                <!-- Automatic computation inputs -->
-                <div class="form-group">
-                    <label>Add Stock Quantity (+)</label>
-                    <input type="number" id="uniform-add-qty" class="input-field" value="0" min="0">
+              </div>
+              <div class="row">
+                <div class="col-6 mb-2">
+                  <label class="form-label mb-0">Added Stock</label>
+                  <input type="number" class="form-control" id="boysAdded" value="0" required>
                 </div>
-                <div class="form-group">
-                    <label>Deduct Stock Quantity (-)</label>
-                    <input type="number" id="uniform-deduct-qty" class="input-field" value="0" min="0">
+                <div class="col-6 mb-2">
+                  <label class="form-label mb-0">Taken Stock</label>
+                  <input type="number" class="form-control" id="boysTaken" value="0" required>
                 </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('uniform-modal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Item</button>
-                </div>
+              </div>
+              <button type="submit" class="btn btn-success w-100 mt-2">Save Uniform</button>
+              <button type="button" class="btn btn-secondary w-100 mt-2 d-none" id="cancelBoysBtn" onclick="resetUniformForm('Boys')">Cancel</button>
             </form>
+          </div>
         </div>
-    </div>
-
-    <!-- VIEW DETAILS MODAL -->
-    <div id="view-modal" class="modal">
-        <div class="modal-content">
-            <h3>Item Details</h3>
-            <br>
-            <div id="view-details-content"></div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('view-modal')">Close</button>
+        <div class="col-lg-8">
+          <div class="table-container">
+            <h5 class="card-title">Boys Uniform Inventory</h5>
+            <div class="table-responsive">
+              <table class="table table-hover mt-3">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Price</th>
+                    <th>Date</th>
+                    <th>Added</th>
+                    <th>Taken</th>
+                    <th>Available</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="boysTableBody">
+                  <tr><td colspan="8" class="text-center">Loading data...</td></tr>
+                </tbody>
+              </table>
             </div>
+          </div>
         </div>
+      </div>
     </div>
 
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvj5J40gQI3pch0NZI9kqYSg8d1GQs6PvwdA_yI8IPeNXt67mx0Wi9K1Csnexflr8p-g/exec";
+    <!-- 3. GIRLS UNIFORMS TAB -->
+    <div class="tab-pane fade" id="girls" role="tabpanel">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card p-3">
+            <h5 class="card-title text-danger" id="girlsFormTitle">Add / Edit Girls Uniform</h5>
+            <form id="girlsForm">
+              <input type="hidden" id="girlsId">
+              <div class="mb-2">
+                <label class="form-label mb-0">Type (e.g. Blouse, Skirt)</label>
+                <input type="text" class="form-control" id="girlsType" required>
+              </div>
+              <div class="mb-2">
+                <label class="form-label mb-0">Size (e.g. S, M, L, XL)</label>
+                <input type="text" class="form-control" id="girlsSize" required>
+              </div>
+              <div class="row">
+                <div class="col-6 mb-2">
+                  <label class="form-label mb-0">Price (₱)</label>
+                  <input type="number" step="0.01" class="form-control" id="girlsPrice" required>
+                </div>
+                <div class="col-6 mb-2">
+                  <label class="form-label mb-0">Date Added</label>
+                  <input type="date" class="form-control" id="girlsDateAdded" required>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-6 mb-2">
+                  <label class="form-label mb-0">Added Stock</label>
+                  <input type="number" class="form-control" id="girlsAdded" value="0" required>
+                </div>
+                <div class="col-6 mb-2">
+                  <label class="form-label mb-0">Taken Stock</label>
+                  <input type="number" class="form-control" id="girlsTaken" value="0" required>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-danger w-100 mt-2">Save Uniform</button>
+              <button type="button" class="btn btn-secondary w-100 mt-2 d-none" id="cancelGirlsBtn" onclick="resetUniformForm('Girls')">Cancel</button>
+            </form>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="table-container">
+            <h5 class="card-title">Girls Uniform Inventory</h5>
+            <div class="table-responsive">
+              <table class="table table-hover mt-3">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Price</th>
+                    <th>Date</th>
+                    <th>Added</th>
+                    <th>Taken</th>
+                    <th>Available</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="girlsTableBody">
+                  <tr><td colspan="8" class="text-center">Loading data...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        let books = [];
-        let uniforms = [];
+  </div>
+</div>
 
-        function showLoading(show) {
-            document.getElementById('loading-overlay').style.display = show ? 'block' : 'none';
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // Bag-ong gi-update nga Google Apps Script Web App URL
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0o8YHMgEgGcifUKhAoEYuGCWKAR1OzGANRJYzaewcI5aQ8j7zoZUiBRv-iLYvxdjrtQ/exec";
+
+  let inventoryData = { books: [], boys: [], girls: [] };
+
+  // Initial Fetch on Load
+  document.addEventListener("DOMContentLoaded", () => {
+    // Standard default date = karon nga adlaw
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById("bookDateAdded").value = today;
+    document.getElementById("boysDateAdded").value = today;
+    document.getElementById("girlsDateAdded").value = today;
+    
+    loadAllData();
+  });
+
+  // Fetch data gikan sa backend
+  function loadAllData() {
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "readAll" })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        inventoryData.books = data.books || [];
+        inventoryData.boys = data.boys || [];
+        inventoryData.girls = data.girls || [];
+
+        renderBooksTable();
+        renderUniformTable('Boys');
+        renderUniformTable('Girls');
+      }
+    })
+    .catch(err => console.error("Error loading data:", err));
+  }
+
+  // --- BOOK OPERATIONS ---
+  function renderBooksTable() {
+    const tbody = document.getElementById("booksTableBody");
+    tbody.innerHTML = "";
+
+    if (inventoryData.books.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center">No books found.</td></tr>';
+      return;
+    }
+
+    inventoryData.books.forEach(b => {
+      const available = Number(b.Available !== undefined ? b.Available : (b.Added - b.Taken));
+      tbody.innerHTML += `
+        <tr>
+          <td>${b.Title || ''}</td>
+          <td>${b.Author || ''}</td>
+          <td>₱${Number(b.Price || 0).toFixed(2)}</td>
+          <td>${b.DateAdded || ''}</td>
+          <td>${b.Added || 0}</td>
+          <td>${b.Taken || 0}</td>
+          <td><span class="badge ${available > 0 ? 'bg-success' : 'bg-danger'} badge-available">${available}</span></td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary me-1" onclick="editBook('${b.ID}')">Edit</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteItem('Books', '${b.ID}')">Delete</button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  document.getElementById("bookForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const id = document.getElementById("bookId").value || "BOOK-" + Date.now();
+    
+    const payload = {
+      action: "saveBook",
+      data: {
+        id: id,
+        title: document.getElementById("bookTitle").value,
+        author: document.getElementById("bookAuthor").value,
+        price: parseFloat(document.getElementById("bookPrice").value),
+        dateAdded: document.getElementById("bookDateAdded").value,
+        added: parseInt(document.getElementById("bookAdded").value),
+        taken: parseInt(document.getElementById("bookTaken").value)
+      }
+    };
+
+    saveData(payload, resetBookForm);
+  });
+
+  function editBook(id) {
+    const book = inventoryData.books.find(b => b.ID == id);
+    if (!book) return;
+
+    document.getElementById("bookId").value = book.ID;
+    document.getElementById("bookTitle").value = book.Title;
+    document.getElementById("bookAuthor").value = book.Author;
+    document.getElementById("bookPrice").value = book.Price;
+    document.getElementById("bookDateAdded").value = book.DateAdded;
+    document.getElementById("bookAdded").value = book.Added;
+    document.getElementById("bookTaken").value = book.Taken;
+
+    document.getElementById("bookFormTitle").innerText = "Edit Book";
+    document.getElementById("cancelBookBtn").classList.remove("d-none");
+  }
+
+  function resetBookForm() {
+    document.getElementById("bookForm").reset();
+    document.getElementById("bookId").value = "";
+    document.getElementById("bookDateAdded").value = new Date().toISOString().split('T')[0];
+    document.getElementById("bookFormTitle").innerText = "Add Book";
+    document.getElementById("cancelBookBtn").classList.add("d-none");
+  }
+
+  // --- UNIFORM OPERATIONS (Boys / Girls) ---
+  function renderUniformTable(category) {
+    const isBoys = category === 'Boys';
+    const tbody = document.getElementById(isBoys ? "boysTableBody" : "girlsTableBody");
+    const list = isBoys ? inventoryData.boys : inventoryData.girls;
+    
+    tbody.innerHTML = "";
+
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center">No ${category.toLowerCase()} uniforms found.</td></tr>`;
+      return;
+    }
+
+    list.forEach(u => {
+      const available = Number(u.Available !== undefined ? u.Available : (u.Added - u.Taken));
+      const sheetName = isBoys ? "Boys Uniforms" : "Girls Uniforms";
+      tbody.innerHTML += `
+        <tr>
+          <td>${u.Type || ''}</td>
+          <td>${u.Size || ''}</td>
+          <td>₱${Number(u.Price || 0).toFixed(2)}</td>
+          <td>${u.DateAdded || ''}</td>
+          <td>${u.Added || 0}</td>
+          <td>${u.Taken || 0}</td>
+          <td><span class="badge ${available > 0 ? 'bg-success' : 'bg-danger'} badge-available">${available}</span></td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary me-1" onclick="editUniform('${category}', '${u.ID}')">Edit</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteItem('${sheetName}', '${u.ID}')">Delete</button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  function setupUniformSubmit(category) {
+    const isBoys = category === 'Boys';
+    const prefix = isBoys ? 'boys' : 'girls';
+
+    document.getElementById(`${prefix}Form`).addEventListener("submit", function(e) {
+      e.preventDefault();
+      const id = document.getElementById(`${prefix}Id`).value || (isBoys ? "BOY-" : "GIRL-") + Date.now();
+
+      const payload = {
+        action: "saveUniform",
+        data: {
+          category: category,
+          id: id,
+          type: document.getElementById(`${prefix}Type`).value,
+          size: document.getElementById(`${prefix}Size`).value,
+          price: parseFloat(document.getElementById(`${prefix}Price`).value),
+          dateAdded: document.getElementById(`${prefix}DateAdded`).value,
+          added: parseInt(document.getElementById(`${prefix}Added`).value),
+          taken: parseInt(document.getElementById(`${prefix}Taken`).value)
         }
+      };
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
+      saveData(payload, () => resetUniformForm(category));
+    });
+  }
 
-        async function fetchAllDataFromSheets() {
-            showLoading(true);
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'readAll' })
-                });
-                const res = await response.json();
-                if (res.status === 'success') {
-                    books = (res.books || []).map(b => ({
-                        id: b.ID,
-                        title: b.Title,
-                        author: b.Author,
-                        added: Number(b.Added || 0),
-                        taken: Number(b.Taken || 0)
-                    }));
+  setupUniformSubmit('Boys');
+  setupUniformSubmit('Girls');
 
-                    const boysData = (res.boys || []).map(u => ({
-                        id: u.ID,
-                        category: 'Boys',
-                        type: u.Type,
-                        size: u.Size,
-                        added: Number(u.Added || 0),
-                        taken: Number(u.Taken || 0)
-                    }));
+  function editUniform(category, id) {
+    const isBoys = category === 'Boys';
+    const prefix = isBoys ? 'boys' : 'girls';
+    const list = isBoys ? inventoryData.boys : inventoryData.girls;
+    const item = list.find(u => u.ID == id);
+    if (!item) return;
 
-                    const girlsData = (res.girls || []).map(u => ({
-                        id: u.ID,
-                        category: 'Girls',
-                        type: u.Type,
-                        size: u.Size,
-                        added: Number(u.Added || 0),
-                        taken: Number(u.Taken || 0)
-                    }));
+    document.getElementById(`${prefix}Id`).value = item.ID;
+    document.getElementById(`${prefix}Type`).value = item.Type;
+    document.getElementById(`${prefix}Size`).value = item.Size;
+    document.getElementById(`${prefix}Price`).value = item.Price;
+    document.getElementById(`${prefix}DateAdded`).value = item.DateAdded;
+    document.getElementById(`${prefix}Added`).value = item.Added;
+    document.getElementById(`${prefix}Taken`).value = item.Taken;
 
-                    uniforms = [...boysData, ...girlsData];
-                    refreshSystem();
-                }
-            } catch (err) {
-                console.error("Error fetching data:", err);
-            } finally {
-                showLoading(false);
-            }
-        }
+    document.getElementById(`${prefix}FormTitle`).innerText = `Edit ${category} Uniform`;
+    document.getElementById(`cancel${category}Btn`).classList.remove("d-none");
+  }
 
-        function handleLogin(e) {
-            e.preventDefault();
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-screen').style.display = 'grid';
-            fetchAllDataFromSheets();
-        }
+  function resetUniformForm(category) {
+    const prefix = category === 'Boys' ? 'boys' : 'girls';
+    document.getElementById(`${prefix}Form`).reset();
+    document.getElementById(`${prefix}Id`).value = "";
+    document.getElementById(`${prefix}DateAdded`).value = new Date().toISOString().split('T')[0];
+    document.getElementById(`${prefix}FormTitle`).innerText = `Add ${category} Uniform`;
+    document.getElementById(`cancel${category}Btn`).classList.add("d-none");
+  }
 
-        function logout() {
-            document.getElementById('app-screen').style.display = 'none';
-            document.getElementById('login-screen').style.display = 'flex';
-        }
+  // --- COMMON ACTIONS ---
+  function saveData(payload, resetCallback) {
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.status === "success") {
+        resetCallback();
+        loadAllData();
+      } else {
+        alert("Error saving: " + res.message);
+      }
+    })
+    .catch(err => console.error("Error:", err));
+  }
 
-        function switchPage(pageId, linkEl) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            if(linkEl) linkEl.classList.add('active');
-            refreshSystem();
-        }
+  function deleteItem(sheetName, id) {
+    if (!confirm("Sigurado ka ba nga gusto nimo kini i-delete?")) return;
 
-        function refreshSystem() {
-            updateDashboard();
-            renderBooks();
-            renderUniforms('Boys', 'boys-table-body');
-            renderUniforms('Girls', 'girls-table-body');
-            renderReports();
-        }
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "deleteItem", sheetName: sheetName, id: id })
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.status === "success") {
+        loadAllData();
+      } else {
+        alert("Error deleting item.");
+      }
+    })
+    .catch(err => console.error("Error:", err));
+  }
+</script>
 
-        function updateDashboard() {
-            document.getElementById('dash-books-count').innerText = books.reduce((acc, b) => acc + (b.added - b.taken), 0);
-            document.getElementById('dash-boys-count').innerText = uniforms.filter(u => u.category === 'Boys').reduce((acc, u) => acc + (u.added - u.taken), 0);
-            document.getElementById('dash-girls-count').innerText = uniforms.filter(u => u.category === 'Girls').reduce((acc, u) => acc + (u.added - u.taken), 0);
-        }
-
-        function renderBooks() {
-            const query = document.getElementById('book-search').value.toLowerCase();
-            const tbody = document.getElementById('books-table-body');
-            tbody.innerHTML = '';
-
-            const filtered = books.filter(b => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query));
-
-            filtered.forEach(b => {
-                const available = b.added - b.taken;
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${b.title}</strong></td>
-                        <td>${b.author}</td>
-                        <td>${b.added}</td>
-                        <td>${b.taken}</td>
-                        <td><span class="badge-stock">${available} units</span></td>
-                        <td>
-                            <button class="btn btn-success" onclick="adjustStock('book', ${b.id}, 'in')">+ In</button>
-                            <button class="btn btn-danger" onclick="adjustStock('book', ${b.id}, 'out')">- Out</button>
-                        </td>
-                        <td>
-                            <button class="btn btn-secondary" onclick="viewItem('Book', ${b.id})">View</button>
-                            <button class="btn btn-warning" onclick="openBookModal(${b.id})">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteBook(${b.id})">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        async function adjustStock(itemType, id, direction) {
-            const qty = prompt(`Pilay i-${direction === 'in' ? 'dugang (Stock In)' : 'kuhaon (Stock Out)'}?`, "1");
-            const num = parseInt(qty);
-            if (isNaN(num) || num <= 0) return;
-
-            if (itemType === 'book') {
-                const book = books.find(b => b.id === id);
-                if (direction === 'in') book.added += num;
-                else book.taken += num;
-                await saveBookToSheet(book);
-            } else {
-                const u = uniforms.find(x => x.id === id);
-                if (direction === 'in') u.added += num;
-                else u.taken += num;
-                await saveUniformToSheet(u);
-            }
-        }
-
-        function openBookModal(id = null) {
-            document.getElementById('book-modal').style.display = 'flex';
-            document.getElementById('book-add-qty').value = 0;
-            document.getElementById('book-deduct-qty').value = 0;
-
-            if(id) {
-                const b = books.find(x => x.id === id);
-                document.getElementById('book-modal-title').innerText = 'Edit Book';
-                document.getElementById('book-id').value = b.id;
-                document.getElementById('book-title').value = b.title;
-                document.getElementById('book-author').value = b.author;
-            } else {
-                document.getElementById('book-modal-title').innerText = 'Add Book';
-                document.getElementById('book-form').reset();
-                document.getElementById('book-id').value = '';
-            }
-        }
-
-        async function saveBook(e) {
-            e.preventDefault();
-            const id = document.getElementById('book-id').value;
-            const addQty = parseInt(document.getElementById('book-add-qty').value) || 0;
-            const deductQty = parseInt(document.getElementById('book-deduct-qty').value) || 0;
-
-            let currentAdded = 0;
-            let currentTaken = 0;
-
-            if (id) {
-                const existing = books.find(b => b.id === Number(id));
-                if (existing) {
-                    currentAdded = existing.added;
-                    currentTaken = existing.taken;
-                }
-            }
-
-            const bookData = {
-                id: id ? Number(id) : Date.now(),
-                title: document.getElementById('book-title').value,
-                author: document.getElementById('book-author').value,
-                added: currentAdded + addQty,
-                taken: currentTaken + deductQty
-            };
-
-            closeModal('book-modal');
-            await saveBookToSheet(bookData);
-        }
-
-        async function saveBookToSheet(bookData) {
-            showLoading(true);
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'saveBook', data: bookData })
-                });
-                await fetchAllDataFromSheets();
-            } catch (err) {
-                console.error("Failed to save book", err);
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        async function deleteBook(id) {
-            if(confirm('Sigurado ka nga gusto nimo i-delete kini nga libro?')) {
-                showLoading(true);
-                try {
-                    await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify({ action: 'deleteItem', sheetName: 'Books', id: id })
-                    });
-                    await fetchAllDataFromSheets();
-                } catch (err) {
-                    console.error("Failed to delete book", err);
-                } finally {
-                    showLoading(false);
-                }
-            }
-        }
-
-        function renderUniforms(category, targetTbodyId) {
-            const tbody = document.getElementById(targetTbodyId);
-            tbody.innerHTML = '';
-
-            const list = uniforms.filter(u => u.category === category);
-            list.forEach(u => {
-                const available = u.added - u.taken;
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${u.type}</strong></td>
-                        <td>${u.size}</td>
-                        <td>${u.added}</td>
-                        <td>${u.taken}</td>
-                        <td><span class="badge-stock">${available} units</span></td>
-                        <td>
-                            <button class="btn btn-success" onclick="adjustStock('uniform', ${u.id}, 'in')">+ In</button>
-                            <button class="btn btn-danger" onclick="adjustStock('uniform', ${u.id}, 'out')">- Out</button>
-                        </td>
-                        <td>
-                            <button class="btn btn-secondary" onclick="viewItem('Uniform', ${u.id})">View</button>
-                            <button class="btn btn-warning" onclick="openUniformModal('${u.category}', ${u.id})">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteUniform(${u.id}, '${category}')">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function openUniformModal(category, id = null) {
-            document.getElementById('uniform-modal').style.display = 'flex';
-            document.getElementById('uniform-category').value = category;
-            document.getElementById('uniform-add-qty').value = 0;
-            document.getElementById('uniform-deduct-qty').value = 0;
-
-            if(id) {
-                const u = uniforms.find(x => x.id === id);
-                document.getElementById('uniform-modal-title').innerText = `Edit ${category} Uniform`;
-                document.getElementById('uniform-id').value = u.id;
-                document.getElementById('uniform-type').value = u.type;
-                document.getElementById('uniform-size').value = u.size;
-            } else {
-                document.getElementById('uniform-modal-title').innerText = `Add ${category} Uniform`;
-                document.getElementById('uniform-form').reset();
-                document.getElementById('uniform-id').value = '';
-                document.getElementById('uniform-category').value = category;
-            }
-        }
-
-        async function saveUniform(e) {
-            e.preventDefault();
-            const id = document.getElementById('uniform-id').value;
-            const addQty = parseInt(document.getElementById('uniform-add-qty').value) || 0;
-            const deductQty = parseInt(document.getElementById('uniform-deduct-qty').value) || 0;
-
-            let currentAdded = 0;
-            let currentTaken = 0;
-
-            if (id) {
-                const existing = uniforms.find(u => u.id === Number(id));
-                if (existing) {
-                    currentAdded = existing.added;
-                    currentTaken = existing.taken;
-                }
-            }
-
-            const uniformData = {
-                id: id ? Number(id) : Date.now(),
-                category: document.getElementById('uniform-category').value,
-                type: document.getElementById('uniform-type').value,
-                size: document.getElementById('uniform-size').value,
-                added: currentAdded + addQty,
-                taken: currentTaken + deductQty
-            };
-
-            closeModal('uniform-modal');
-            await saveUniformToSheet(uniformData);
-        }
-
-        async function saveUniformToSheet(uniformData) {
-            showLoading(true);
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'saveUniform', data: uniformData })
-                });
-                await fetchAllDataFromSheets();
-            } catch (err) {
-                console.error("Failed to save uniform", err);
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        async function deleteUniform(id, category) {
-            if(confirm('Sigurado ka nga gusto nimo i-delete kini nga uniform?')) {
-                showLoading(true);
-                const sheetName = category === 'Boys' ? 'Boys Uniforms' : 'Girls Uniforms';
-                try {
-                    await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify({ action: 'deleteItem', sheetName: sheetName, id: id })
-                    });
-                    await fetchAllDataFromSheets();
-                } catch (err) {
-                    console.error("Failed to delete uniform", err);
-                } finally {
-                    showLoading(false);
-                }
-            }
-        }
-
-        function viewItem(type, id) {
-            const container = document.getElementById('view-details-content');
-            if (type === 'Book') {
-                const b = books.find(x => x.id === id);
-                container.innerHTML = `
-                    <p><strong>ID:</strong> ${b.id}</p>
-                    <p><strong>Title:</strong> ${b.title}</p>
-                    <p><strong>Author:</strong> ${b.author}</p>
-                    <p><strong>Total Added:</strong> ${b.added}</p>
-                    <p><strong>Total Taken:</strong> ${b.taken}</p>
-                    <p><strong>Available:</strong> ${b.added - b.taken}</p>
-                `;
-            } else {
-                const u = uniforms.find(x => x.id === id);
-                container.innerHTML = `
-                    <p><strong>ID:</strong> ${u.id}</p>
-                    <p><strong>Category:</strong> ${u.category}</p>
-                    <p><strong>Type:</strong> ${u.type}</p>
-                    <p><strong>Size:</strong> ${u.size}</p>
-                    <p><strong>Total Added:</strong> ${u.added}</p>
-                    <p><strong>Total Taken:</strong> ${u.taken}</p>
-                    <p><strong>Available:</strong> ${u.added - u.taken}</p>
-                `;
-            }
-            document.getElementById('view-modal').style.display = 'flex';
-        }
-
-        function renderReports() {
-            const tbody = document.getElementById('reports-table-body');
-            tbody.innerHTML = '';
-            
-            const bAdded = books.reduce((acc, b) => acc + b.added, 0);
-            const bTaken = books.reduce((acc, b) => acc + b.taken, 0);
-
-            const boys = uniforms.filter(u => u.category === 'Boys');
-            const boysAdded = boys.reduce((acc, u) => acc + u.added, 0);
-            const boysTaken = boys.reduce((acc, u) => acc + u.taken, 0);
-
-            const girls = uniforms.filter(u => u.category === 'Girls');
-            const girlsAdded = girls.reduce((acc, u) => acc + u.added, 0);
-            const girlsTaken = girls.reduce((acc, u) => acc + u.taken, 0);
-
-            const rows = [
-                { category: 'Books Inventory', added: bAdded, taken: bTaken },
-                { category: 'Boys Uniforms', added: boysAdded, taken: boysTaken },
-                { category: 'Girls Uniforms', added: girlsAdded, taken: girlsTaken }
-            ];
-
-            rows.forEach(r => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${r.category}</strong></td>
-                        <td>${r.added}</td>
-                        <td>${r.taken}</td>
-                        <td><span class="badge-stock">${r.added - r.taken} units</span></td>
-                    </tr>
-                `;
-            });
-        }
-    </script>
 </body>
 </html>
