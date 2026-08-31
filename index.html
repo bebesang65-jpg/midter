@@ -394,13 +394,14 @@
                     <label>Author</label>
                     <input type="text" id="book-author" class="input-field" required>
                 </div>
+                <!-- Automatic computation inputs -->
                 <div class="form-group">
-                    <label>Total Added (In)</label>
-                    <input type="number" id="book-added" class="input-field" min="0" required>
+                    <label>Add Stock Quantity (+)</label>
+                    <input type="number" id="book-add-qty" class="input-field" value="0" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Total Taken (Out)</label>
-                    <input type="number" id="book-taken" class="input-field" min="0" required>
+                    <label>Deduct Stock Quantity (-)</label>
+                    <input type="number" id="book-deduct-qty" class="input-field" value="0" min="0">
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('book-modal')">Cancel</button>
@@ -434,13 +435,14 @@
                         <option value="XL">XL</option>
                     </select>
                 </div>
+                <!-- Automatic computation inputs -->
                 <div class="form-group">
-                    <label>Total Added (In)</label>
-                    <input type="number" id="uniform-added" class="input-field" min="0" required>
+                    <label>Add Stock Quantity (+)</label>
+                    <input type="number" id="uniform-add-qty" class="input-field" value="0" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Total Taken (Out)</label>
-                    <input type="number" id="uniform-taken" class="input-field" min="0" required>
+                    <label>Deduct Stock Quantity (-)</label>
+                    <input type="number" id="uniform-deduct-qty" class="input-field" value="0" min="0">
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('uniform-modal')">Cancel</button>
@@ -587,7 +589,7 @@
         }
 
         async function adjustStock(itemType, id, direction) {
-            const qty = prompt(`Unsa kadaghan ang imong i-${direction === 'in' ? 'dugang (Stock In)' : 'kuhaon (Stock Out)'}?`, "1");
+            const qty = prompt(`Pilay i-${direction === 'in' ? 'dugang (Stock In)' : 'kuhaon (Stock Out)'}?`, "1");
             const num = parseInt(qty);
             if (isNaN(num) || num <= 0) return;
 
@@ -606,31 +608,45 @@
 
         function openBookModal(id = null) {
             document.getElementById('book-modal').style.display = 'flex';
+            document.getElementById('book-add-qty').value = 0;
+            document.getElementById('book-deduct-qty').value = 0;
+
             if(id) {
                 const b = books.find(x => x.id === id);
                 document.getElementById('book-modal-title').innerText = 'Edit Book';
                 document.getElementById('book-id').value = b.id;
                 document.getElementById('book-title').value = b.title;
                 document.getElementById('book-author').value = b.author;
-                document.getElementById('book-added').value = b.added;
-                document.getElementById('book-taken').value = b.taken;
             } else {
                 document.getElementById('book-modal-title').innerText = 'Add Book';
                 document.getElementById('book-form').reset();
                 document.getElementById('book-id').value = '';
-                document.getElementById('book-taken').value = 0;
             }
         }
 
         async function saveBook(e) {
             e.preventDefault();
             const id = document.getElementById('book-id').value;
+            const addQty = parseInt(document.getElementById('book-add-qty').value) || 0;
+            const deductQty = parseInt(document.getElementById('book-deduct-qty').value) || 0;
+
+            let currentAdded = 0;
+            let currentTaken = 0;
+
+            if (id) {
+                const existing = books.find(b => b.id === Number(id));
+                if (existing) {
+                    currentAdded = existing.added;
+                    currentTaken = existing.taken;
+                }
+            }
+
             const bookData = {
                 id: id ? Number(id) : Date.now(),
                 title: document.getElementById('book-title').value,
                 author: document.getElementById('book-author').value,
-                added: parseInt(document.getElementById('book-added').value),
-                taken: parseInt(document.getElementById('book-taken').value)
+                added: currentAdded + addQty,
+                taken: currentTaken + deductQty
             };
 
             closeModal('book-modal');
@@ -702,6 +718,8 @@
         function openUniformModal(category, id = null) {
             document.getElementById('uniform-modal').style.display = 'flex';
             document.getElementById('uniform-category').value = category;
+            document.getElementById('uniform-add-qty').value = 0;
+            document.getElementById('uniform-deduct-qty').value = 0;
 
             if(id) {
                 const u = uniforms.find(x => x.id === id);
@@ -709,27 +727,38 @@
                 document.getElementById('uniform-id').value = u.id;
                 document.getElementById('uniform-type').value = u.type;
                 document.getElementById('uniform-size').value = u.size;
-                document.getElementById('uniform-added').value = u.added;
-                document.getElementById('uniform-taken').value = u.taken;
             } else {
                 document.getElementById('uniform-modal-title').innerText = `Add ${category} Uniform`;
                 document.getElementById('uniform-form').reset();
                 document.getElementById('uniform-id').value = '';
                 document.getElementById('uniform-category').value = category;
-                document.getElementById('uniform-taken').value = 0;
             }
         }
 
         async function saveUniform(e) {
             e.preventDefault();
             const id = document.getElementById('uniform-id').value;
+            const addQty = parseInt(document.getElementById('uniform-add-qty').value) || 0;
+            const deductQty = parseInt(document.getElementById('uniform-deduct-qty').value) || 0;
+
+            let currentAdded = 0;
+            let currentTaken = 0;
+
+            if (id) {
+                const existing = uniforms.find(u => u.id === Number(id));
+                if (existing) {
+                    currentAdded = existing.added;
+                    currentTaken = existing.taken;
+                }
+            }
+
             const uniformData = {
                 id: id ? Number(id) : Date.now(),
                 category: document.getElementById('uniform-category').value,
                 type: document.getElementById('uniform-type').value,
                 size: document.getElementById('uniform-size').value,
-                added: parseInt(document.getElementById('uniform-added').value),
-                taken: parseInt(document.getElementById('uniform-taken').value)
+                added: currentAdded + addQty,
+                taken: currentTaken + deductQty
             };
 
             closeModal('uniform-modal');
