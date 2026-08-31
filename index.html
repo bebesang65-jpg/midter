@@ -20,9 +20,10 @@
 
     /* Form Design */
     .form-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 6px; }
-    .form-group { display: flex; flex-direction: column; flex: 1; min-width: 150px; }
+    .form-group { display: flex; flex-direction: column; flex: 1; min-width: 140px; }
     .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
     .form-group input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+    .form-group input[readonly] { background-color: #e9ecef; color: #495057; cursor: not-allowed; font-weight: bold; }
     
     .btn { padding: 9px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; }
     .btn-save { background-color: #2ecc71; margin-top: 19px; }
@@ -70,6 +71,10 @@
         <input type="number" step="0.01" id="bookPrice" required>
       </div>
       <div class="form-group">
+        <label>Date & Time Added (Auto)</label>
+        <input type="text" id="bookDateAdded" readonly>
+      </div>
+      <div class="form-group">
         <label>Added</label>
         <input type="number" id="bookAdded" value="0" required>
       </div>
@@ -87,7 +92,7 @@
           <th>Title</th>
           <th>Author</th>
           <th>Price</th>
-          <th>Date Added</th>
+          <th>Date & Time Added</th>
           <th>Added</th>
           <th>Taken</th>
           <th>Available</th>
@@ -118,6 +123,10 @@
         <input type="number" step="0.01" id="boysPrice" required>
       </div>
       <div class="form-group">
+        <label>Date & Time Added (Auto)</label>
+        <input type="text" id="boysDateAdded" readonly>
+      </div>
+      <div class="form-group">
         <label>Added</label>
         <input type="number" id="boysAdded" value="0" required>
       </div>
@@ -135,7 +144,7 @@
           <th>Type</th>
           <th>Size</th>
           <th>Price</th>
-          <th>Date Added</th>
+          <th>Date & Time Added</th>
           <th>Added</th>
           <th>Taken</th>
           <th>Available</th>
@@ -166,6 +175,10 @@
         <input type="number" step="0.01" id="girlsPrice" required>
       </div>
       <div class="form-group">
+        <label>Date & Time Added (Auto)</label>
+        <input type="text" id="girlsDateAdded" readonly>
+      </div>
+      <div class="form-group">
         <label>Added</label>
         <input type="number" id="girlsAdded" value="0" required>
       </div>
@@ -183,7 +196,7 @@
           <th>Type</th>
           <th>Size</th>
           <th>Price</th>
-          <th>Date Added</th>
+          <th>Date & Time Added</th>
           <th>Added</th>
           <th>Taken</th>
           <th>Available</th>
@@ -200,10 +213,12 @@
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0o8YHMgEgGcifUKhAoEYuGCWKAR1OzGANRJYzaewcI5aQ8j7zoZUiBRv-iLYvxdjrtQ/exec";
 
   let inventoryData = { books: [], boys: [], girls: [] };
-  let editingDates = { books: {}, boys: {}, girls: {} }; // Mipreserba sa orihinal nga Date Added kon mag-edit
+  let editingDates = { books: {}, boys: {}, girls: {} };
 
   document.addEventListener("DOMContentLoaded", () => {
     loadAllData();
+    updateLiveTimestamps();
+    setInterval(updateLiveTimestamps, 1000); // Mag-update matag segundo
   });
 
   // Tab Navigation Function
@@ -215,9 +230,36 @@
     event.currentTarget.classList.add('active');
   }
 
-  // Get Automatic Date YYYY-MM-DD
-  function getTodayDate() {
-    return new Date().toISOString().split('T')[0];
+  // Get Current Date & Time (Format: YYYY-MM-DD hh:mm:ss AM/PM)
+  function getCurrentDateTime() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    hours = hours % 12;
+    hours = hours ? hours : 12; // 0 becomes 12
+    const strHours = String(hours).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${strHours}:${minutes}:${seconds} ${ampm}`;
+  }
+
+  // Update readonly inputs dynamically if not in Edit mode
+  function updateLiveTimestamps() {
+    if (!document.getElementById("bookId").value) {
+      document.getElementById("bookDateAdded").value = getCurrentDateTime();
+    }
+    if (!document.getElementById("boysId").value) {
+      document.getElementById("boysDateAdded").value = getCurrentDateTime();
+    }
+    if (!document.getElementById("girlsId").value) {
+      document.getElementById("girlsDateAdded").value = getCurrentDateTime();
+    }
   }
 
   // Fetch data
@@ -277,8 +319,7 @@
     const isNew = !id;
     const bookId = isNew ? "BOOK-" + Date.now() : id;
     
-    // Automatic Date: Gamiton ang karaang date kon Edit, apan Automatic Today Date kon Bag-o
-    const dateAdded = isNew ? getTodayDate() : (editingDates.books[id] || getTodayDate());
+    const dateAdded = document.getElementById("bookDateAdded").value;
 
     const payload = {
       action: "saveBook",
@@ -304,10 +345,9 @@
     document.getElementById("bookTitle").value = book.Title;
     document.getElementById("bookAuthor").value = book.Author;
     document.getElementById("bookPrice").value = book.Price;
+    document.getElementById("bookDateAdded").value = book.DateAdded || getCurrentDateTime();
     document.getElementById("bookAdded").value = book.Added;
     document.getElementById("bookTaken").value = book.Taken;
-
-    editingDates.books[book.ID] = book.DateAdded; // Preserbar sa orihinal nga Date Added
 
     document.getElementById("cancelBookBtn").style.display = "inline-block";
   }
@@ -316,6 +356,7 @@
     document.getElementById("bookForm").reset();
     document.getElementById("bookId").value = "";
     document.getElementById("cancelBookBtn").style.display = "none";
+    updateLiveTimestamps();
   }
 
   // --- UNIFORMS (BOYS / GIRLS) ---
@@ -361,9 +402,7 @@
       const isNew = !id;
       const uniformId = isNew ? (isBoys ? "BOY-" : "GIRL-") + Date.now() : id;
 
-      // Automatic Date Handling
-      const storeKey = isBoys ? 'boys' : 'girls';
-      const dateAdded = isNew ? getTodayDate() : (editingDates[storeKey][id] || getTodayDate());
+      const dateAdded = document.getElementById(`${prefix}DateAdded`).value;
 
       const payload = {
         action: "saveUniform",
@@ -397,11 +436,9 @@
     document.getElementById(`${prefix}Type`).value = item.Type;
     document.getElementById(`${prefix}Size`).value = item.Size;
     document.getElementById(`${prefix}Price`).value = item.Price;
+    document.getElementById(`${prefix}DateAdded`).value = item.DateAdded || getCurrentDateTime();
     document.getElementById(`${prefix}Added`).value = item.Added;
     document.getElementById(`${prefix}Taken`).value = item.Taken;
-
-    const storeKey = isBoys ? 'boys' : 'girls';
-    editingDates[storeKey][item.ID] = item.DateAdded; // Preserbar sa orihinal nga Date Added
 
     document.getElementById(`cancel${category}Btn`).style.display = "inline-block";
   }
@@ -411,6 +448,7 @@
     document.getElementById(`${prefix}Form`).reset();
     document.getElementById(`${prefix}Id`).value = "";
     document.getElementById(`cancel${category}Btn`).style.display = "none";
+    updateLiveTimestamps();
   }
 
   // --- GENERAL FUNCTIONS ---
