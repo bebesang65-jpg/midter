@@ -165,10 +165,13 @@
       <h2>Books Inventory</h2>
 
       <form id="bookForm" class="form-container">
-        <input type="hidden" id="bookId">
         <input type="hidden" id="bookOriginalAdded" value="0">
         <input type="hidden" id="bookOriginalTaken" value="0">
 
+        <div class="form-group">
+          <label>Book ID (Auto)</label>
+          <input type="text" id="bookId" readonly placeholder="Auto-generated ID">
+        </div>
         <div class="form-group">
           <label>Title</label>
           <input type="text" id="bookTitle" required>
@@ -213,12 +216,13 @@
       </form>
 
       <div class="search-container">
-        <input type="text" id="searchBook" class="search-input" placeholder="🔍 Search Title or Author (e.g. Filipino)..." onkeyup="renderBooksTable()">
+        <input type="text" id="searchBook" class="search-input" placeholder="🔍 Search ID, Title or Author..." onkeyup="renderBooksTable()">
       </div>
 
       <table>
         <thead>
           <tr>
+            <th>ID</th>
             <th>Title</th>
             <th>Author</th>
             <th>Price</th>
@@ -230,7 +234,7 @@
           </tr>
         </thead>
         <tbody id="booksTableBody">
-          <tr><td colspan="8">Loading data...</td></tr>
+          <tr><td colspan="9">Loading data...</td></tr>
         </tbody>
       </table>
     </div>
@@ -240,17 +244,32 @@
       <h2>Boys Uniforms</h2>
 
       <form id="boysForm" class="form-container">
-        <input type="hidden" id="boysId">
         <input type="hidden" id="boysOriginalAdded" value="0">
         <input type="hidden" id="boysOriginalTaken" value="0">
 
         <div class="form-group">
+          <label>Uniform ID (Auto)</label>
+          <input type="text" id="boysId" readonly placeholder="Auto-generated ID">
+        </div>
+        <div class="form-group">
           <label>Type</label>
-          <input type="text" id="boysType" required>
+          <select id="boysType" required>
+            <option value="">-- Select Type --</option>
+            <option value="Type A">Type A</option>
+            <option value="Type B">Type B</option>
+            <option value="PE Uniform">PE Uniform</option>
+          </select>
         </div>
         <div class="form-group">
           <label>Size</label>
-          <input type="text" id="boysSize" required>
+          <select id="boysSize" required>
+            <option value="">-- Select Size --</option>
+            <option value="S">Small (S)</option>
+            <option value="M">Medium (M)</option>
+            <option value="L">Large (L)</option>
+            <option value="XL">Extra Large (XL)</option>
+            <option value="XXL">Double Extra Large (XXL)</option>
+          </select>
         </div>
         <div class="form-group">
           <label>Price (₱)</label>
@@ -288,12 +307,13 @@
       </form>
 
       <div class="search-container">
-        <input type="text" id="searchBoys" class="search-input" placeholder="🔍 Search uniform type..." onkeyup="renderUniformTable('Boys')">
+        <input type="text" id="searchBoys" class="search-input" placeholder="🔍 Search ID, Type or Size..." onkeyup="renderUniformTable('Boys')">
       </div>
 
       <table>
         <thead>
           <tr>
+            <th>ID</th>
             <th>Type</th>
             <th>Size</th>
             <th>Price</th>
@@ -305,7 +325,7 @@
           </tr>
         </thead>
         <tbody id="boysTableBody">
-          <tr><td colspan="8">Loading data...</td></tr>
+          <tr><td colspan="9">Loading data...</td></tr>
         </tbody>
       </table>
     </div>
@@ -315,17 +335,32 @@
       <h2>Girls Uniforms</h2>
 
       <form id="girlsForm" class="form-container">
-        <input type="hidden" id="girlsId">
         <input type="hidden" id="girlsOriginalAdded" value="0">
         <input type="hidden" id="girlsOriginalTaken" value="0">
 
         <div class="form-group">
+          <label>Uniform ID (Auto)</label>
+          <input type="text" id="girlsId" readonly placeholder="Auto-generated ID">
+        </div>
+        <div class="form-group">
           <label>Type</label>
-          <input type="text" id="girlsType" required>
+          <select id="girlsType" required>
+            <option value="">-- Select Type --</option>
+            <option value="Type A">Type A</option>
+            <option value="Type B">Type B</option>
+            <option value="PE Uniform">PE Uniform</option>
+          </select>
         </div>
         <div class="form-group">
           <label>Size</label>
-          <input type="text" id="girlsSize" required>
+          <select id="girlsSize" required>
+            <option value="">-- Select Size --</option>
+            <option value="S">Small (S)</option>
+            <option value="M">Medium (M)</option>
+            <option value="L">Large (L)</option>
+            <option value="XL">Extra Large (XL)</option>
+            <option value="XXL">Double Extra Large (XXL)</option>
+          </select>
         </div>
         <div class="form-group">
           <label>Price (₱)</label>
@@ -363,12 +398,13 @@
       </form>
 
       <div class="search-container">
-        <input type="text" id="searchGirls" class="search-input" placeholder="🔍 Search uniform type..." onkeyup="renderUniformTable('Girls')">
+        <input type="text" id="searchGirls" class="search-input" placeholder="🔍 Search ID, Type or Size..." onkeyup="renderUniformTable('Girls')">
       </div>
 
       <table>
         <thead>
           <tr>
+            <th>ID</th>
             <th>Type</th>
             <th>Size</th>
             <th>Price</th>
@@ -380,7 +416,7 @@
           </tr>
         </thead>
         <tbody id="girlsTableBody">
-          <tr><td colspan="8">Loading data...</td></tr>
+          <tr><td colspan="9">Loading data...</td></tr>
         </tbody>
       </table>
     </div>
@@ -541,13 +577,14 @@
     tbody.innerHTML = "";
 
     const filteredBooks = inventoryData.books.filter(b => {
+      const id = String(b.ID || b.id || '').toLowerCase();
       const title = (b.Title || b.title || '').toLowerCase();
       const author = (b.Author || b.author || '').toLowerCase();
-      return title.includes(searchQuery) || author.includes(searchQuery);
+      return id.includes(searchQuery) || title.includes(searchQuery) || author.includes(searchQuery);
     });
 
     if (filteredBooks.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8">No books found.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9">No books found.</td></tr>';
       return;
     }
 
@@ -558,6 +595,7 @@
 
       tbody.innerHTML += `
         <tr>
+          <td><strong>${b.ID || b.id || ''}</strong></td>
           <td>${b.Title || b.title || ''}</td>
           <td>${b.Author || b.author || ''}</td>
           <td>₱${Number(b.Price || b.price || 0).toFixed(2)}</td>
@@ -581,6 +619,7 @@
 
     const id = document.getElementById("bookId").value;
     const isNew = !id;
+    // AUTOMATICALLY GENERATE UNIQUE BOOK ID IF NEW
     const bookId = isNew ? "BOOK-" + Date.now() : id;
 
     const payload = {
@@ -639,13 +678,14 @@
     tbody.innerHTML = "";
 
     const filteredList = list.filter(u => {
+      const id = String(u.ID || u.id || '').toLowerCase();
       const type = (u.Type || u.type || '').toLowerCase();
       const size = (u.Size || u.size || '').toLowerCase();
-      return type.includes(searchQuery) || size.includes(searchQuery);
+      return id.includes(searchQuery) || type.includes(searchQuery) || size.includes(searchQuery);
     });
 
     if (filteredList.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8">No ${category.toLowerCase()} uniforms found.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9">No ${category.toLowerCase()} uniforms found.</td></tr>`;
       return;
     }
 
@@ -657,6 +697,7 @@
 
       tbody.innerHTML += `
         <tr>
+          <td><strong>${u.ID || u.id || ''}</strong></td>
           <td>${u.Type || u.type || ''}</td>
           <td>${u.Size || u.size || ''}</td>
           <td>₱${Number(u.Price || u.price || 0).toFixed(2)}</td>
@@ -683,6 +724,7 @@
 
       const id = document.getElementById(`${prefix}Id`).value;
       const isNew = !id;
+      // AUTOMATICALLY GENERATE UNIQUE UNIFORM ID IF NEW
       const uniformId = isNew ? (isBoys ? "BOY-" : "GIRL-") + Date.now() : id;
 
       const payload = {
