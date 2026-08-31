@@ -9,16 +9,13 @@
     body { background-color: #f4f6f9; padding: 20px; color: #333; }
     h1 { text-align: center; margin-bottom: 20px; color: #2c3e50; }
     
-    /* Tabs Header */
     .tabs { display: flex; justify-content: center; margin-bottom: 20px; gap: 10px; }
     .tab-btn { padding: 10px 20px; font-size: 16px; border: none; background-color: #e0e0e0; cursor: pointer; border-radius: 5px; font-weight: bold; transition: 0.3s; }
     .tab-btn.active { background-color: #3498db; color: white; }
     
-    /* Content Sections */
     .tab-content { display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     .tab-content.active { display: block; }
 
-    /* Form Design */
     .form-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 6px; }
     .form-group { display: flex; flex-direction: column; flex: 1; min-width: 140px; }
     .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
@@ -31,7 +28,6 @@
     .btn-edit { background-color: #f39c12; padding: 4px 8px; font-size: 12px; }
     .btn-delete { background-color: #e74c3c; padding: 4px 8px; font-size: 12px; }
 
-    /* Table Design */
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
     th { background-color: #34495e; color: white; }
@@ -71,16 +67,20 @@
         <input type="number" step="0.01" id="bookPrice" required>
       </div>
       <div class="form-group">
-        <label>Date & Time Added (Auto)</label>
+        <label>Date & Time Added</label>
         <input type="text" id="bookDateAdded" readonly>
       </div>
       <div class="form-group">
-        <label>Added</label>
-        <input type="number" id="bookAdded" value="0" required>
+        <label>Total Added Stock</label>
+        <input type="number" id="bookAdded" value="0" min="0" oninput="calculateAvailable('book')" required>
       </div>
       <div class="form-group">
-        <label>Taken</label>
-        <input type="number" id="bookTaken" value="0" required>
+        <label>Taken Stock</label>
+        <input type="number" id="bookTaken" value="0" min="0" oninput="calculateAvailable('book')" required>
+      </div>
+      <div class="form-group">
+        <label>Available Stock (Auto)</label>
+        <input type="number" id="bookAvailable" value="0" readonly>
       </div>
       <button type="submit" class="btn btn-save" id="saveBookBtn">Save Book</button>
       <button type="button" class="btn btn-cancel" id="cancelBookBtn" style="display:none;" onclick="resetBookForm()">Cancel</button>
@@ -93,9 +93,9 @@
           <th>Author</th>
           <th>Price</th>
           <th>Date & Time Added</th>
-          <th>Added</th>
+          <th>Total Added</th>
           <th>Taken</th>
-          <th>Available</th>
+          <th>Available Stock</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -123,16 +123,20 @@
         <input type="number" step="0.01" id="boysPrice" required>
       </div>
       <div class="form-group">
-        <label>Date & Time Added (Auto)</label>
+        <label>Date & Time Added</label>
         <input type="text" id="boysDateAdded" readonly>
       </div>
       <div class="form-group">
-        <label>Added</label>
-        <input type="number" id="boysAdded" value="0" required>
+        <label>Total Added Stock</label>
+        <input type="number" id="boysAdded" value="0" min="0" oninput="calculateAvailable('boys')" required>
       </div>
       <div class="form-group">
-        <label>Taken</label>
-        <input type="number" id="boysTaken" value="0" required>
+        <label>Taken Stock</label>
+        <input type="number" id="boysTaken" value="0" min="0" oninput="calculateAvailable('boys')" required>
+      </div>
+      <div class="form-group">
+        <label>Available Stock (Auto)</label>
+        <input type="number" id="boysAvailable" value="0" readonly>
       </div>
       <button type="submit" class="btn btn-save">Save Uniform</button>
       <button type="button" class="btn btn-cancel" id="cancelBoysBtn" style="display:none;" onclick="resetUniformForm('Boys')">Cancel</button>
@@ -145,9 +149,9 @@
           <th>Size</th>
           <th>Price</th>
           <th>Date & Time Added</th>
-          <th>Added</th>
+          <th>Total Added</th>
           <th>Taken</th>
-          <th>Available</th>
+          <th>Available Stock</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -175,16 +179,20 @@
         <input type="number" step="0.01" id="girlsPrice" required>
       </div>
       <div class="form-group">
-        <label>Date & Time Added (Auto)</label>
+        <label>Date & Time Added</label>
         <input type="text" id="girlsDateAdded" readonly>
       </div>
       <div class="form-group">
-        <label>Added</label>
-        <input type="number" id="girlsAdded" value="0" required>
+        <label>Total Added Stock</label>
+        <input type="number" id="girlsAdded" value="0" min="0" oninput="calculateAvailable('girls')" required>
       </div>
       <div class="form-group">
-        <label>Taken</label>
-        <input type="number" id="girlsTaken" value="0" required>
+        <label>Taken Stock</label>
+        <input type="number" id="girlsTaken" value="0" min="0" oninput="calculateAvailable('girls')" required>
+      </div>
+      <div class="form-group">
+        <label>Available Stock (Auto)</label>
+        <input type="number" id="girlsAvailable" value="0" readonly>
       </div>
       <button type="submit" class="btn btn-save">Save Uniform</button>
       <button type="button" class="btn btn-cancel" id="cancelGirlsBtn" style="display:none;" onclick="resetUniformForm('Girls')">Cancel</button>
@@ -197,9 +205,9 @@
           <th>Size</th>
           <th>Price</th>
           <th>Date & Time Added</th>
-          <th>Added</th>
+          <th>Total Added</th>
           <th>Taken</th>
-          <th>Available</th>
+          <th>Available Stock</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -213,15 +221,13 @@
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0o8YHMgEgGcifUKhAoEYuGCWKAR1OzGANRJYzaewcI5aQ8j7zoZUiBRv-iLYvxdjrtQ/exec";
 
   let inventoryData = { books: [], boys: [], girls: [] };
-  let editingDates = { books: {}, boys: {}, girls: {} };
 
   document.addEventListener("DOMContentLoaded", () => {
     loadAllData();
     updateLiveTimestamps();
-    setInterval(updateLiveTimestamps, 1000); // Mag-update matag segundo
+    setInterval(updateLiveTimestamps, 1000);
   });
 
-  // Tab Navigation Function
   function openTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -230,7 +236,6 @@
     event.currentTarget.classList.add('active');
   }
 
-  // Get Current Date & Time (Format: YYYY-MM-DD hh:mm:ss AM/PM)
   function getCurrentDateTime() {
     const now = new Date();
     const year = now.getFullYear();
@@ -243,13 +248,12 @@
     const ampm = hours >= 12 ? 'PM' : 'AM';
     
     hours = hours % 12;
-    hours = hours ? hours : 12; // 0 becomes 12
+    hours = hours ? hours : 12;
     const strHours = String(hours).padStart(2, '0');
 
     return `${year}-${month}-${day} ${strHours}:${minutes}:${seconds} ${ampm}`;
   }
 
-  // Update readonly inputs dynamically if not in Edit mode
   function updateLiveTimestamps() {
     if (!document.getElementById("bookId").value) {
       document.getElementById("bookDateAdded").value = getCurrentDateTime();
@@ -262,7 +266,15 @@
     }
   }
 
-  // Fetch data
+  // AUTOMATIC CALCULATION FUNCTION
+  function calculateAvailable(prefix) {
+    const added = parseFloat(document.getElementById(`${prefix}Added`).value) || 0;
+    const taken = parseFloat(document.getElementById(`${prefix}Taken`).value) || 0;
+    
+    const available = added - taken;
+    document.getElementById(`${prefix}Available`).value = available >= 0 ? available : 0;
+  }
+
   function loadAllData() {
     fetch(SCRIPT_URL, {
       method: "POST",
@@ -294,19 +306,22 @@
     }
 
     inventoryData.books.forEach(b => {
-      const available = Number(b.Available !== undefined ? b.Available : (b.Added - b.Taken));
+      const added = Number(b.Added || b['Total Added'] || b.added || 0);
+      const taken = Number(b.Taken || b['Total Taken'] || b.taken || 0);
+      const available = added - taken;
+
       tbody.innerHTML += `
         <tr>
-          <td>${b.Title || ''}</td>
-          <td>${b.Author || ''}</td>
-          <td>₱${Number(b.Price || 0).toFixed(2)}</td>
-          <td>${b.DateAdded || ''}</td>
-          <td>${b.Added || 0}</td>
-          <td>${b.Taken || 0}</td>
+          <td>${b.Title || b.title || ''}</td>
+          <td>${b.Author || b.author || ''}</td>
+          <td>₱${Number(b.Price || b.price || 0).toFixed(2)}</td>
+          <td>${b.DateAdded || b.dateAdded || ''}</td>
+          <td>${added}</td>
+          <td>${taken}</td>
           <td><span class="badge ${available > 0 ? 'bg-green' : 'bg-red'}">${available}</span></td>
           <td>
-            <button class="btn btn-edit" onclick="editBook('${b.ID}')">Edit</button>
-            <button class="btn btn-delete" onclick="deleteItem('Books', '${b.ID}')">Delete</button>
+            <button class="btn btn-edit" onclick="editBook('${b.ID || b.id}')">Edit</button>
+            <button class="btn btn-delete" onclick="deleteItem('Books', '${b.ID || b.id}')">Delete</button>
           </td>
         </tr>
       `;
@@ -318,8 +333,6 @@
     const id = document.getElementById("bookId").value;
     const isNew = !id;
     const bookId = isNew ? "BOOK-" + Date.now() : id;
-    
-    const dateAdded = document.getElementById("bookDateAdded").value;
 
     const payload = {
       action: "saveBook",
@@ -328,9 +341,9 @@
         title: document.getElementById("bookTitle").value,
         author: document.getElementById("bookAuthor").value,
         price: parseFloat(document.getElementById("bookPrice").value),
-        dateAdded: dateAdded,
-        added: parseInt(document.getElementById("bookAdded").value),
-        taken: parseInt(document.getElementById("bookTaken").value)
+        dateAdded: document.getElementById("bookDateAdded").value,
+        added: parseInt(document.getElementById("bookAdded").value) || 0,
+        taken: parseInt(document.getElementById("bookTaken").value) || 0
       }
     };
 
@@ -338,17 +351,18 @@
   });
 
   function editBook(id) {
-    const book = inventoryData.books.find(b => b.ID == id);
+    const book = inventoryData.books.find(b => (b.ID || b.id) == id);
     if (!book) return;
 
-    document.getElementById("bookId").value = book.ID;
-    document.getElementById("bookTitle").value = book.Title;
-    document.getElementById("bookAuthor").value = book.Author;
-    document.getElementById("bookPrice").value = book.Price;
-    document.getElementById("bookDateAdded").value = book.DateAdded || getCurrentDateTime();
-    document.getElementById("bookAdded").value = book.Added;
-    document.getElementById("bookTaken").value = book.Taken;
+    document.getElementById("bookId").value = book.ID || book.id;
+    document.getElementById("bookTitle").value = book.Title || book.title || '';
+    document.getElementById("bookAuthor").value = book.Author || book.author || '';
+    document.getElementById("bookPrice").value = book.Price || book.price || 0;
+    document.getElementById("bookDateAdded").value = book.DateAdded || book.dateAdded || getCurrentDateTime();
+    document.getElementById("bookAdded").value = book.Added || book['Total Added'] || 0;
+    document.getElementById("bookTaken").value = book.Taken || book['Total Taken'] || 0;
 
+    calculateAvailable('book');
     document.getElementById("cancelBookBtn").style.display = "inline-block";
   }
 
@@ -356,6 +370,7 @@
     document.getElementById("bookForm").reset();
     document.getElementById("bookId").value = "";
     document.getElementById("cancelBookBtn").style.display = "none";
+    calculateAvailable('book');
     updateLiveTimestamps();
   }
 
@@ -372,20 +387,23 @@
     }
 
     list.forEach(u => {
-      const available = Number(u.Available !== undefined ? u.Available : (u.Added - u.Taken));
+      const added = Number(u.Added || u['Total Added'] || u.added || 0);
+      const taken = Number(u.Taken || u['Total Taken'] || u.taken || 0);
+      const available = added - taken;
       const sheetName = isBoys ? "Boys Uniforms" : "Girls Uniforms";
+
       tbody.innerHTML += `
         <tr>
-          <td>${u.Type || ''}</td>
-          <td>${u.Size || ''}</td>
-          <td>₱${Number(u.Price || 0).toFixed(2)}</td>
-          <td>${u.DateAdded || ''}</td>
-          <td>${u.Added || 0}</td>
-          <td>${u.Taken || 0}</td>
+          <td>${u.Type || u.type || ''}</td>
+          <td>${u.Size || u.size || ''}</td>
+          <td>₱${Number(u.Price || u.price || 0).toFixed(2)}</td>
+          <td>${u.DateAdded || u.dateAdded || ''}</td>
+          <td>${added}</td>
+          <td>${taken}</td>
           <td><span class="badge ${available > 0 ? 'bg-green' : 'bg-red'}">${available}</span></td>
           <td>
-            <button class="btn btn-edit" onclick="editUniform('${category}', '${u.ID}')">Edit</button>
-            <button class="btn btn-delete" onclick="deleteItem('${sheetName}', '${u.ID}')">Delete</button>
+            <button class="btn btn-edit" onclick="editUniform('${category}', '${u.ID || u.id}')">Edit</button>
+            <button class="btn btn-delete" onclick="deleteItem('${sheetName}', '${u.ID || u.id}')">Delete</button>
           </td>
         </tr>
       `;
@@ -402,8 +420,6 @@
       const isNew = !id;
       const uniformId = isNew ? (isBoys ? "BOY-" : "GIRL-") + Date.now() : id;
 
-      const dateAdded = document.getElementById(`${prefix}DateAdded`).value;
-
       const payload = {
         action: "saveUniform",
         data: {
@@ -412,9 +428,9 @@
           type: document.getElementById(`${prefix}Type`).value,
           size: document.getElementById(`${prefix}Size`).value,
           price: parseFloat(document.getElementById(`${prefix}Price`).value),
-          dateAdded: dateAdded,
-          added: parseInt(document.getElementById(`${prefix}Added`).value),
-          taken: parseInt(document.getElementById(`${prefix}Taken`).value)
+          dateAdded: document.getElementById(`${prefix}DateAdded`).value,
+          added: parseInt(document.getElementById(`${prefix}Added`).value) || 0,
+          taken: parseInt(document.getElementById(`${prefix}Taken`).value) || 0
         }
       };
 
@@ -429,17 +445,18 @@
     const isBoys = category === 'Boys';
     const prefix = isBoys ? 'boys' : 'girls';
     const list = isBoys ? inventoryData.boys : inventoryData.girls;
-    const item = list.find(u => u.ID == id);
+    const item = list.find(u => (u.ID || u.id) == id);
     if (!item) return;
 
-    document.getElementById(`${prefix}Id`).value = item.ID;
-    document.getElementById(`${prefix}Type`).value = item.Type;
-    document.getElementById(`${prefix}Size`).value = item.Size;
-    document.getElementById(`${prefix}Price`).value = item.Price;
-    document.getElementById(`${prefix}DateAdded`).value = item.DateAdded || getCurrentDateTime();
-    document.getElementById(`${prefix}Added`).value = item.Added;
-    document.getElementById(`${prefix}Taken`).value = item.Taken;
+    document.getElementById(`${prefix}Id`).value = item.ID || item.id;
+    document.getElementById(`${prefix}Type`).value = item.Type || item.type || '';
+    document.getElementById(`${prefix}Size`).value = item.Size || item.size || '';
+    document.getElementById(`${prefix}Price`).value = item.Price || item.price || 0;
+    document.getElementById(`${prefix}DateAdded`).value = item.DateAdded || item.dateAdded || getCurrentDateTime();
+    document.getElementById(`${prefix}Added`).value = item.Added || item['Total Added'] || 0;
+    document.getElementById(`${prefix}Taken`).value = item.Taken || item['Total Taken'] || 0;
 
+    calculateAvailable(prefix);
     document.getElementById(`cancel${category}Btn`).style.display = "inline-block";
   }
 
@@ -448,10 +465,10 @@
     document.getElementById(`${prefix}Form`).reset();
     document.getElementById(`${prefix}Id`).value = "";
     document.getElementById(`cancel${category}Btn`).style.display = "none";
+    calculateAvailable(prefix);
     updateLiveTimestamps();
   }
 
-  // --- GENERAL FUNCTIONS ---
   function saveData(payload, resetCallback) {
     fetch(SCRIPT_URL, {
       method: "POST",
