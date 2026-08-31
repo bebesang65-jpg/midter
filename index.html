@@ -17,9 +17,9 @@
     .tab-content.active { display: block; }
 
     .form-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 6px; }
-    .form-group { display: flex; flex-direction: column; flex: 1; min-width: 140px; }
+    .form-group { display: flex; flex-direction: column; flex: 1; min-width: 120px; }
     .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
-    .form-group input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+    .form-group input, .form-group select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
     .form-group input[readonly] { background-color: #e9ecef; color: #495057; cursor: not-allowed; font-weight: bold; }
     
     .btn { padding: 9px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; }
@@ -42,7 +42,7 @@
 
   <h1>Inventory Management System</h1>
 
-  <!-- Navigation Tabs -->
+  <!-- Tabs -->
   <div class="tabs">
     <button class="tab-btn active" onclick="openTab('books')">📚 Books</button>
     <button class="tab-btn" onclick="openTab('boys')">👦 Boys Uniforms</button>
@@ -54,6 +54,9 @@
     <h2>Books Inventory</h2>
     <form id="bookForm" class="form-container">
       <input type="hidden" id="bookId">
+      <input type="hidden" id="bookOriginalAdded" value="0">
+      <input type="hidden" id="bookOriginalTaken" value="0">
+
       <div class="form-group">
         <label>Title</label>
         <input type="text" id="bookTitle" required>
@@ -67,16 +70,27 @@
         <input type="number" step="0.01" id="bookPrice" required>
       </div>
       <div class="form-group">
-        <label>Date & Time Added</label>
+        <label>Date & Time</label>
         <input type="text" id="bookDateAdded" readonly>
       </div>
       <div class="form-group">
-        <label>Total Added Stock</label>
-        <input type="number" id="bookAdded" value="0" min="0" oninput="calculateAvailable('book')" required>
+        <label>Action Type</label>
+        <select id="bookActionType" onchange="calculateStock('book')">
+          <option value="add">➕ Add Stock</option>
+          <option value="deduct">➖ Deduct Stock (Taken)</option>
+        </select>
       </div>
       <div class="form-group">
-        <label>Taken Stock</label>
-        <input type="number" id="bookTaken" value="0" min="0" oninput="calculateAvailable('book')" required>
+        <label>Quantity</label>
+        <input type="number" id="bookQty" value="0" min="0" oninput="calculateStock('book')" required>
+      </div>
+      <div class="form-group">
+        <label>Total Added (Auto)</label>
+        <input type="number" id="bookAdded" value="0" readonly>
+      </div>
+      <div class="form-group">
+        <label>Taken (Auto)</label>
+        <input type="number" id="bookTaken" value="0" readonly>
       </div>
       <div class="form-group">
         <label>Available Stock (Auto)</label>
@@ -110,12 +124,15 @@
     <h2>Boys Uniforms</h2>
     <form id="boysForm" class="form-container">
       <input type="hidden" id="boysId">
+      <input type="hidden" id="boysOriginalAdded" value="0">
+      <input type="hidden" id="boysOriginalTaken" value="0">
+
       <div class="form-group">
-        <label>Type (e.g. Polo)</label>
+        <label>Type</label>
         <input type="text" id="boysType" required>
       </div>
       <div class="form-group">
-        <label>Size (e.g. M, L)</label>
+        <label>Size</label>
         <input type="text" id="boysSize" required>
       </div>
       <div class="form-group">
@@ -123,16 +140,27 @@
         <input type="number" step="0.01" id="boysPrice" required>
       </div>
       <div class="form-group">
-        <label>Date & Time Added</label>
+        <label>Date & Time</label>
         <input type="text" id="boysDateAdded" readonly>
       </div>
       <div class="form-group">
-        <label>Total Added Stock</label>
-        <input type="number" id="boysAdded" value="0" min="0" oninput="calculateAvailable('boys')" required>
+        <label>Action Type</label>
+        <select id="boysActionType" onchange="calculateStock('boys')">
+          <option value="add">➕ Add Stock</option>
+          <option value="deduct">➖ Deduct Stock (Taken)</option>
+        </select>
       </div>
       <div class="form-group">
-        <label>Taken Stock</label>
-        <input type="number" id="boysTaken" value="0" min="0" oninput="calculateAvailable('boys')" required>
+        <label>Quantity</label>
+        <input type="number" id="boysQty" value="0" min="0" oninput="calculateStock('boys')" required>
+      </div>
+      <div class="form-group">
+        <label>Total Added (Auto)</label>
+        <input type="number" id="boysAdded" value="0" readonly>
+      </div>
+      <div class="form-group">
+        <label>Taken (Auto)</label>
+        <input type="number" id="boysTaken" value="0" readonly>
       </div>
       <div class="form-group">
         <label>Available Stock (Auto)</label>
@@ -166,12 +194,15 @@
     <h2>Girls Uniforms</h2>
     <form id="girlsForm" class="form-container">
       <input type="hidden" id="girlsId">
+      <input type="hidden" id="girlsOriginalAdded" value="0">
+      <input type="hidden" id="girlsOriginalTaken" value="0">
+
       <div class="form-group">
-        <label>Type (e.g. Skirt)</label>
+        <label>Type</label>
         <input type="text" id="girlsType" required>
       </div>
       <div class="form-group">
-        <label>Size (e.g. S, M)</label>
+        <label>Size</label>
         <input type="text" id="girlsSize" required>
       </div>
       <div class="form-group">
@@ -179,16 +210,27 @@
         <input type="number" step="0.01" id="girlsPrice" required>
       </div>
       <div class="form-group">
-        <label>Date & Time Added</label>
+        <label>Date & Time</label>
         <input type="text" id="girlsDateAdded" readonly>
       </div>
       <div class="form-group">
-        <label>Total Added Stock</label>
-        <input type="number" id="girlsAdded" value="0" min="0" oninput="calculateAvailable('girls')" required>
+        <label>Action Type</label>
+        <select id="girlsActionType" onchange="calculateStock('girls')">
+          <option value="add">➕ Add Stock</option>
+          <option value="deduct">➖ Deduct Stock (Taken)</option>
+        </select>
       </div>
       <div class="form-group">
-        <label>Taken Stock</label>
-        <input type="number" id="girlsTaken" value="0" min="0" oninput="calculateAvailable('girls')" required>
+        <label>Quantity</label>
+        <input type="number" id="girlsQty" value="0" min="0" oninput="calculateStock('girls')" required>
+      </div>
+      <div class="form-group">
+        <label>Total Added (Auto)</label>
+        <input type="number" id="girlsAdded" value="0" readonly>
+      </div>
+      <div class="form-group">
+        <label>Taken (Auto)</label>
+        <input type="number" id="girlsTaken" value="0" readonly>
       </div>
       <div class="form-group">
         <label>Available Stock (Auto)</label>
@@ -218,7 +260,6 @@
   </div>
 
 <script>
-  // Ang bag-o nimo nga Apps Script URL
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGInehLYpXzd-dc8pJFO2Q-NsOMkp92QaO0OG8Z4nLXjrAIayT-ud95oAEVRL4v2y2ow/exec";
 
   let inventoryData = { books: [], boys: [], girls: [] };
@@ -267,11 +308,27 @@
     }
   }
 
-  function calculateAvailable(prefix) {
-    const added = parseFloat(document.getElementById(`${prefix}Added`).value) || 0;
-    const taken = parseFloat(document.getElementById(`${prefix}Taken`).value) || 0;
+  // AUTOMATIC CALCULATION FUNCTION (Add vs Deduct)
+  function calculateStock(prefix) {
+    const actionType = document.getElementById(`${prefix}ActionType`).value;
+    const qty = parseInt(document.getElementById(`${prefix}Qty`).value) || 0;
     
-    const available = added - taken;
+    const baseAdded = parseInt(document.getElementById(`${prefix}OriginalAdded`).value) || 0;
+    const baseTaken = parseInt(document.getElementById(`${prefix}OriginalTaken`).value) || 0;
+
+    let finalAdded = baseAdded;
+    let finalTaken = baseTaken;
+
+    if (actionType === "add") {
+      finalAdded = baseAdded + qty;
+    } else if (actionType === "deduct") {
+      finalTaken = baseTaken + qty;
+    }
+
+    const available = finalAdded - finalTaken;
+
+    document.getElementById(`${prefix}Added`).value = finalAdded;
+    document.getElementById(`${prefix}Taken`).value = finalTaken;
     document.getElementById(`${prefix}Available`).value = available >= 0 ? available : 0;
   }
 
@@ -354,23 +411,30 @@
     const book = inventoryData.books.find(b => (b.ID || b.id) == id);
     if (!book) return;
 
+    const baseAdded = Number(book.Added || book['Total Added'] || 0);
+    const baseTaken = Number(book.Taken || book['Total Taken'] || 0);
+
     document.getElementById("bookId").value = book.ID || book.id;
+    document.getElementById("bookOriginalAdded").value = baseAdded;
+    document.getElementById("bookOriginalTaken").value = baseTaken;
+
     document.getElementById("bookTitle").value = book.Title || book.title || '';
     document.getElementById("bookAuthor").value = book.Author || book.author || '';
     document.getElementById("bookPrice").value = book.Price || book.price || 0;
     document.getElementById("bookDateAdded").value = book.DateAdded || book.dateAdded || getCurrentDateTime();
-    document.getElementById("bookAdded").value = book.Added || book['Total Added'] || 0;
-    document.getElementById("bookTaken").value = book.Taken || book['Total Taken'] || 0;
+    document.getElementById("bookQty").value = 0;
 
-    calculateAvailable('book');
+    calculateStock('book');
     document.getElementById("cancelBookBtn").style.display = "inline-block";
   }
 
   function resetBookForm() {
     document.getElementById("bookForm").reset();
     document.getElementById("bookId").value = "";
+    document.getElementById("bookOriginalAdded").value = "0";
+    document.getElementById("bookOriginalTaken").value = "0";
     document.getElementById("cancelBookBtn").style.display = "none";
-    calculateAvailable('book');
+    calculateStock('book');
     updateLiveTimestamps();
   }
 
@@ -448,15 +512,20 @@
     const item = list.find(u => (u.ID || u.id) == id);
     if (!item) return;
 
+    const baseAdded = Number(item.Added || item['Total Added'] || 0);
+    const baseTaken = Number(item.Taken || item['Total Taken'] || 0);
+
     document.getElementById(`${prefix}Id`).value = item.ID || item.id;
+    document.getElementById(`${prefix}OriginalAdded`).value = baseAdded;
+    document.getElementById(`${prefix}OriginalTaken`).value = baseTaken;
+
     document.getElementById(`${prefix}Type`).value = item.Type || item.type || '';
     document.getElementById(`${prefix}Size`).value = item.Size || item.size || '';
     document.getElementById(`${prefix}Price`).value = item.Price || item.price || 0;
     document.getElementById(`${prefix}DateAdded`).value = item.DateAdded || item.dateAdded || getCurrentDateTime();
-    document.getElementById(`${prefix}Added`).value = item.Added || item['Total Added'] || 0;
-    document.getElementById(`${prefix}Taken`).value = item.Taken || item['Total Taken'] || 0;
+    document.getElementById(`${prefix}Qty`).value = 0;
 
-    calculateAvailable(prefix);
+    calculateStock(prefix);
     document.getElementById(`cancel${category}Btn`).style.display = "inline-block";
   }
 
@@ -464,8 +533,10 @@
     const prefix = category === 'Boys' ? 'boys' : 'girls';
     document.getElementById(`${prefix}Form`).reset();
     document.getElementById(`${prefix}Id`).value = "";
+    document.getElementById(`${prefix}OriginalAdded`).value = "0";
+    document.getElementById(`${prefix}OriginalTaken`).value = "0";
     document.getElementById(`cancel${category}Btn`).style.display = "none";
-    calculateAvailable(prefix);
+    calculateStock(prefix);
     updateLiveTimestamps();
   }
 
