@@ -1,5 +1,224 @@
+<!DOCTYPE html>
+<html lang="ceb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory System</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #f4f6f9; padding: 20px; color: #333; }
+    h1 { text-align: center; margin-bottom: 20px; color: #2c3e50; }
+    
+    .tabs { display: flex; justify-content: center; margin-bottom: 20px; gap: 10px; }
+    .tab-btn { padding: 10px 20px; font-size: 16px; border: none; background-color: #e0e0e0; cursor: pointer; border-radius: 5px; font-weight: bold; transition: 0.3s; }
+    .tab-btn.active { background-color: #3498db; color: white; }
+    
+    .tab-content { display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .tab-content.active { display: block; }
+
+    .form-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 6px; }
+    .form-group { display: flex; flex-direction: column; flex: 1; min-width: 140px; }
+    .form-group label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
+    .form-group input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+    .form-group input[readonly] { background-color: #e9ecef; color: #495057; cursor: not-allowed; font-weight: bold; }
+    
+    .btn { padding: 9px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; }
+    .btn-save { background-color: #2ecc71; margin-top: 19px; }
+    .btn-cancel { background-color: #95a5a6; margin-top: 19px; }
+    .btn-edit { background-color: #f39c12; padding: 4px 8px; font-size: 12px; }
+    .btn-delete { background-color: #e74c3c; padding: 4px 8px; font-size: 12px; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
+    th { background-color: #34495e; color: white; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    
+    .badge { padding: 3px 7px; border-radius: 3px; font-weight: bold; color: white; }
+    .bg-green { background-color: #2ecc71; }
+    .bg-red { background-color: #e74c3c; }
+  </style>
+</head>
+<body>
+
+  <h1>Inventory Management System</h1>
+
+  <!-- Navigation Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="openTab('books')">📚 Books</button>
+    <button class="tab-btn" onclick="openTab('boys')">👦 Boys Uniforms</button>
+    <button class="tab-btn" onclick="openTab('girls')">👧 Girls Uniforms</button>
+  </div>
+
+  <!-- BOOKS SECTION -->
+  <div id="books" class="tab-content active">
+    <h2>Books Inventory</h2>
+    <form id="bookForm" class="form-container">
+      <input type="hidden" id="bookId">
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="bookTitle" required>
+      </div>
+      <div class="form-group">
+        <label>Author</label>
+        <input type="text" id="bookAuthor" required>
+      </div>
+      <div class="form-group">
+        <label>Price (₱)</label>
+        <input type="number" step="0.01" id="bookPrice" required>
+      </div>
+      <div class="form-group">
+        <label>Date & Time Added</label>
+        <input type="text" id="bookDateAdded" readonly>
+      </div>
+      <div class="form-group">
+        <label>Total Added Stock</label>
+        <input type="number" id="bookAdded" value="0" min="0" oninput="calculateAvailable('book')" required>
+      </div>
+      <div class="form-group">
+        <label>Taken Stock</label>
+        <input type="number" id="bookTaken" value="0" min="0" oninput="calculateAvailable('book')" required>
+      </div>
+      <div class="form-group">
+        <label>Available Stock (Auto)</label>
+        <input type="number" id="bookAvailable" value="0" readonly>
+      </div>
+      <button type="submit" class="btn btn-save" id="saveBookBtn">Save Book</button>
+      <button type="button" class="btn btn-cancel" id="cancelBookBtn" style="display:none;" onclick="resetBookForm()">Cancel</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Price</th>
+          <th>Date & Time Added</th>
+          <th>Total Added</th>
+          <th>Taken</th>
+          <th>Available Stock</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="booksTableBody">
+        <tr><td colspan="8">Loading data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- BOYS UNIFORMS SECTION -->
+  <div id="boys" class="tab-content">
+    <h2>Boys Uniforms</h2>
+    <form id="boysForm" class="form-container">
+      <input type="hidden" id="boysId">
+      <div class="form-group">
+        <label>Type (e.g. Polo)</label>
+        <input type="text" id="boysType" required>
+      </div>
+      <div class="form-group">
+        <label>Size (e.g. M, L)</label>
+        <input type="text" id="boysSize" required>
+      </div>
+      <div class="form-group">
+        <label>Price (₱)</label>
+        <input type="number" step="0.01" id="boysPrice" required>
+      </div>
+      <div class="form-group">
+        <label>Date & Time Added</label>
+        <input type="text" id="boysDateAdded" readonly>
+      </div>
+      <div class="form-group">
+        <label>Total Added Stock</label>
+        <input type="number" id="boysAdded" value="0" min="0" oninput="calculateAvailable('boys')" required>
+      </div>
+      <div class="form-group">
+        <label>Taken Stock</label>
+        <input type="number" id="boysTaken" value="0" min="0" oninput="calculateAvailable('boys')" required>
+      </div>
+      <div class="form-group">
+        <label>Available Stock (Auto)</label>
+        <input type="number" id="boysAvailable" value="0" readonly>
+      </div>
+      <button type="submit" class="btn btn-save">Save Uniform</button>
+      <button type="button" class="btn btn-cancel" id="cancelBoysBtn" style="display:none;" onclick="resetUniformForm('Boys')">Cancel</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Size</th>
+          <th>Price</th>
+          <th>Date & Time Added</th>
+          <th>Total Added</th>
+          <th>Taken</th>
+          <th>Available Stock</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="boysTableBody">
+        <tr><td colspan="8">Loading data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- GIRLS UNIFORMS SECTION -->
+  <div id="girls" class="tab-content">
+    <h2>Girls Uniforms</h2>
+    <form id="girlsForm" class="form-container">
+      <input type="hidden" id="girlsId">
+      <div class="form-group">
+        <label>Type (e.g. Skirt)</label>
+        <input type="text" id="girlsType" required>
+      </div>
+      <div class="form-group">
+        <label>Size (e.g. S, M)</label>
+        <input type="text" id="girlsSize" required>
+      </div>
+      <div class="form-group">
+        <label>Price (₱)</label>
+        <input type="number" step="0.01" id="girlsPrice" required>
+      </div>
+      <div class="form-group">
+        <label>Date & Time Added</label>
+        <input type="text" id="girlsDateAdded" readonly>
+      </div>
+      <div class="form-group">
+        <label>Total Added Stock</label>
+        <input type="number" id="girlsAdded" value="0" min="0" oninput="calculateAvailable('girls')" required>
+      </div>
+      <div class="form-group">
+        <label>Taken Stock</label>
+        <input type="number" id="girlsTaken" value="0" min="0" oninput="calculateAvailable('girls')" required>
+      </div>
+      <div class="form-group">
+        <label>Available Stock (Auto)</label>
+        <input type="number" id="girlsAvailable" value="0" readonly>
+      </div>
+      <button type="submit" class="btn btn-save">Save Uniform</button>
+      <button type="button" class="btn btn-cancel" id="cancelGirlsBtn" style="display:none;" onclick="resetUniformForm('Girls')">Cancel</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Size</th>
+          <th>Price</th>
+          <th>Date & Time Added</th>
+          <th>Total Added</th>
+          <th>Taken</th>
+          <th>Available Stock</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="girlsTableBody">
+        <tr><td colspan="8">Loading data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
 <script>
-  // Bag-ong gi-update nga Google Apps Script Web App URL
+  // Ang bag-o nimo nga Apps Script URL
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGInehLYpXzd-dc8pJFO2Q-NsOMkp92QaO0OG8Z4nLXjrAIayT-ud95oAEVRL4v2y2ow/exec";
 
   let inventoryData = { books: [], boys: [], girls: [] };
@@ -48,7 +267,6 @@
     }
   }
 
-  // AUTOMATIC CALCULATION FUNCTION
   function calculateAvailable(prefix) {
     const added = parseFloat(document.getElementById(`${prefix}Added`).value) || 0;
     const taken = parseFloat(document.getElementById(`${prefix}Taken`).value) || 0;
@@ -286,3 +504,6 @@
     .catch(err => console.error("Error:", err));
   }
 </script>
+
+</body>
+</html>
