@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ceb">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,332 +16,423 @@
 
   <style>
     :root {
-      --bg-gradient: radial-gradient(circle at center, #0d3838 0%, #051a1a 100%);
-      --card-bg: rgba(10, 35, 35, 0.75);
-      --card-border: #134e4e;
-      --text-main: #ffffff;
-      --text-muted: #94a3b8;
-      --input-bg: #092121;
-      --input-border: #134e4e;
-      --accent-teal: #14b8a6;
-      --accent-hover: #0d9488;
-      --icon-box-bg: #0f3838;
+      --primary: #0d3b3e;
+      --primary-hover: #08282a;
+      --accent: #2563eb;
+      --bg-main: #f8fafc;
+      --sidebar-bg: #0f172a;
+      --sidebar-hover: #1e293b;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    
-    body {
-      background: var(--bg-gradient);
-      background-size: cover;
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text-main); display: flex; min-height: 100vh; }
 
-    /* AUTH CARD DESIGN MATCHING YOUR SCREENSHOT */
-    .auth-container {
-      width: 100%;
-      max-width: 480px;
-      padding: 20px;
+    /* AUTHENTICATION SCREEN */
+    #authSection {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(135deg, #051b1e 0%, #0a3236 50%, #020f11 100%);
+      display: flex; justify-content: center; align-items: center; z-index: 999;
+      padding: 20px; overflow-y: auto;
     }
-
     .auth-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 40px 30px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      backdrop-filter: blur(10px);
+      width: 100%; max-width: 420px; text-align: center; padding: 30px;
     }
-
     .auth-card h2 {
-      color: var(--accent-teal);
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      margin-bottom: 16px;
-      text-transform: uppercase;
+      color: #ffffff; font-size: 26px; font-weight: 800; margin-bottom: 25px; letter-spacing: 1.5px;
     }
-
-    .auth-card p.description {
-      color: #a0aec0;
-      font-size: 13px;
-      line-height: 1.5;
-      margin-bottom: 25px;
-    }
-
-    /* INPUT FIELD WITH INTEGRATED ICON BOX */
+    
     .input-group {
-      display: flex;
-      margin-bottom: 18px;
-      width: 100%;
+      position: relative; margin-bottom: 16px; display: flex; align-items: center;
     }
-
-    .input-icon-box {
-      background: var(--icon-box-bg);
-      border: 1px solid var(--input-border);
-      border-right: none;
-      border-radius: 4px 0 0 4px;
-      width: 45px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: var(--accent-teal);
-      font-size: 16px;
+    .input-icon {
+      position: absolute; width: 48px; height: 48px; background: #ffffff;
+      border-radius: 50%; display: flex; justify-content: center; align-items: center;
+      font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 2;
     }
+    .input-icon.left { left: 0; }
+    .input-icon.right { right: 0; }
 
     .auth-input, .auth-select {
-      flex: 1;
-      height: 45px;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      border-radius: 0 4px 4px 0;
-      padding: 0 15px;
-      color: #ffffff;
-      font-size: 14px;
-      outline: none;
-      transition: border 0.2s;
+      width: 100%; height: 48px; background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 25px;
+      padding: 0 20px 0 58px; color: #ffffff; font-size: 14px; outline: none;
+      backdrop-filter: blur(5px); transition: all 0.3s ease;
     }
-
-    .auth-input::placeholder {
-      color: #4a5568;
-    }
-
+    .auth-input::placeholder { color: #cbd5e1; }
     .auth-input:focus, .auth-select:focus {
-      border-color: var(--accent-teal);
+      background: rgba(255, 255, 255, 0.25); border-color: #ffffff;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
     }
-
-    .auth-select option {
-      background: #092121;
-      color: #fff;
-    }
-
-    /* BRIGHT TEAL BUTTON */
-    .btn-submit {
-      width: 100%;
-      height: 45px;
-      background: var(--accent-teal);
-      color: #ffffff;
-      border: none;
-      border-radius: 4px;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.2s;
-      text-transform: uppercase;
-    }
-
-    .btn-submit:hover {
-      background: var(--accent-hover);
-    }
-
-    .btn-submit:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+    .auth-select option { background: #0a3236; color: #ffffff; }
 
     .timer-badge {
-      display: block;
-      color: #f59e0b;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 15px;
+      font-weight: 700; color: #f59e0b; font-size: 14px; margin-bottom: 12px; display: block;
     }
 
-    .auth-toggle-link {
-      margin-top: 20px;
-      display: inline-block;
-      color: #a0aec0;
-      font-size: 12px;
-      text-decoration: underline;
-      cursor: pointer;
+    .btn-auth {
+      width: 100%; height: 48px; background: #ffffff; color: #0a3236;
+      border: none; border-radius: 25px; font-weight: 800; cursor: pointer;
+      font-size: 15px; margin-top: 10px; transition: 0.3s; letter-spacing: 1px;
     }
+    .btn-auth:hover { background: #e2e8f0; transform: translateY(-2px); }
+    .btn-resend { background: #2563eb; color: #ffffff; }
+    .btn-resend:hover { background: #1d4ed8; }
+    
+    .auth-toggle {
+      margin-top: 20px; color: #cbd5e1; font-size: 13px; cursor: pointer; text-decoration: underline;
+    }
+    .auth-toggle:hover { color: #ffffff; }
 
-    .auth-toggle-link:hover {
-      color: var(--accent-teal);
-    }
+    /* LAYOUT & SIDEBAR */
+    #mainSystem { display: none; width: 100%; }
+    .app-container { display: flex; min-height: 100vh; }
+    
+    .sidebar { width: 260px; background-color: var(--sidebar-bg); color: white; display: flex; flex-direction: column; justify-content: space-between; padding: 24px 0; flex-shrink: 0; }
+    .brand { padding: 0 24px 16px 24px; font-size: 16px; font-weight: 700; border-bottom: 1px solid #1e293b; letter-spacing: 0.5px; display: flex; flex-direction: column; gap: 4px; }
+    .user-badge { font-size: 11px; background: #334155; padding: 4px 8px; border-radius: 4px; color: #38bdf8; width: fit-content; font-weight: 600; margin-top: 6px; }
+    
+    .nav-menu { list-style: none; margin-top: 20px; }
+    .nav-item { padding: 14px 24px; font-size: 14px; color: #94a3b8; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px; font-weight: 500; }
+    .nav-item:hover { background-color: var(--sidebar-hover); color: #f8fafc; }
+    .nav-item.active { background-color: var(--accent); color: white; font-weight: 600; }
+    
+    .btn-logout-sidebar { margin: 20px 24px 0 24px; padding: 12px; background-color: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; cursor: pointer; font-weight: 600; text-align: center; transition: 0.2s; }
+    .btn-logout-sidebar:hover { background-color: #ef4444; color: white; }
+
+    /* MAIN CONTENT AREA */
+    .main-content { flex: 1; padding: 32px; overflow-y: auto; }
+    .page-header { margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+    .page-header h1 { font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+    .page-header p { color: var(--text-muted); font-size: 13px; }
+
+    /* DASHBOARD CARDS */
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 24px; }
+    .card { background: var(--card-bg); padding: 18px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.02); position: relative; overflow: hidden; }
+    .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); }
+    .card.value-card::before { background: var(--warning); }
+    .card h3 { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .card .count { font-size: 28px; font-weight: 800; color: var(--text-main); line-height: 1; }
+
+    .view-panel { display: none; }
+    .view-panel.active { display: block; }
+
+    .admin-only { display: block; }
   </style>
 </head>
 <body>
 
-  <div class="auth-container">
+  <!-- AUTHENTICATION SCREEN -->
+  <div id="authSection">
     
-    <!-- LOGIN VIEW -->
+    <!-- LOGIN CARD -->
     <div class="auth-card" id="loginCard">
       <h2>USER LOGIN</h2>
-      <p class="description">Enter your details to access the bookstore inventory management system.</p>
-      
       <form id="loginForm">
         <div class="input-group">
-          <div class="input-icon-box">👤</div>
-          <input type="text" id="loginUser" class="auth-input" placeholder="Username" required>
+          <div class="input-icon left">👤</div>
+          <input type="text" id="loginUsername" class="auth-input" placeholder="Username" required>
         </div>
         <div class="input-group">
-          <div class="input-icon-box">🔒</div>
-          <input type="password" id="loginPass" class="auth-input" placeholder="Password" required>
+          <input type="password" id="loginPassword" class="auth-input" style="padding-left: 20px; padding-right: 60px;" placeholder="Password" required>
+          <div class="input-icon right">🔒</div>
         </div>
-        <button type="submit" class="btn-submit">LOGIN</button>
+        <button type="submit" class="btn-auth">LOGIN</button>
       </form>
-      
-      <a class="auth-toggle-link" onclick="showCard('signup')">Don't have an account? Register here</a>
+      <div class="auth-toggle" onclick="toggleAuth('signup')">Wala pa'y account? Mag Sign Up diri</div>
     </div>
 
-    <!-- SIGNUP VIEW -->
+    <!-- SIGN UP CARD -->
     <div class="auth-card" id="signupCard" style="display: none;">
-      <h2>CREATE ACCOUNT</h2>
-      <p class="description">Fill in your information to receive a verification code via Gmail.</p>
+      <h2 id="signupHeaderTitle">CREATE ACCOUNT</h2>
       
+      <!-- STEP 1: REGISTRATION FORM -->
       <form id="signupForm">
         <div class="input-group">
-          <div class="input-icon-box">📧</div>
+          <div class="input-icon left">📧</div>
           <input type="email" id="signupEmail" class="auth-input" placeholder="Gmail Address" required>
         </div>
         <div class="input-group">
-          <div class="input-icon-box">👤</div>
-          <input type="text" id="signupUser" class="auth-input" placeholder="Username" required>
+          <div class="input-icon left">👤</div>
+          <input type="text" id="signupUsername" class="auth-input" placeholder="Choose Username" required>
         </div>
         <div class="input-group">
-          <div class="input-icon-box">🔒</div>
-          <input type="password" id="signupPass" class="auth-input" placeholder="Password" required>
+          <input type="password" id="signupPassword" class="auth-input" style="padding-left: 20px; padding-right: 60px;" placeholder="Choose Password" required>
+          <div class="input-icon right">🔒</div>
         </div>
         <div class="input-group">
-          <div class="input-icon-box">🔑</div>
+          <div class="input-icon left">🔑</div>
           <select id="signupRole" class="auth-select" required>
             <option value="" disabled selected>-- Select Role --</option>
             <option value="Staff">Staff / Cashier</option>
             <option value="Admin">Admin (Full Access)</option>
           </select>
         </div>
-        <button type="submit" id="btnRegister" class="btn-submit">REGISTER & SEND OTP</button>
+        <button type="submit" class="btn-auth" id="btnRegister">SEND OTP TO GMAIL</button>
       </form>
 
-      <a class="auth-toggle-link" onclick="showCard('login')">Already have an account? Login here</a>
-    </div>
+      <!-- STEP 2: OTP VERIFICATION -->
+      <div id="otpSection" style="display: none;">
+        <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 12px;">
+          Gipadad-an og OTP verification code ang imong Gmail address. Paki-check sa imong Inbox/Spam.
+        </p>
 
-    <!-- GMAIL VERIFICATION VIEW (MATCHING YOUR SCREENSHOT) -->
-    <div class="auth-card" id="otpCard" style="display: none;">
-      <h2>GMAIL VERIFICATION</h2>
-      <p class="description">A 6-digit verification code has been sent to your Gmail address. Please enter it below to complete registration.</p>
-      
-      <span id="timerDisplay" class="timer-badge">Code expires in: 60s</span>
+        <span id="timerDisplay" class="timer-badge">Mawala ang code sa: 60s</span>
 
-      <form id="otpForm">
-        <div class="input-group">
-          <div class="input-icon-box">🔢</div>
-          <input type="text" id="otpInput" class="auth-input" placeholder="Enter 6-Digit Verification Code" maxlength="6" required>
-        </div>
-        <button type="submit" class="btn-submit">VERIFY & COMPLETE</button>
-      </form>
+        <form id="otpForm">
+          <div class="input-group">
+            <div class="input-icon left">🔢</div>
+            <input type="text" id="signupOTP" class="auth-input" placeholder="Enter 6-Digit Code" maxlength="6" required>
+          </div>
+          <button type="submit" class="btn-auth" id="btnVerify">VERIFY & ENTER DASHBOARD</button>
+        </form>
 
-      <button type="button" id="btnResend" class="btn-submit" style="background: #2563eb; display: none; margin-top: 10px;" onclick="resendCode()">RESEND CODE</button>
-      <br>
-      <a class="auth-toggle-link" onclick="showCard('login')">Already have an account? Login here</a>
+        <button type="button" class="btn-auth btn-resend" id="btnResend" style="display: none;" onclick="resendOTP()">RESEND BAG-ONG CODE</button>
+      </div>
+
+      <div class="auth-toggle" onclick="toggleAuth('login')">Naa na'y account? Mag-Login na lang</div>
     </div>
 
   </div>
 
+  <!-- MAIN SYSTEM CONTENT -->
+  <div id="mainSystem">
+    <div class="app-container">
+      
+      <div class="sidebar">
+        <div>
+          <div class="brand">
+            <span>📚 BOOKSTORE INVENTORY</span>
+            <span id="userRoleDisplay" class="user-badge">Role: Admin</span>
+          </div>
+          <ul class="nav-menu">
+            <li class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard', this)">1. Dashboard</li>
+            <li class="nav-item" id="nav-books" onclick="switchView('books', this)">2. Books Inventory</li>
+          </ul>
+        </div>
+        <button class="btn-logout-sidebar" onclick="logout()">Logout 🚪</button>
+      </div>
+
+      <div class="main-content">
+        <div id="dashboard" class="view-panel active">
+          <div class="page-header">
+            <div>
+              <h1 id="welcomeUserHeader">System Overview</h1>
+              <p>Live summary of stock levels and inventory metrics.</p>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="card">
+              <h3>Total Books Stock</h3>
+              <div class="count" id="dashTotalBooks">150</div>
+            </div>
+            <div class="card value-card admin-only">
+              <h3>Est. Total Inventory Value</h3>
+              <div class="count" id="dashTotalValue" style="font-size:22px;">₱4,250.00</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="books" class="view-panel">
+          <div class="page-header">
+            <h1>Books Inventory</h1>
+          </div>
+          <p style="color: var(--text-muted);">Book inventory records panel.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script>
+  let users = JSON.parse(localStorage.getItem("system_users")) || [
+    { email: "admin@gmail.com", username: "admin", password: "123", role: "Admin" }
+  ];
+
+  let currentUser = null;
   let generatedOTP = null;
-  let tempUserData = null;
-  let countdown = null;
-  let timerSeconds = 60;
-  let isExpired = false;
+  let pendingUserData = null;
+  let countdownTimer = null;
+  let timeLeft = 60;
+  let isCodeExpired = false;
 
-  function showCard(type) {
-    clearInterval(countdown);
-    document.getElementById("loginCard").style.display = "none";
-    document.getElementById("signupCard").style.display = "none";
-    document.getElementById("otpCard").style.display = "none";
-
-    if (type === 'signup') document.getElementById("signupCard").style.display = "block";
-    else if (type === 'otp') document.getElementById("otpCard").style.display = "block";
-    else document.getElementById("loginCard").style.display = "block";
+  function toggleAuth(view) {
+    clearInterval(countdownTimer);
+    if (view === 'signup') {
+      document.getElementById("loginCard").style.display = "none";
+      document.getElementById("signupCard").style.display = "block";
+      resetSignupForm();
+    } else {
+      document.getElementById("signupCard").style.display = "none";
+      document.getElementById("loginCard").style.display = "block";
+    }
   }
 
-  // STEP 1: SEND EMAIL VIA EMAILJS
+  function resetSignupForm() {
+    clearInterval(countdownTimer);
+    document.getElementById("signupForm").reset();
+    document.getElementById("otpForm").reset();
+    document.getElementById("signupForm").style.display = "block";
+    document.getElementById("otpSection").style.display = "none";
+    document.getElementById("signupHeaderTitle").innerText = "CREATE ACCOUNT";
+  }
+
+  // STEP 1: SUBMIT SIGNUP & SEND VIA EMAILJS
   document.getElementById("signupForm").addEventListener("submit", function(e) {
     e.preventDefault();
-    
+
     const email = document.getElementById("signupEmail").value.trim();
-    const user = document.getElementById("signupUser").value.trim();
-    const pass = document.getElementById("signupPass").value;
+    const user = document.getElementById("signupUsername").value.trim();
+    const pass = document.getElementById("signupPassword").value;
     const role = document.getElementById("signupRole").value;
 
-    tempUserData = { email, user, pass, role };
+    if (users.find(u => u.username === user)) {
+      alert("❌ Kana nga Username na-gamit na! Mag-pili og lain.");
+      return;
+    }
+
+    pendingUserData = { email, username: user, password: pass, role };
+    
+    // Generate Random 6-digit OTP
     generatedOTP = Math.floor(100000 + Math.random() * 900000);
 
-    const btn = document.getElementById("btnRegister");
-    btn.innerText = "SENDING EMAIL...";
-    btn.disabled = true;
+    const btnRegister = document.getElementById("btnRegister");
+    btnRegister.innerText = "SENDING EMAIL...";
+    btnRegister.disabled = true;
 
-    // TODO: Ipuli ang 'YOUR_SERVICE_ID' ug 'YOUR_TEMPLATE_ID' gikan sa EmailJS Dashboard
+    // EmailJS API Call
+    // TODO: I-replace ang 'YOUR_SERVICE_ID' ug 'YOUR_TEMPLATE_ID' sa imong actual IDs sa EmailJS
     emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
       to_email: email,
       to_name: user,
       otp_code: generatedOTP
     }).then(() => {
-      btn.innerText = "REGISTER & SEND OTP";
-      btn.disabled = false;
-      showCard('otp');
-      startTimer();
-    }).catch((err) => {
-      btn.innerText = "REGISTER & SEND OTP";
-      btn.disabled = false;
-      alert("❌ Email Sending Failed! Check EmailJS credentials or connection.");
+      btnRegister.innerText = "SEND OTP TO GMAIL";
+      btnRegister.disabled = false;
+
+      document.getElementById("signupForm").style.display = "none";
+      document.getElementById("otpSection").style.display = "block";
+      document.getElementById("signupHeaderTitle").innerText = "GMAIL VERIFICATION";
+      document.getElementById("btnResend").style.display = "none";
+
+      start60sTimer();
+    }).catch((error) => {
+      btnRegister.innerText = "SEND OTP TO GMAIL";
+      btnRegister.disabled = false;
+      alert("❌ Nagka-error sa pag-send sa email. Siguroha nga husto ang EmailJS Keys ug Internet connection.\n\nError details: " + JSON.stringify(error));
     });
   });
 
-  // COUNTDOWN TIMER
-  function startTimer() {
-    clearInterval(countdown);
-    timerSeconds = 60;
-    isExpired = false;
-    document.getElementById("btnResend").style.display = "none";
-    
-    const timerElem = document.getElementById("timerDisplay");
-    timerElem.style.color = "#f59e0b";
+  // 60-SECOND COUNTDOWN TIMER
+  function start60sTimer() {
+    clearInterval(countdownTimer);
+    timeLeft = 60;
+    isCodeExpired = false;
+    const timerDisplay = document.getElementById("timerDisplay");
+    timerDisplay.style.color = "#f59e0b";
 
-    countdown = setInterval(() => {
-      timerSeconds--;
-      timerElem.innerText = `Code expires in: ${timerSeconds}s`;
+    countdownTimer = setInterval(() => {
+      timeLeft--;
+      timerDisplay.innerText = `Mawala ang code sa: ${timeLeft}s`;
 
-      if (timerSeconds <= 0) {
-        clearInterval(countdown);
-        isExpired = true;
-        timerElem.innerText = "Code Expired! Click Resend to get a new code.";
-        timerElem.style.color = "#ef4444";
+      if (timeLeft <= 0) {
+        clearInterval(countdownTimer);
+        isCodeExpired = true;
+        timerDisplay.innerText = "EXPIRED NA ANG OTP CODE! (60s Limit)";
+        timerDisplay.style.color = "#ef4444";
         document.getElementById("btnResend").style.display = "block";
       }
     }, 1000);
   }
 
-  function resendCode() {
-    document.getElementById("signupForm").dispatchEvent(new Event('submit'));
+  function resendOTP() {
+    if (pendingUserData) {
+      document.getElementById("signupForm").dispatchEvent(new Event('submit'));
+    }
   }
 
-  // STEP 2: VERIFY CODE
+  // STEP 2: VERIFY OTP & ENTER DASHBOARD
   document.getElementById("otpForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
-    if (isExpired) {
-      alert("❌ Verification code has expired. Please click 'RESEND CODE'.");
+    if (isCodeExpired) {
+      alert("❌ Expired Code: Lapas na ang 60 seconds. Pindota ang 'RESEND BAG-ONG CODE'.");
       return;
     }
 
-    const inputCode = document.getElementById("otpInput").value.trim();
+    const inputOTP = document.getElementById("signupOTP").value.trim();
 
-    if (inputCode === String(generatedOTP)) {
-      alert("✅ Registration Successful! Code verified.");
-      showCard('login');
+    if (inputOTP === String(generatedOTP) && pendingUserData !== null) {
+      clearInterval(countdownTimer);
+
+      users.push(pendingUserData);
+      localStorage.setItem("system_users", JSON.stringify(users));
+
+      currentUser = pendingUserData;
+      alert(`✅ Verification Successful!\nWelcome ${currentUser.username}! Mo-redirect na sa Dashboard...`);
+
+      pendingUserData = null;
+      generatedOTP = null;
+
+      document.getElementById("authSection").style.display = "none";
+      document.getElementById("mainSystem").style.display = "block";
+      applyRolePermissions();
     } else {
-      alert("❌ Invalid Verification Code. Please check your Gmail.");
+      alert("❌ Verification Failed: Mali ang gi-input nga OTP code. Palihug tan-awa pag-usab sa imong Gmail.");
     }
   });
+
+  // LOGIN LOGIC
+  document.getElementById("loginForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const user = document.getElementById("loginUsername").value.trim();
+    const pass = document.getElementById("loginPassword").value;
+
+    const foundUser = users.find(u => u.username === user && u.password === pass);
+
+    if (foundUser) {
+      currentUser = foundUser;
+      document.getElementById("authSection").style.display = "none";
+      document.getElementById("mainSystem").style.display = "block";
+      applyRolePermissions();
+    } else {
+      alert("❌ Mali ang Username o Password!");
+    }
+  });
+
+  function applyRolePermissions() {
+    document.getElementById("userRoleDisplay").innerText = `User: ${currentUser.username} (${currentUser.role})`;
+    document.getElementById("welcomeUserHeader").innerText = `Welcome, ${currentUser.username}!`;
+
+    const adminElements = document.querySelectorAll(".admin-only");
+    if (currentUser.role === "Staff") {
+      adminElements.forEach(el => el.style.display = "none");
+    } else {
+      adminElements.forEach(el => el.style.display = "block");
+    }
+  }
+
+  function logout() {
+    if (confirm("Sigurado ka ba nga gusto nimo mag-logout?")) {
+      currentUser = null;
+      document.getElementById("mainSystem").style.display = "none";
+      document.getElementById("authSection").style.display = "flex";
+      document.getElementById("loginForm").reset();
+    }
+  }
+
+  function switchView(viewId, element) {
+    document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+    if (element) element.classList.add('active');
+  }
 </script>
 </body>
 </html>
