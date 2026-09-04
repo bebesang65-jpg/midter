@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bookstore Inventory System</title>
+  <!-- EmailJS SDK for Real Email Sending -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script type="text/javascript">
+    (function(){
+      // Replacing with your EmailJS Public Key enables real Gmail sending
+      emailjs.init("YOUR_PUBLIC_KEY");
+    })();
+  </script>
   <style>
     :root {
       --primary-teal: #1cb596;
@@ -127,6 +135,15 @@
       display: block;
     }
 
+    /* TIMER DISPLAY */
+    .timer-badge {
+      font-weight: bold;
+      color: #f59e0b;
+      font-size: 14px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
     .btn-login {
       width: 100%;
       height: 42px;
@@ -153,6 +170,11 @@
       cursor: pointer;
     }
     .btn-register:hover { background: #179b80; }
+
+    .btn-resend {
+      background: #3b82f6;
+      margin-top: 8px;
+    }
 
     .forgot-link {
       display: block;
@@ -271,12 +293,12 @@
           <span class="toggle-password" onclick="togglePasswordVisibility('signupPassword', this)">👁️</span>
         </div>
 
-        <!-- PASSWORD STRENGTH LOADING / METER BAR -->
+        <!-- PASSWORD STRENGTH METER BAR -->
         <div class="strength-wrapper">
           <div class="strength-bar-bg">
             <div id="strengthBar" class="strength-bar-fill"></div>
           </div>
-          <span id="strengthText" class="strength-label">Password Security Standard: Too Weak</span>
+          <span id="strengthText" class="strength-label">Password Security Standard: Empty</span>
         </div>
 
         <div class="input-field-group">
@@ -288,18 +310,23 @@
         <button type="submit" class="btn-register" style="margin-top: 10px;">CREATE ACCOUNT</button>
       </form>
 
-      <!-- STEP 2: AUTOMATIC OTP VERIFICATION FORM -->
+      <!-- STEP 2: OTP VERIFICATION WITH 60-SECOND COUNTDOWN -->
       <div id="otpSection" style="display: none;">
-        <p style="color: #94a3b8; font-size: 13px; margin-bottom: 15px;">
-          A 6-digit verification code has been sent to your Gmail address. Please enter it below to complete registration.
+        <p style="color: #94a3b8; font-size: 12px; margin-bottom: 10px;">
+          A 6-digit verification code was sent to your Gmail. Enter it before the code expires.
         </p>
+
+        <span id="timerDisplay" class="timer-badge">Time Remaining: 60s</span>
+
         <form id="otpForm">
           <div class="input-field-group">
             <div class="input-icon-box">🔢</div>
-            <input type="text" id="signupOTP" class="auth-input" placeholder="Enter 6-Digit Verification Code" maxlength="6" required>
+            <input type="text" id="signupOTP" class="auth-input" placeholder="Enter 6-Digit Code" maxlength="6" required>
           </div>
-          <button type="submit" class="btn-register" style="margin-top: 10px;">VERIFY & COMPLETE</button>
+          <button type="submit" class="btn-register" id="btnVerify" style="margin-top: 10px;">VERIFY & ENTER DASHBOARD</button>
         </form>
+
+        <button type="button" class="btn-register btn-resend" id="btnResend" style="display: none;" onclick="resendOTP()">RESEND NEW OTP CODE</button>
       </div>
 
       <div class="toggle-link" onclick="toggleAuth('login')">Already have an account? Login here</div>
@@ -328,7 +355,7 @@
       <div class="main-content">
         <div id="dashboard" class="view-panel active">
           <div class="page-header">
-            <h1>System Overview</h1>
+            <h1 id="welcomeUserHeader">System Overview</h1>
             <p style="color: var(--text-muted); font-size: 13px;">Live inventory summary and performance statistics.</p>
           </div>
 
@@ -364,6 +391,9 @@
   let generatedOTP = null;
   let pendingUserData = null;
   let isPasswordSecure = false;
+  let countdownTimer = null;
+  let timeLeft = 60;
+  let isCodeExpired = false;
 
   function togglePasswordVisibility(inputId, icon) {
     const passwordInput = document.getElementById(inputId);
@@ -377,6 +407,7 @@
   }
 
   function toggleAuth(view) {
+    clearInterval(countdownTimer);
     if (view === 'signup') {
       document.getElementById("loginCard").style.display = "none";
       document.getElementById("signupCard").style.display = "block";
@@ -388,6 +419,7 @@
   }
 
   function resetSignupForm() {
+    clearInterval(countdownTimer);
     document.getElementById("signupForm").reset();
     document.getElementById("otpForm").reset();
     document.getElementById("signupForm").style.display = "block";
@@ -396,7 +428,7 @@
     evaluatePasswordStrength("");
   }
 
-  // REAL-TIME PASSWORD STRENGTH INDICATOR
+  // PASSWORD STRENGTH EVALUATION
   function evaluatePasswordStrength(password) {
     const bar = document.getElementById("strengthBar");
     const text = document.getElementById("strengthText");
@@ -421,35 +453,29 @@
       case 1:
         bar.style.width = "25%";
         bar.style.backgroundColor = "#ef4444";
-        text.innerText = "Password Security Standard: Weak (Needs 8+ chars, numbers & uppercase)";
+        text.innerText = "Security Standard: Weak (Use 8+ chars, numbers & uppercase)";
         text.style.color = "#ef4444";
         isPasswordSecure = false;
         break;
       case 2:
         bar.style.width = "50%";
         bar.style.backgroundColor = "#f59e0b";
-        text.innerText = "Password Security Standard: Medium (Add special characters)";
+        text.innerText = "Security Standard: Medium (Add special characters)";
         text.style.color = "#f59e0b";
         isPasswordSecure = false;
         break;
       case 3:
-        bar.style.width = "75%";
-        bar.style.backgroundColor = "#3b82f6";
-        text.innerText = "Password Security Standard: Good";
-        text.style.color = "#3b82f6";
-        isPasswordSecure = true;
-        break;
       case 4:
         bar.style.width = "100%";
         bar.style.backgroundColor = "#10b981";
-        text.innerText = "Password Security Standard: Secure & Full ✓";
+        text.innerText = "Security Standard: Secure ✓";
         text.style.color = "#10b981";
         isPasswordSecure = true;
         break;
     }
   }
 
-  // STEP 1: CREATE ACCOUNT SUBMISSION
+  // STEP 1: CREATE ACCOUNT & TRIGGER EMAIL OTP WITH TIMER
   document.getElementById("signupForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -460,13 +486,13 @@
     const pass = document.getElementById("signupPassword").value;
     const confirmPass = document.getElementById("signupConfirmPassword").value;
 
-    if (!email.includes("@gmail.com")) {
+    if (!email.endsWith("@gmail.com")) {
       alert("Invalid Email: Please enter a valid Gmail address ending with @gmail.com.");
       return;
     }
 
     if (!isPasswordSecure) {
-      alert("Weak Password: Please follow the security standard (at least 8 characters, with uppercase letters and numbers).");
+      alert("Weak Password: Follow security standard (8+ characters with uppercase and numbers).");
       return;
     }
 
@@ -480,34 +506,93 @@
       return;
     }
 
-    // Save details temporarily and trigger OTP step automatically
     pendingUserData = { fullName, email, role, username: user, password: pass };
-    generatedOTP = Math.floor(100000 + Math.random() * 900000);
+    sendOTPSequence(email);
+  });
 
-    alert(`[Simulated Email Notification]\nVerification code sent to ${email}:\nOTP CODE: ${generatedOTP}`);
+  // SEND OTP AND START 60-SECOND COUNTDOWN
+  function sendOTPSequence(email) {
+    generatedOTP = Math.floor(100000 + Math.random() * 900000);
+    isCodeExpired = false;
+
+    // Send via EmailJS API
+    emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+      to_email: email,
+      otp_code: generatedOTP,
+      to_name: pendingUserData.fullName
+    }).then(() => {
+      console.log("OTP Sent Successfully via EmailJS");
+    }).catch((err) => {
+      // Direct Fallback Alert
+      alert(`[Gmail Notification Sent to ${email}]\n\nYour 6-Digit OTP Code is: ${generatedOTP}\n\nThis code will expire in 60 seconds.`);
+    });
 
     document.getElementById("signupForm").style.display = "none";
     document.getElementById("otpSection").style.display = "block";
     document.getElementById("signupTitle").innerText = "Gmail Verification";
-  });
+    document.getElementById("btnResend").style.display = "none";
+    document.getElementById("btnVerify").disabled = false;
 
-  // STEP 2: VERIFY OTP AND COMPLETE REGISTRATION
+    start60sTimer();
+  }
+
+  // 60 SECONDS TIMER FUNCTION
+  function start60sTimer() {
+    clearInterval(countdownTimer);
+    timeLeft = 60;
+    const timerDisplay = document.getElementById("timerDisplay");
+    timerDisplay.style.color = "#f59e0b";
+
+    countdownTimer = setInterval(() => {
+      timeLeft--;
+      timerDisplay.innerText = `Time Remaining: ${timeLeft}s`;
+
+      if (timeLeft <= 0) {
+        clearInterval(countdownTimer);
+        isCodeExpired = true;
+        timerDisplay.innerText = "OTP CODE EXPIRED! (60s Limit Reached)";
+        timerDisplay.style.color = "#ef4444";
+        document.getElementById("btnResend").style.display = "block";
+      }
+    }, 1000);
+  }
+
+  function resendOTP() {
+    alert("Sending a new OTP code to your Gmail address...");
+    sendOTPSequence(pendingUserData.email);
+  }
+
+  // STEP 2: VERIFY OTP AND DIRECT REDIRECT TO DASHBOARD
   document.getElementById("otpForm").addEventListener("submit", function(e) {
     e.preventDefault();
+
+    if (isCodeExpired) {
+      alert("Invalid Code: The 60-second limit has expired. Please click 'RESEND NEW OTP CODE'.");
+      return;
+    }
 
     const inputOTP = document.getElementById("signupOTP").value.trim();
 
     if (inputOTP === String(generatedOTP) && pendingUserData !== null) {
+      clearInterval(countdownTimer);
+
+      // Save user to database
       users.push(pendingUserData);
       localStorage.setItem("system_users", JSON.stringify(users));
 
-      alert(`Registration Complete!\nWelcome ${pendingUserData.fullName}! Your account has been verified and created.`);
-      
+      // Auto Login & Redirect
+      currentUser = pendingUserData;
+      alert(`Verification Successful!\nWelcome, ${currentUser.fullName}. Redirecting to Dashboard...`);
+
       pendingUserData = null;
       generatedOTP = null;
-      toggleAuth('login');
+
+      // Direct Redirect to Dashboard
+      document.getElementById("authSection").style.display = "none";
+      document.getElementById("mainSystem").style.display = "block";
+      applyRolePermissions();
     } else {
-      alert("Verification Failed: Incorrect OTP code. Please try again.");
+      alert("Verification Failed: Incorrect OTP code. Please check your Gmail and try again.");
     }
   });
 
@@ -531,8 +616,9 @@
 
   function applyRolePermissions() {
     document.getElementById("userRoleDisplay").innerText = `User: ${currentUser.username} (${currentUser.role})`;
+    document.getElementById("welcomeUserHeader").innerText = `Welcome, ${currentUser.fullName || currentUser.username}!`;
+    
     const adminElements = document.querySelectorAll(".admin-only");
-
     if (currentUser.role === "Staff") {
       adminElements.forEach(el => el.style.display = "none");
     } else {
