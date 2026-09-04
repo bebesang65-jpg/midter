@@ -8,7 +8,7 @@
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script type="text/javascript">
     (function(){
-      // TODO: Replace "YOUR_PUBLIC_KEY" with your actual EmailJS Public Key
+      // TODO: I-replace ang "YOUR_PUBLIC_KEY" sa imong tinuod nga EmailJS Public Key
       emailjs.init("YOUR_PUBLIC_KEY");
     })();
   </script>
@@ -510,7 +510,7 @@
     sendOTPSequence(email);
   });
 
-  // SEND OTP CODE WITH EMAILJS (STRIKING EMAIL TEMPLATE PAYLOAD)
+  // SEND OTP CODE USING YOUR SERVICE ID (service_kqwnyli)
   function sendOTPSequence(email) {
     generatedOTP = Math.floor(100000 + Math.random() * 900000);
     isCodeExpired = false;
@@ -519,8 +519,8 @@
     btn.innerText = "SENDING EMAIL...";
     btn.disabled = true;
 
-    // TODO: Replace "YOUR_SERVICE_ID" and "YOUR_TEMPLATE_ID" with your EmailJS IDs
-    emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+    // Gi-update na ang Service ID dire
+    emailjs.send("service_kqwnyli", "YOUR_TEMPLATE_ID", {
       to_email: email,
       to_name: pendingUserData.fullName,
       otp_code: generatedOTP
@@ -537,7 +537,8 @@
     }).catch((err) => {
       btn.innerText = "CREATE ACCOUNT";
       btn.disabled = false;
-      alert(`[Email Sending Failed]\nCheck your EmailJS Service ID and Template ID.\n\nFallback OTP Code: ${generatedOTP}`);
+      console.error("EmailJS Error:", err);
+      alert(`[Email Sending Failed]\nPlease check your EmailJS Template ID or Public Key.\n\nFallback OTP Code: ${generatedOTP}`);
       
       document.getElementById("signupForm").style.display = "none";
       document.getElementById("otpSection").style.display = "block";
