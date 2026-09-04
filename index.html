@@ -8,7 +8,7 @@
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script type="text/javascript">
     (function(){
-      // Replace "YOUR_PUBLIC_KEY" with your actual EmailJS key if available
+      // TODO: Replace "YOUR_PUBLIC_KEY" with your actual EmailJS Public Key
       emailjs.init("YOUR_PUBLIC_KEY");
     })();
   </script>
@@ -307,7 +307,7 @@
           <span class="toggle-password" onclick="togglePasswordVisibility('signupConfirmPassword', this)">👁️</span>
         </div>
 
-        <button type="submit" class="btn-register" style="margin-top: 10px;">CREATE ACCOUNT</button>
+        <button type="submit" id="btnRegisterSubmit" class="btn-register" style="margin-top: 10px;">CREATE ACCOUNT</button>
       </form>
 
       <!-- STEP 2: OTP VERIFICATION WITH 60s TIMER -->
@@ -510,28 +510,40 @@
     sendOTPSequence(email);
   });
 
-  // SEND OTP CODE AND START COUNTDOWN
+  // SEND OTP CODE WITH EMAILJS (STRIKING EMAIL TEMPLATE PAYLOAD)
   function sendOTPSequence(email) {
     generatedOTP = Math.floor(100000 + Math.random() * 900000);
     isCodeExpired = false;
 
-    // Send using EmailJS API (fallback alert included)
+    const btn = document.getElementById("btnRegisterSubmit");
+    btn.innerText = "SENDING EMAIL...";
+    btn.disabled = true;
+
+    // TODO: Replace "YOUR_SERVICE_ID" and "YOUR_TEMPLATE_ID" with your EmailJS IDs
     emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
       to_email: email,
-      otp_code: generatedOTP,
-      to_name: pendingUserData.fullName
+      to_name: pendingUserData.fullName,
+      otp_code: generatedOTP
     }).then(() => {
-      console.log("OTP Sent Successfully via EmailJS");
+      btn.innerText = "CREATE ACCOUNT";
+      btn.disabled = false;
+
+      document.getElementById("signupForm").style.display = "none";
+      document.getElementById("otpSection").style.display = "block";
+      document.getElementById("signupTitle").innerText = "Gmail Verification";
+      document.getElementById("btnResend").style.display = "none";
+
+      start60sTimer();
     }).catch((err) => {
-      alert(`[Gmail Notification Sent to ${email}]\n\nYour 6-Digit OTP Code is: ${generatedOTP}\n\nThis code will expire in 60 seconds.`);
+      btn.innerText = "CREATE ACCOUNT";
+      btn.disabled = false;
+      alert(`[Email Sending Failed]\nCheck your EmailJS Service ID and Template ID.\n\nFallback OTP Code: ${generatedOTP}`);
+      
+      document.getElementById("signupForm").style.display = "none";
+      document.getElementById("otpSection").style.display = "block";
+      document.getElementById("signupTitle").innerText = "Gmail Verification";
+      start60sTimer();
     });
-
-    document.getElementById("signupForm").style.display = "none";
-    document.getElementById("otpSection").style.display = "block";
-    document.getElementById("signupTitle").innerText = "Gmail Verification";
-    document.getElementById("btnResend").style.display = "none";
-
-    start60sTimer();
   }
 
   // 60 SECONDS COUNTDOWN TIMER FUNCTION
@@ -556,7 +568,6 @@
   }
 
   function resendOTP() {
-    alert("Sending a new 6-digit OTP code to your Gmail address...");
     sendOTPSequence(pendingUserData.email);
   }
 
