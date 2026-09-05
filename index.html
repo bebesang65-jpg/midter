@@ -23,6 +23,58 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     body { background-color: var(--bg-main); color: var(--text-main); display: flex; min-height: 100vh; }
 
+    /* PROFESSIONAL CENTERED MODAL / POPUP ALERT */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease-in-out;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-box {
+      background: #ffffff;
+      width: 90%;
+      max-width: 380px;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      text-align: center;
+      transform: scale(0.95);
+      transition: transform 0.2s ease-in-out;
+    }
+    .modal-overlay.active .modal-box {
+      transform: scale(1);
+    }
+    .modal-icon { font-size: 38px; margin-bottom: 12px; display: block; }
+    .modal-title { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+    .modal-message { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+    .modal-actions { display: flex; justify-content: center; gap: 10px; }
+    .btn-modal {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-modal-primary { background: var(--primary); color: white; }
+    .btn-modal-primary:hover { background: var(--primary-hover); }
+    .btn-modal-danger { background: var(--danger); color: white; }
+    .btn-modal-danger:hover { background: #dc2626; }
+    .btn-modal-cancel { background: #f1f5f9; color: var(--text-muted); border: 1px solid var(--border-color); }
+    .btn-modal-cancel:hover { background: #e2e8f0; color: var(--text-main); }
+
     /* LOGIN SCREEN STYLES */
     #loginSection {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -206,6 +258,17 @@
 </head>
 <body>
 
+  <div id="customModal" class="modal-overlay">
+    <div class="modal-box">
+      <span id="modalIcon" class="modal-icon">⚠️</span>
+      <h3 id="modalTitle" class="modal-title">Attention</h3>
+      <p id="modalMessage" class="modal-message">Sample alert message.</p>
+      <div id="modalActions" class="modal-actions">
+        <button id="modalPrimaryBtn" class="btn-modal btn-modal-primary" onclick="closeModal()">OK</button>
+      </div>
+    </div>
+  </div>
+
   <div id="loginSection">
     <div class="login-card">
       <h2>🔐 Admin Login</h2>
@@ -230,7 +293,7 @@
             <li class="nav-item" id="nav-girls" onclick="switchView('girls', this)">4. Girls Uniforms</li>
           </ul>
         </div>
-        <button class="btn-logout-sidebar" onclick="logout()">Logout 🚪</button>
+        <button class="btn-logout-sidebar" onclick="confirmLogout()">Logout 🚪</button>
       </div>
 
       <div class="main-content">
@@ -540,6 +603,39 @@
   let currentPage = { books: 1, boys: 1, girls: 1 };
   const rowsPerPage = 5;
 
+  // CUSTOM CENTERED MODAL / ALERT CONTROLLER
+  function showModal({ icon = '⚠️', title = 'Notice', message = '', primaryBtnText = 'OK', primaryBtnClass = 'btn-modal-primary', onConfirm = null, showCancel = false }) {
+    document.getElementById("modalIcon").innerText = icon;
+    document.getElementById("modalTitle").innerText = title;
+    document.getElementById("modalMessage").innerText = message;
+
+    const actionsContainer = document.getElementById("modalActions");
+    actionsContainer.innerHTML = "";
+
+    if (showCancel) {
+      const cancelBtn = document.createElement("button");
+      cancelBtn.className = "btn-modal btn-modal-cancel";
+      cancelBtn.innerText = "Cancel";
+      cancelBtn.onclick = closeModal;
+      actionsContainer.appendChild(cancelBtn);
+    }
+
+    const primaryBtn = document.createElement("button");
+    primaryBtn.className = `btn-modal ${primaryBtnClass}`;
+    primaryBtn.innerText = primaryBtnText;
+    primaryBtn.onclick = () => {
+      closeModal();
+      if (onConfirm) onConfirm();
+    };
+    actionsContainer.appendChild(primaryBtn);
+
+    document.getElementById("customModal").classList.add("active");
+  }
+
+  function closeModal() {
+    document.getElementById("customModal").classList.remove("active");
+  }
+
   // AUTHENTICATION LOGIC
   document.getElementById("loginForm").addEventListener("submit", function(e) {
     e.preventDefault();
@@ -551,16 +647,30 @@
       document.getElementById("mainSystem").style.display = "block";
       loadAllData();
     } else {
-      alert("❌ Mali ang Username o Password!");
+      showModal({
+        icon: '❌',
+        title: 'Authentication Failed',
+        message: 'Mali ang Username o Password! Palihug sulayi pag-usab.',
+        primaryBtnText: 'Try Again',
+        primaryBtnClass: 'btn-modal-danger'
+      });
     }
   });
 
-  function logout() {
-    if (confirm("Sigurado ka ba nga gusto nimo mag-logout?")) {
-      document.getElementById("mainSystem").style.display = "none";
-      document.getElementById("loginSection").style.display = "flex";
-      document.getElementById("loginForm").reset();
-    }
+  function confirmLogout() {
+    showModal({
+      icon: '🚪',
+      title: 'Logout Confirmation',
+      message: 'Sigurado ka ba nga gusto nimo mag-logout sa sistema?',
+      primaryBtnText: 'Logout',
+      primaryBtnClass: 'btn-modal-danger',
+      showCancel: true,
+      onConfirm: () => {
+        document.getElementById("mainSystem").style.display = "none";
+        document.getElementById("loginSection").style.display = "flex";
+        document.getElementById("loginForm").reset();
+      }
+    });
   }
 
   // NAVIGATION VIEW SWITCHER
@@ -581,7 +691,12 @@
   function printReport(category) {
     const data = inventoryData[category];
     if (!data || data.length === 0) {
-      alert("⚠️ Walay data nga pwedeng i-print o i-save sa PDF!");
+      showModal({
+        icon: '⚠️',
+        title: 'Empty Inventory',
+        message: 'Walay data nga pwedeng i-print sa pagkakaron.',
+        primaryBtnText: 'OK'
+      });
       return;
     }
 
