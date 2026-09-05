@@ -144,7 +144,7 @@
 
     .pagination-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background-color: #f8fafc; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-muted); }
 
-    /* PRINT LAYOUT (EXCEL GRID / SPREADSHEET STYLE FOR PDF) */
+    /* PRINT LAYOUT (REPORT FORMAT BASED ON SAMPLE DOCUMENT) */
     #printArea { display: none; }
 
     @media print {
@@ -156,7 +156,6 @@
       .print-header p { font-size: 12px; color: #333; }
       .print-meta { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 12px; font-weight: 600; }
       
-      /* EXCEL TABLE STYLE */
       .print-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: auto; }
       .print-table th, .print-table td { border: 1px solid #000; padding: 6px 8px; font-size: 11px; text-align: left; word-break: break-word; }
       .print-table th { background-color: #e2e8f0 !important; font-weight: bold; text-transform: uppercase; text-align: center; }
@@ -543,7 +542,7 @@
     switchView(viewId, navElem);
   }
 
-  // PRINT U-PRINT FORM REPORT - EXCEL MATCHING FORMAT (ATTRIBUTES / HEADER FIRST THEN VALUES)
+  // PRINT REPORT FUNCTION - ATTRIBUTES AT TOP (HEADER), VALUES BELOW (BODY)
   function printReport(category) {
     const data = inventoryData[category];
     if (!data || data.length === 0) {
@@ -559,7 +558,7 @@
     let grandTotalItems = 0;
     let grandTotalValue = 0;
 
-    // ATTRIBUTES (HEADERS) MATCHING EXACT GOOGLE SHEETS/EXCEL COLUMNS
+    // 1. ATTRIBUTES (HEADER ROW AT TOP)
     if (category === 'books') {
       attributesHeaderHTML = `
         <tr>
@@ -588,7 +587,7 @@
         </tr>`;
     }
 
-    // VALUES (ROWS) SPREADSHEET MAPPING
+    // 2. VALUES (DATA ROWS BELOW THE HEADERS)
     data.forEach(item => {
       const id = item.ID || item.id || 'N/A';
       const price = Number(item.Price || item.price || 0);
@@ -637,7 +636,7 @@
     const printHTML = `
       <div class="print-header">
         <h2>U-PRINT BOOKSTORE SERVICES</h2>
-        <p>Official Inventory & Stock Summary Report (Excel Export Layout)</p>
+        <p>Official Analytical Report / Inventory Summary</p>
       </div>
       <div class="print-meta">
         <div>Category: <b>${categoryName}</b></div>
