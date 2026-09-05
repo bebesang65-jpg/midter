@@ -144,28 +144,29 @@
 
     .pagination-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background-color: #f8fafc; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-muted); }
 
-    /* PRINT LAYOUT (RECEIPT / OFFICIAL REPORT FORMAT) */
+    /* PRINT LAYOUT (EXCEL GRID / SPREADSHEET STYLE FOR PDF) */
     #printArea { display: none; }
 
     @media print {
       body * { visibility: hidden; }
       #printArea, #printArea * { visibility: visible; display: block !important; }
-      #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 25px; color: #000; background: #fff; }
-      .print-header { text-align: center; margin-bottom: 20px; border-bottom: 2px dashed #000; padding-bottom: 15px; }
-      .print-header h2 { font-size: 22px; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; }
-      .print-header p { font-size: 13px; color: #222; }
-      .print-meta { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 15px; font-weight: 600; border-bottom: 1px solid #ddd; padding-bottom: 8px; }
-      .print-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-      .print-table th, .print-table td { border: 1px solid #000; padding: 8px 10px; font-size: 12px; text-align: left; }
-      .print-table th { background-color: #f2f2f2 !important; font-weight: bold; text-transform: uppercase; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; color: #000; background: #fff; }
+      .print-header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+      .print-header h2 { font-size: 20px; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; }
+      .print-header p { font-size: 12px; color: #333; }
+      .print-meta { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 12px; font-weight: 600; }
       
-      .print-summary { width: 100%; border: 1px solid #000; margin-bottom: 30px; font-size: 13px; }
-      .print-summary td { padding: 8px 12px; font-weight: bold; }
-      .print-summary tr:nth-child(even) { background-color: #f9f9f9; }
+      /* EXCEL TABLE STYLE */
+      .print-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: auto; }
+      .print-table th, .print-table td { border: 1px solid #000; padding: 6px 8px; font-size: 11px; text-align: left; word-break: break-word; }
+      .print-table th { background-color: #e2e8f0 !important; font-weight: bold; text-transform: uppercase; text-align: center; }
+      
+      .print-summary { width: 100%; border: 1px solid #000; margin-bottom: 20px; font-size: 12px; border-collapse: collapse; }
+      .print-summary td { padding: 6px 10px; font-weight: bold; border: 1px solid #000; }
 
-      .print-footer { display: flex; justify-content: space-between; margin-top: 40px; font-size: 12px; }
-      .signature-box { text-align: center; width: 200px; }
-      .signature-line { border-bottom: 1px solid #000; margin-bottom: 5px; height: 35px; }
+      .print-footer { display: flex; justify-content: space-between; margin-top: 30px; font-size: 11px; }
+      .signature-box { text-align: center; width: 180px; }
+      .signature-line { border-bottom: 1px solid #000; margin-bottom: 5px; height: 30px; }
     }
   </style>
 </head>
@@ -542,7 +543,7 @@
     switchView(viewId, navElem);
   }
 
-  // PRINT U-PRINT FORM REPORT WITH DETAILED TABLE (TYPE, SIZE, PRICE, TOTALS)
+  // PRINT U-PRINT FORM REPORT - EXCEL MATCHING FORMAT (ATTRIBUTES / HEADER FIRST THEN VALUES)
   function printReport(category) {
     const data = inventoryData[category];
     if (!data || data.length === 0) {
@@ -553,40 +554,45 @@
     const today = new Date().toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' });
     let categoryName = category === 'books' ? 'BOOKS INVENTORY' : category === 'boys' ? 'BOYS UNIFORM INVENTORY' : 'GIRLS UNIFORM INVENTORY';
 
-    let tableHeadersHTML = "";
-    let rowsHTML = "";
+    let attributesHeaderHTML = "";
+    let valuesRowsHTML = "";
     let grandTotalItems = 0;
     let grandTotalValue = 0;
 
+    // ATTRIBUTES (HEADERS) MATCHING EXACT GOOGLE SHEETS/EXCEL COLUMNS
     if (category === 'books') {
-      tableHeadersHTML = `
+      attributesHeaderHTML = `
         <tr>
           <th>ID</th>
-          <th>Title</th>
-          <th>Author</th>
-          <th>Price</th>
-          <th>Added</th>
-          <th>Taken</th>
-          <th>Available</th>
-          <th>Total Value</th>
+          <th>TITLE</th>
+          <th>AUTHOR</th>
+          <th>PRICE</th>
+          <th>DATE & TIME ADDED</th>
+          <th>TOTAL ADDED</th>
+          <th>TOTAL TAKEN</th>
+          <th>AVAILABLE STOCK</th>
+          <th>TOTAL VALUE</th>
         </tr>`;
     } else {
-      tableHeadersHTML = `
+      attributesHeaderHTML = `
         <tr>
           <th>ID</th>
-          <th>Uniform Type</th>
-          <th>Size</th>
-          <th>Price</th>
-          <th>Added</th>
-          <th>Taken</th>
-          <th>Available</th>
-          <th>Total Value</th>
+          <th>TYPE</th>
+          <th>SIZE</th>
+          <th>PRICE</th>
+          <th>DATE & TIME ADDED</th>
+          <th>TOTAL ADDED</th>
+          <th>TOTAL TAKEN</th>
+          <th>AVAILABLE STOCK</th>
+          <th>TOTAL VALUE</th>
         </tr>`;
     }
 
+    // VALUES (ROWS) SPREADSHEET MAPPING
     data.forEach(item => {
       const id = item.ID || item.id || 'N/A';
       const price = Number(item.Price || item.price || 0);
+      const timestamp = item.Timestamp || item.timestamp || 'N/A';
       const added = Number(item.Added || item['Total Added'] || item.added || 0);
       const taken = Number(item.Taken || item['Total Taken'] || item.taken || 0);
       const avail = added - taken;
@@ -598,30 +604,32 @@
       if (category === 'books') {
         const title = item.Title || item.title || '-';
         const author = item.Author || item.author || '-';
-        rowsHTML += `
+        valuesRowsHTML += `
           <tr>
-            <td>${id}</td>
+            <td style="text-align:center;">${id}</td>
             <td><b>${title}</b></td>
             <td>${author}</td>
-            <td>₱${price.toFixed(2)}</td>
-            <td>${added}</td>
-            <td>${taken}</td>
-            <td><b>${avail}</b></td>
-            <td>₱${totalItemValue.toFixed(2)}</td>
+            <td style="text-align:right;">₱${price.toFixed(2)}</td>
+            <td style="text-align:center;">${timestamp}</td>
+            <td style="text-align:center;">${added}</td>
+            <td style="text-align:center;">${taken}</td>
+            <td style="text-align:center;"><b>${avail}</b></td>
+            <td style="text-align:right;">₱${totalItemValue.toFixed(2)}</td>
           </tr>`;
       } else {
         const type = item.Type || item.type || '-';
         const size = item.Size || item.size || '-';
-        rowsHTML += `
+        valuesRowsHTML += `
           <tr>
-            <td>${id}</td>
+            <td style="text-align:center;">${id}</td>
             <td><b>${type}</b></td>
-            <td>${size}</td>
-            <td>₱${price.toFixed(2)}</td>
-            <td>${added}</td>
-            <td>${taken}</td>
-            <td><b>${avail}</b></td>
-            <td>₱${totalItemValue.toFixed(2)}</td>
+            <td style="text-align:center;">${size}</td>
+            <td style="text-align:right;">₱${price.toFixed(2)}</td>
+            <td style="text-align:center;">${timestamp}</td>
+            <td style="text-align:center;">${added}</td>
+            <td style="text-align:center;">${taken}</td>
+            <td style="text-align:center;"><b>${avail}</b></td>
+            <td style="text-align:right;">₱${totalItemValue.toFixed(2)}</td>
           </tr>`;
       }
     });
@@ -629,7 +637,7 @@
     const printHTML = `
       <div class="print-header">
         <h2>U-PRINT BOOKSTORE SERVICES</h2>
-        <p>Official Inventory & Stock Summary Report</p>
+        <p>Official Inventory & Stock Summary Report (Excel Export Layout)</p>
       </div>
       <div class="print-meta">
         <div>Category: <b>${categoryName}</b></div>
@@ -638,10 +646,10 @@
       
       <table class="print-table">
         <thead>
-          ${tableHeadersHTML}
+          ${attributesHeaderHTML}
         </thead>
         <tbody>
-          ${rowsHTML}
+          ${valuesRowsHTML}
         </tbody>
       </table>
 
@@ -652,7 +660,7 @@
         </tr>
         <tr>
           <td>Grand Total Stock Value:</td>
-          <td style="text-align: right; font-size:15px;"><b>₱${grandTotalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b></td>
+          <td style="text-align: right; font-size:14px;"><b>₱${grandTotalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b></td>
         </tr>
       </table>
 
