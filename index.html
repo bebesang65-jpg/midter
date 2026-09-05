@@ -60,7 +60,7 @@
     .page-header p { color: var(--text-muted); font-size: 13px; }
 
     /* SEARCH BAR IN UPPER RIGHT */
-    .search-container { display: flex; align-items: center; }
+    .search-container { display: flex; align-items: center; gap: 10px; }
     .search-input { padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 8px; width: 280px; font-size: 13px; outline: none; transition: all 0.2s; background-color: #fff; }
     .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
 
@@ -119,20 +119,17 @@
     .btn-action-delete { background-color: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
     .btn-action-delete:hover { background-color: #fca5a5; color: #991b1b; }
 
-    /* TABLES (PA-UBOS SCROLLING & COMPACT ID) */
+    /* TABLES & PAGINATION */
     .table-card { 
       background: var(--card-bg); 
       border-radius: 12px; 
       border: 1px solid var(--border-color); 
       box-shadow: 0 1px 3px rgba(0,0,0,0.02); 
-      max-height: 480px; 
-      overflow-y: auto; 
+      overflow: hidden;
     }
     table { width: 100%; border-collapse: collapse; text-align: left; table-layout: auto; }
     
     th { 
-      position: sticky; 
-      top: 0; 
       background-color: #f8fafc; 
       color: var(--text-muted); 
       font-size: 11px; 
@@ -141,7 +138,6 @@
       letter-spacing: 0.5px; 
       padding: 12px 14px; 
       border-bottom: 1px solid var(--border-color); 
-      z-index: 10;
     }
     td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid var(--border-color); color: var(--text-main); vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
@@ -153,11 +149,12 @@
     .badge-green { background-color: #d1fae5; color: #065f46; }
     .badge-red { background-color: #fee2e2; color: #991b1b; }
     .badge-amber { background-color: #fef3c7; color: #92400e; }
+
+    .pagination-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background-color: #f8fafc; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-muted); }
   </style>
 </head>
 <body>
 
-  <!-- LOGIN SECTION -->
   <div id="loginSection">
     <div class="login-card">
       <h2>🔐 Admin Login</h2>
@@ -169,11 +166,9 @@
     </div>
   </div>
 
-  <!-- MAIN APP CONTAINER -->
   <div id="mainSystem">
     <div class="app-container">
       
-      <!-- SIDEBAR -->
       <div class="sidebar">
         <div>
           <div class="brand">📚 BOOKSTORE INVENTORY</div>
@@ -187,10 +182,8 @@
         <button class="btn-logout-sidebar" onclick="logout()">Logout 🚪</button>
       </div>
 
-      <!-- MAIN CONTENT -->
       <div class="main-content">
         
-        <!-- DASHBOARD VIEW -->
         <div id="dashboard" class="view-panel active">
           <div class="page-header">
             <div>
@@ -199,7 +192,6 @@
             </div>
           </div>
 
-          <!-- SUMMARY CARDS -->
           <div class="dashboard-grid">
             <div class="card">
               <h3>Total Books Stock</h3>
@@ -219,14 +211,12 @@
             </div>
           </div>
 
-          <!-- QUICK SHORTCUTS -->
           <div class="shortcut-container">
             <button class="btn-shortcut" onclick="quickNav('books')">📖 Go to Books Inventory</button>
             <button class="btn-shortcut" onclick="quickNav('boys')">👔 Go to Boys Uniforms</button>
             <button class="btn-shortcut" onclick="quickNav('girls')">👗 Go to Girls Uniforms</button>
           </div>
 
-          <!-- LOW STOCK WARNING TABLE -->
           <h2 style="font-size: 16px; margin-bottom: 12px; font-weight: 700; color: #b91c1c; display: flex; align-items: center; gap: 6px;">
             ⚠️ Low Stock Alert (5 Items or Less Remaining)
           </h2>
@@ -234,7 +224,7 @@
             <table>
               <thead>
                 <tr>
-                  <th width="100">Category</th>
+                  <th width="120">Category</th>
                   <th width="100">ID</th>
                   <th>Item Details</th>
                   <th width="100">Price</th>
@@ -248,7 +238,6 @@
           </div>
         </div>
 
-        <!-- BOOKS VIEW -->
         <div id="books" class="view-panel">
           <div class="page-header">
             <div>
@@ -256,7 +245,8 @@
               <p>Manage book stock levels and details.</p>
             </div>
             <div class="search-container">
-              <input type="text" id="searchBook" class="search-input" placeholder="🔍 Search ID, Title or Author..." onkeyup="renderBooksTable()">
+              <button class="btn-shortcut" onclick="exportToCSV('books')">📥 Export CSV</button>
+              <input type="text" id="searchBook" class="search-input" placeholder="🔍 Search ID, Title or Author..." onkeyup="currentPage.books = 1; renderBooksTable();">
             </div>
           </div>
 
@@ -309,17 +299,16 @@
                   <th width="80">Added</th>
                   <th width="80">Taken</th>
                   <th width="90">Available</th>
-                  <th width="120" style="text-align: right; padding-right: 16px;">Actions</th>
                 </tr>
               </thead>
               <tbody id="booksTableBody">
-                <tr><td colspan="9">Loading data...</td></tr>
+                <tr><td colspan="8">Loading data...</td></tr>
               </tbody>
             </table>
+            <div id="booksPagination" class="pagination-bar"></div>
           </div>
         </div>
 
-        <!-- BOYS UNIFORMS VIEW -->
         <div id="boys" class="view-panel">
           <div class="page-header">
             <div>
@@ -327,7 +316,8 @@
               <p>Manage stock levels for male uniforms.</p>
             </div>
             <div class="search-container">
-              <input type="text" id="searchBoys" class="search-input" placeholder="🔍 Search ID, Type or Size..." onkeyup="renderUniformTable('Boys')">
+              <button class="btn-shortcut" onclick="exportToCSV('boys')">📥 Export CSV</button>
+              <input type="text" id="searchBoys" class="search-input" placeholder="🔍 Search ID, Type or Size..." onkeyup="currentPage.boys = 1; renderUniformTable('Boys');">
             </div>
           </div>
 
@@ -392,17 +382,16 @@
                   <th width="80">Added</th>
                   <th width="80">Taken</th>
                   <th width="90">Available</th>
-                  <th width="120" style="text-align: right; padding-right: 16px;">Actions</th>
                 </tr>
               </thead>
               <tbody id="boysTableBody">
-                <tr><td colspan="9">Loading data...</td></tr>
+                <tr><td colspan="8">Loading data...</td></tr>
               </tbody>
             </table>
+            <div id="boysPagination" class="pagination-bar"></div>
           </div>
         </div>
 
-        <!-- GIRLS UNIFORMS VIEW -->
         <div id="girls" class="view-panel">
           <div class="page-header">
             <div>
@@ -410,7 +399,8 @@
               <p>Manage stock levels for female uniforms.</p>
             </div>
             <div class="search-container">
-              <input type="text" id="searchGirls" class="search-input" placeholder="🔍 Search ID, Type or Size..." onkeyup="renderUniformTable('Girls')">
+              <button class="btn-shortcut" onclick="exportToCSV('girls')">📥 Export CSV</button>
+              <input type="text" id="searchGirls" class="search-input" placeholder="🔍 Search ID, Type or Size..." onkeyup="currentPage.girls = 1; renderUniformTable('Girls');">
             </div>
           </div>
 
@@ -475,13 +465,13 @@
                   <th width="80">Added</th>
                   <th width="80">Taken</th>
                   <th width="90">Available</th>
-                  <th width="120" style="text-align: right; padding-right: 16px;">Actions</th>
                 </tr>
               </thead>
               <tbody id="girlsTableBody">
-                <tr><td colspan="9">Loading data...</td></tr>
+                <tr><td colspan="8">Loading data...</td></tr>
               </tbody>
             </table>
+            <div id="girlsPagination" class="pagination-bar"></div>
           </div>
         </div>
 
@@ -492,6 +482,10 @@
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGInehLYpXzd-dc8pJFO2Q-NsOMkp92QaO0OG8Z4nLXjrAIayT-ud95oAEVRL4v2y2ow/exec";
   let inventoryData = { books: [], boys: [], girls: [] };
+  
+  // PAGINATION CONTROLS
+  let currentPage = { books: 1, boys: 1, girls: 1 };
+  const rowsPerPage = 5;
 
   // AUTHENTICATION LOGIC
   document.getElementById("loginForm").addEventListener("submit", function(e) {
@@ -530,64 +524,50 @@
     switchView(viewId, navElem);
   }
 
-  // TIMESTAMP GENERATOR
-  function getCurrentDateTime() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    
-    let hours = now.getHours();
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    const strHours = String(hours).padStart(2, '0');
+  // EXPORT CSV FEATURE
+  function exportToCSV(type) {
+    const data = inventoryData[type];
+    if (!data || data.length === 0) {
+      alert("⚠️ Walay data nga pwedeng i-export!");
+      return;
+    }
 
-    return `${year}-${month}-${day} ${strHours}:${minutes}:${seconds} ${ampm}`;
+    let csv = "\uFEFF"; // UTF-8 BOM
+    const headers = Object.keys(data[0]);
+    csv += headers.join(",") + "\n";
+
+    data.forEach(row => {
+      const values = headers.map(header => `"${row[header] || ''}"`);
+      csv += values.join(",") + "\n";
+    });
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${type}_inventory_report.csv`;
+    link.click();
   }
 
-  // STOCK COMPUTATION
-  function computeStock(prefix) {
-    const actionType = document.getElementById(`${prefix}ActionType`).value;
-    const qty = parseInt(document.getElementById(`${prefix}Qty`).value) || 0;
-    
-    const baseAdded = parseInt(document.getElementById(`${prefix}OriginalAdded`).value) || 0;
-    const baseTaken = parseInt(document.getElementById(`${prefix}OriginalTaken`).value) || 0;
+  // RENDER PAGINATION UI
+  function updatePaginationUI(containerId, totalItems, type) {
+    const totalPages = Math.ceil(totalItems / rowsPerPage) || 1;
+    const curPage = currentPage[type];
+    const container = document.getElementById(containerId);
 
-    let finalAdded = baseAdded;
-    let finalTaken = baseTaken;
-
-    if (actionType === "add") {
-      finalAdded = baseAdded + qty;
-    } else if (actionType === "deduct") {
-      finalTaken = baseTaken + qty;
-    }
-
-    return { added: finalAdded, taken: finalTaken };
+    container.innerHTML = `
+      <span>Showing page ${curPage} of ${totalPages} (${totalItems} total items)</span>
+      <div style="display:flex; gap:6px;">
+        <button class="btn-shortcut" ${curPage === 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''} onclick="changePage('${type}', ${curPage - 1})">Previous</button>
+        <button class="btn-shortcut" ${curPage >= totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''} onclick="changePage('${type}', ${curPage + 1})">Next</button>
+      </div>
+    `;
   }
 
-  function validateInput(prefix) {
-    const qty = parseInt(document.getElementById(`${prefix}Qty`).value) || 0;
-    const actionType = document.getElementById(`${prefix}ActionType`).value;
-
-    const baseAdded = parseInt(document.getElementById(`${prefix}OriginalAdded`).value) || 0;
-    const baseTaken = parseInt(document.getElementById(`${prefix}OriginalTaken`).value) || 0;
-    const currentAvailable = baseAdded - baseTaken;
-
-    if (qty <= 0) {
-      alert("⚠️ Palihug i-input ang sakto nga Quantity (dapat labaw sa 0).");
-      return false;
-    }
-
-    if (actionType === "deduct" && qty > currentAvailable) {
-      alert(`⚠️ Dili pwede mag-deduct og ${qty}! Ang natabilin nga Available Stock kay ${currentAvailable} ra.`);
-      return false;
-    }
-
-    return true;
+  function changePage(type, page) {
+    currentPage[type] = page;
+    if (type === 'books') renderBooksTable();
+    else if (type === 'boys') renderUniformTable('Boys');
+    else if (type === 'girls') renderUniformTable('Girls');
   }
 
   // LOAD DATA FROM GOOGLE SHEETS
@@ -614,13 +594,9 @@
 
   // UPDATE DASHBOARD OVERVIEW CARDS & LOW STOCK TABLE
   function updateDashboard() {
-    let totalBooks = 0;
-    let totalBoys = 0;
-    let totalGirls = 0;
-    let totalVal = 0;
+    let totalBooks = 0, totalBoys = 0, totalGirls = 0, totalVal = 0;
     let lowStockItems = [];
 
-    // BOOKS METRICS
     inventoryData.books.forEach(b => {
       const added = Number(b.Added || b['Total Added'] || 0);
       const taken = Number(b.Taken || b['Total Taken'] || 0);
@@ -630,12 +606,9 @@
       totalBooks += avail > 0 ? avail : 0;
       totalVal += (avail > 0 ? avail : 0) * price;
 
-      if (avail <= 5) {
-        lowStockItems.push({ cat: 'Book 📖', id: b.ID || b.id, name: b.Title || b.title, price: price, avail: avail });
-      }
+      if (avail <= 5) lowStockItems.push({ cat: 'Book 📖', id: b.ID || b.id, name: b.Title || b.title, price, avail });
     });
 
-    // BOYS UNIFORMS METRICS
     inventoryData.boys.forEach(b => {
       const added = Number(b.Added || b['Total Added'] || 0);
       const taken = Number(b.Taken || b['Total Taken'] || 0);
@@ -645,12 +618,9 @@
       totalBoys += avail > 0 ? avail : 0;
       totalVal += (avail > 0 ? avail : 0) * price;
 
-      if (avail <= 5) {
-        lowStockItems.push({ cat: 'Boys Uniform 👔', id: b.ID || b.id, name: `${b.Type || b.type} (${b.Size || b.size})`, price: price, avail: avail });
-      }
+      if (avail <= 5) lowStockItems.push({ cat: 'Boys Uniform 👔', id: b.ID || b.id, name: `${b.Type || b.type} (${b.Size || b.size})`, price, avail });
     });
 
-    // GIRLS UNIFORMS METRICS
     inventoryData.girls.forEach(g => {
       const added = Number(g.Added || g['Total Added'] || 0);
       const taken = Number(g.Taken || g['Total Taken'] || 0);
@@ -660,17 +630,14 @@
       totalGirls += avail > 0 ? avail : 0;
       totalVal += (avail > 0 ? avail : 0) * price;
 
-      if (avail <= 5) {
-        lowStockItems.push({ cat: 'Girls Uniform 👗', id: g.ID || g.id, name: `${g.Type || g.type} (${g.Size || g.size})`, price: price, avail: avail });
-      }
+      if (avail <= 5) lowStockItems.push({ cat: 'Girls Uniform 👗', id: g.ID || g.id, name: `${g.Type || g.type} (${g.Size || g.size})`, price, avail });
     });
 
-    document.getElementById("dashTotalBooks").innerText = totalBooks >= 0 ? totalBooks : 0;
-    document.getElementById("dashTotalBoys").innerText = totalBoys >= 0 ? totalBoys : 0;
-    document.getElementById("dashTotalGirls").innerText = totalGirls >= 0 ? totalGirls : 0;
+    document.getElementById("dashTotalBooks").innerText = totalBooks;
+    document.getElementById("dashTotalBoys").innerText = totalBoys;
+    document.getElementById("dashTotalGirls").innerText = totalGirls;
     document.getElementById("dashTotalValue").innerText = "₱" + totalVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // RENDER LOW STOCK TABLE
     const lowStockTbody = document.getElementById("lowStockTableBody");
     lowStockTbody.innerHTML = "";
 
@@ -692,27 +659,31 @@
     });
   }
 
-  // RENDER & SEARCH BOOKS
+  // RENDER BOOKS TABLE WITH PAGINATION
   function renderBooksTable() {
     const tbody = document.getElementById("booksTableBody");
     const searchQuery = document.getElementById("searchBook").value.toLowerCase();
     tbody.innerHTML = "";
 
-    const filteredBooks = inventoryData.books.filter(b => {
+    const filtered = inventoryData.books.filter(b => {
       const id = String(b.ID || b.id || '').toLowerCase();
       const title = (b.Title || b.title || '').toLowerCase();
       const author = (b.Author || b.author || '').toLowerCase();
       return id.includes(searchQuery) || title.includes(searchQuery) || author.includes(searchQuery);
     });
 
-    if (filteredBooks.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color: var(--text-muted); padding:20px;">No books found.</td></tr>';
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--text-muted); padding:20px;">No books found.</td></tr>';
+      updatePaginationUI("booksPagination", 0, "books");
       return;
     }
 
-    filteredBooks.forEach(b => {
-      const added = Number(b.Added || b['Total Added'] || b.added || 0);
-      const taken = Number(b.Taken || b['Total Taken'] || b.taken || 0);
+    const start = (currentPage.books - 1) * rowsPerPage;
+    const paginatedItems = filtered.slice(start, start + rowsPerPage);
+
+    paginatedItems.forEach(b => {
+      const added = Number(b.Added || b['Total Added'] || 0);
+      const taken = Number(b.Taken || b['Total Taken'] || 0);
       const available = added - taken;
 
       tbody.innerHTML += `
@@ -725,98 +696,40 @@
           <td>${added}</td>
           <td>${taken}</td>
           <td><span class="badge ${available > 0 ? 'badge-green' : 'badge-red'}">${available}</span></td>
-          <td style="text-align: right; padding-right: 12px;">
-            <div class="action-group">
-              <button class="btn-action btn-action-edit" onclick="editBook('${b.ID || b.id}')">✏️ Edit</button>
-              <button class="btn-action btn-action-delete" onclick="deleteItem('Books', '${b.ID || b.id}')">🗑️ Delete</button>
-            </div>
-          </td>
         </tr>
       `;
     });
+
+    updatePaginationUI("booksPagination", filtered.length, "books");
   }
 
-  // BOOK FORM SUBMIT
-  document.getElementById("bookForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-    if (!validateInput('book')) return;
-
-    const id = document.getElementById("bookId").value;
-    const isNew = !id;
-    const bookId = isNew ? "BOOK-" + Date.now() : id;
-    const stock = computeStock('book');
-
-    const payload = {
-      action: "saveBook",
-      data: {
-        id: bookId,
-        title: document.getElementById("bookTitle").value,
-        author: document.getElementById("bookAuthor").value,
-        price: parseFloat(document.getElementById("bookPrice").value),
-        dateAdded: getCurrentDateTime(),
-        added: stock.added,
-        taken: stock.taken
-      }
-    };
-
-    saveData(payload, resetBookForm);
-  });
-
-  function editBook(id) {
-    const book = inventoryData.books.find(b => (b.ID || b.id) == id);
-    if (!book) return;
-
-    const baseAdded = Number(book.Added || book['Total Added'] || 0);
-    const baseTaken = Number(book.Taken || book['Total Taken'] || 0);
-
-    document.getElementById("bookId").value = book.ID || book.id;
-    document.getElementById("bookOriginalAdded").value = baseAdded;
-    document.getElementById("bookOriginalTaken").value = baseTaken;
-
-    document.getElementById("bookTitle").value = book.Title || book.title || '';
-    document.getElementById("bookAuthor").value = book.Author || book.author || '';
-    document.getElementById("bookPrice").value = book.Price || book.price || 0;
-    document.getElementById("bookQty").value = 1;
-
-    document.getElementById("bookEditIdLbl").innerText = book.ID || book.id;
-    document.getElementById("bookEditBanner").style.display = "block";
-    document.getElementById("cancelBookBtn").style.display = "inline-flex";
-  }
-
-  function resetBookForm() {
-    document.getElementById("bookForm").reset();
-    document.getElementById("bookId").value = "";
-    document.getElementById("bookOriginalAdded").value = "0";
-    document.getElementById("bookOriginalTaken").value = "0";
-    document.getElementById("bookEditBanner").style.display = "none";
-    document.getElementById("cancelBookBtn").style.display = "none";
-  }
-
-  // RENDER & SEARCH UNIFORMS (BOYS & GIRLS)
-  function renderUniformTable(category) {
-    const isBoys = category === 'Boys';
-    const tbody = document.getElementById(isBoys ? "boysTableBody" : "girlsTableBody");
-    const searchQuery = document.getElementById(isBoys ? "searchBoys" : "searchGirls").value.toLowerCase();
-    const list = isBoys ? inventoryData.boys : inventoryData.girls;
+  // RENDER UNIFORM TABLE WITH PAGINATION
+  function renderUniformTable(gender) {
+    const key = gender.toLowerCase();
+    const tbody = document.getElementById(`${key}TableBody`);
+    const searchQuery = document.getElementById(`search${gender}`).value.toLowerCase();
     tbody.innerHTML = "";
 
-    const filteredList = list.filter(u => {
+    const filtered = inventoryData[key].filter(u => {
       const id = String(u.ID || u.id || '').toLowerCase();
       const type = (u.Type || u.type || '').toLowerCase();
       const size = (u.Size || u.size || '').toLowerCase();
       return id.includes(searchQuery) || type.includes(searchQuery) || size.includes(searchQuery);
     });
 
-    if (filteredList.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color: var(--text-muted); padding:20px;">No ${category.toLowerCase()} uniforms found.</td></tr>`;
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted); padding:20px;">No ${key} uniforms found.</td></tr>`;
+      updatePaginationUI(`${key}Pagination`, 0, key);
       return;
     }
 
-    filteredList.forEach(u => {
-      const added = Number(u.Added || u['Total Added'] || u.added || 0);
-      const taken = Number(u.Taken || u['Total Taken'] || u.taken || 0);
+    const start = (currentPage[key] - 1) * rowsPerPage;
+    const paginatedItems = filtered.slice(start, start + rowsPerPage);
+
+    paginatedItems.forEach(u => {
+      const added = Number(u.Added || u['Total Added'] || 0);
+      const taken = Number(u.Taken || u['Total Taken'] || 0);
       const available = added - taken;
-      const sheetName = isBoys ? "Boys Uniforms" : "Girls Uniforms";
 
       tbody.innerHTML += `
         <tr>
@@ -828,122 +741,12 @@
           <td>${added}</td>
           <td>${taken}</td>
           <td><span class="badge ${available > 0 ? 'badge-green' : 'badge-red'}">${available}</span></td>
-          <td style="text-align: right; padding-right: 12px;">
-            <div class="action-group">
-              <button class="btn-action btn-action-edit" onclick="editUniform('${category}', '${u.ID || u.id}')">✏️ Edit</button>
-              <button class="btn-action btn-action-delete" onclick="deleteItem('${sheetName}', '${u.ID || u.id}')">🗑️ Delete</button>
-            </div>
-          </td>
         </tr>
       `;
     });
-  }
 
-  function setupUniformSubmit(category) {
-    const isBoys = category === 'Boys';
-    const prefix = isBoys ? 'boys' : 'girls';
-
-    document.getElementById(`${prefix}Form`).addEventListener("submit", function(e) {
-      e.preventDefault();
-      if (!validateInput(prefix)) return;
-
-      const id = document.getElementById(`${prefix}Id`).value;
-      const isNew = !id;
-      const uniformId = isNew ? (isBoys ? "BOY-" : "GIRL-") + Date.now() : id;
-      const stock = computeStock(prefix);
-
-      const payload = {
-        action: "saveUniform",
-        data: {
-          category: category,
-          id: uniformId,
-          type: document.getElementById(`${prefix}Type`).value,
-          size: document.getElementById(`${prefix}Size`).value,
-          price: parseFloat(document.getElementById(`${prefix}Price`).value),
-          dateAdded: getCurrentDateTime(),
-          added: stock.added,
-          taken: stock.taken
-        }
-      };
-
-      saveData(payload, () => resetUniformForm(category));
-    });
-  }
-
-  setupUniformSubmit('Boys');
-  setupUniformSubmit('Girls');
-
-  function editUniform(category, id) {
-    const isBoys = category === 'Boys';
-    const prefix = isBoys ? 'boys' : 'girls';
-    const list = isBoys ? inventoryData.boys : inventoryData.girls;
-    const item = list.find(u => (u.ID || u.id) == id);
-    if (!item) return;
-
-    const baseAdded = Number(item.Added || item['Total Added'] || 0);
-    const baseTaken = Number(item.Taken || item['Total Taken'] || 0);
-
-    document.getElementById(`${prefix}Id`).value = item.ID || item.id;
-    document.getElementById(`${prefix}OriginalAdded`).value = baseAdded;
-    document.getElementById(`${prefix}OriginalTaken`).value = baseTaken;
-
-    document.getElementById(`${prefix}Type`).value = item.Type || item.type || '';
-    document.getElementById(`${prefix}Size`).value = item.Size || item.size || '';
-    document.getElementById(`${prefix}Price`).value = item.Price || item.price || 0;
-    document.getElementById(`${prefix}Qty`).value = 1;
-
-    document.getElementById(`${prefix}EditIdLbl`).innerText = item.ID || item.id;
-    document.getElementById(`${prefix}EditBanner`).style.display = "block";
-    document.getElementById(`cancel${category}Btn`).style.display = "inline-flex";
-  }
-
-  function resetUniformForm(category) {
-    const prefix = category === 'Boys' ? 'boys' : 'girls';
-    document.getElementById(`${prefix}Form`).reset();
-    document.getElementById(`${prefix}Id`).value = "";
-    document.getElementById(`${prefix}OriginalAdded`).value = "0";
-    document.getElementById(`${prefix}OriginalTaken`).value = "0";
-    document.getElementById(`${prefix}EditBanner`).style.display = "none";
-    document.getElementById(`cancel${category}Btn`).style.display = "none";
-  }
-
-  // SAVE DATA TO SERVER
-  function saveData(payload, resetCallback) {
-    fetch(SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.status === "success") {
-        resetCallback();
-        loadAllData();
-      } else {
-        alert("Error saving: " + res.message);
-      }
-    })
-    .catch(err => console.error("Error:", err));
-  }
-
-  // DELETE ITEM
-  function deleteItem(sheetName, id) {
-    if (!confirm("Sigurado ka ba nga gusto nimo kini i-delete?")) return;
-
-    fetch(SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "deleteItem", sheetName: sheetName, id: id })
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.status === "success") {
-        loadAllData();
-      } else {
-        alert("Error deleting item.");
-      }
-    })
-    .catch(err => console.error("Error:", err));
+    updatePaginationUI(`${key}Pagination`, filtered.length, key);
   }
 </script>
-
 </body>
 </html>
