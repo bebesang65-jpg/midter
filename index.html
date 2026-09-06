@@ -1054,9 +1054,9 @@
       lowStockTbody.innerHTML = '';
 
       let lowStockItems = [];
-      db.books.filter(b => b.qty <= 5).forEach(b => lowStockItems.push({ cat: '📖 Book', id: b.id, name: `${b.title} (${b.author})`, price: b.price, qty: b.qty }));
-      db.boys.filter(b => b.qty <= 5).forEach(b => lowStockItems.push({ cat: '👔 Boys Uniform', id: b.id, name: `${b.type} - Size ${b.size}`, price: b.price, qty: b.qty }));
-      db.girls.filter(g => g.qty <= 5).forEach(g => lowStockItems.push({ cat: '👗 Girls Uniform', id: g.id, name: `${g.type} - Size ${g.size}`, price: g.price, qty: g.qty }));
+      db.books.filter(b => b.qty > 0 && b.qty <= 5).forEach(b => lowStockItems.push({ cat: '📖 Book', id: b.id, name: `${b.title} (${b.author})`, price: b.price, qty: b.qty }));
+      db.boys.filter(b => b.qty > 0 && b.qty <= 5).forEach(b => lowStockItems.push({ cat: '👔 Boys Uniform', id: b.id, name: `${b.type} - Size ${b.size}`, price: b.price, qty: b.qty }));
+      db.girls.filter(g => g.qty > 0 && g.qty <= 5).forEach(g => lowStockItems.push({ cat: '👗 Girls Uniform', id: g.id, name: `${g.type} - Size ${g.size}`, price: g.price, qty: g.qty }));
 
       if (lowStockItems.length === 0) {
         lowStockTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--success); padding:20px; font-weight:600;">All stock levels are sufficient.</td></tr>`;
@@ -1082,14 +1082,17 @@
       const search = document.getElementById('searchBook').value.toLowerCase();
       tbody.innerHTML = '';
 
+      // Filter out items where qty <= 0 so they immediately disappear once stock runs out
       const filtered = db.books.filter(b => 
-        b.id.toLowerCase().includes(search) || 
-        b.title.toLowerCase().includes(search) || 
-        b.author.toLowerCase().includes(search)
+        b.qty > 0 && (
+          b.id.toLowerCase().includes(search) || 
+          b.title.toLowerCase().includes(search) || 
+          b.author.toLowerCase().includes(search)
+        )
       );
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color: var(--text-muted);">No records found. Add a book using the form above.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color: var(--text-muted);">No active records found.</td></tr>`;
         return;
       }
 
@@ -1148,7 +1151,7 @@
           qty, 
           dateAdded: new Date().toLocaleString(), 
           added: qty,
-          taken: 0,
+          totalTaken: 0,
           sheetName: 'Books Inventory'
         };
         db.books.push(bookObj);
@@ -1202,14 +1205,17 @@
       const search = document.getElementById(`search${category}`).value.toLowerCase();
       tbody.innerHTML = '';
 
+      // Filter out items where qty <= 0 so they immediately disappear once stock runs out
       const filtered = db[key].filter(u => 
-        u.id.toLowerCase().includes(search) || 
-        u.type.toLowerCase().includes(search) || 
-        u.size.toLowerCase().includes(search)
+        u.qty > 0 && (
+          u.id.toLowerCase().includes(search) || 
+          u.type.toLowerCase().includes(search) || 
+          u.size.toLowerCase().includes(search)
+        )
       );
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color: var(--text-muted);">No records found. Add a uniform using the form above.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color: var(--text-muted);">No active records found.</td></tr>`;
         return;
       }
 
@@ -1273,7 +1279,7 @@
             qty, 
             dateAdded: new Date().toLocaleString(), 
             added: qty, 
-            taken: 0,
+            totalTaken: 0,
             sheetName: sheetTabName
           };
           db[key].push(uniformObj);
