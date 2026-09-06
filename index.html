@@ -274,6 +274,8 @@
     .btn-restore:hover { background: var(--success); color: white; }
     .btn-deduct { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
     .btn-deduct:hover { background: #d97706; color: white; }
+    .btn-addstock { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; }
+    .btn-addstock:hover { background: var(--success); color: white; }
 
     .table-card { 
       background: var(--card-bg); border-radius: 18px; border: 1px solid var(--border-color); 
@@ -444,7 +446,7 @@
             <li class="nav-item" id="nav-books" onclick="switchView('books', this)"><span>📖</span> Books Inventory</li>
             <li class="nav-item" id="nav-boys" onclick="switchView('boys', this)"><span>👔</span> Boys Uniforms</li>
             <li class="nav-item" id="nav-girls" onclick="switchView('girls', this)"><span>👗</span> Girls Uniforms</li>
-            <li class="nav-item" id="nav-logs" onclick="switchView('logs', this)"><span>📋</span> Deduction Logs</li>
+            <li class="nav-item" id="nav-logs" onclick="switchView('logs', this)"><span>📋</span> Deduction/Addition Logs</li>
             <li class="nav-item" id="nav-recycle" onclick="switchView('recycle', this)"><span>🗑️</span> Recycle Bin</li>
           </ul>
         </div>
@@ -506,7 +508,7 @@
             <button class="btn-shortcut" onclick="quickNav('books')">📖 Go to Books Inventory</button>
             <button class="btn-shortcut" onclick="quickNav('boys')">👔 Go to Boys Uniforms</button>
             <button class="btn-shortcut" onclick="quickNav('girls')">👗 Go to Girls Uniforms</button>
-            <button class="btn-shortcut" onclick="quickNav('logs')">📋 View Deduction Logs</button>
+            <button class="btn-shortcut" onclick="quickNav('logs')">📋 View Activity Logs</button>
             <button class="btn-shortcut" id="dashRecycleShortcut" onclick="quickNav('recycle')">🗑️ View Recycle Bin</button>
           </div>
 
@@ -567,7 +569,7 @@
               <input type="number" step="0.01" id="bookPrice" placeholder="0.00" required>
             </div>
             <div class="form-group">
-              <label>Stock Quantity</label>
+              <label>Initial Stock Quantity</label>
               <input type="number" id="bookQty" value="1" min="0" required>
             </div>
 
@@ -586,7 +588,7 @@
                   <th>Author</th>
                   <th width="100">Price</th>
                   <th width="100">Available</th>
-                  <th width="200" style="text-align: center;">Actions</th>
+                  <th width="220" style="text-align: center;">Actions</th>
                 </tr>
               </thead>
               <tbody id="booksTableBody">
@@ -642,7 +644,7 @@
               <input type="number" step="0.01" id="boysPrice" placeholder="0.00" required>
             </div>
             <div class="form-group">
-              <label>Stock Quantity</label>
+              <label>Initial Stock Quantity</label>
               <input type="number" id="boysQty" value="1" min="0" required>
             </div>
 
@@ -661,7 +663,7 @@
                   <th>Size</th>
                   <th width="100">Price</th>
                   <th width="100">Available</th>
-                  <th width="200" style="text-align: center;">Actions</th>
+                  <th width="220" style="text-align: center;">Actions</th>
                 </tr>
               </thead>
               <tbody id="boysTableBody">
@@ -717,7 +719,7 @@
               <input type="number" step="0.01" id="girlsPrice" placeholder="0.00" required>
             </div>
             <div class="form-group">
-              <label>Stock Quantity</label>
+              <label>Initial Stock Quantity</label>
               <input type="number" id="girlsQty" value="1" min="0" required>
             </div>
 
@@ -736,7 +738,7 @@
                   <th>Size</th>
                   <th width="100">Price</th>
                   <th width="100">Available</th>
-                  <th width="200" style="text-align: center;">Actions</th>
+                  <th width="220" style="text-align: center;">Actions</th>
                 </tr>
               </thead>
               <tbody id="girlsTableBody">
@@ -746,12 +748,12 @@
           </div>
         </div>
 
-        <!-- DEDUCTION LOGS VIEW -->
+        <!-- DEDUCTION / ACTIVITY LOGS VIEW -->
         <div id="logs" class="view-panel">
           <div class="page-header">
             <div>
-              <h1>Stock Deduction Logs</h1>
-              <p>Track all stock deductions performed by staff members and admins.</p>
+              <h1>Stock Activity Logs</h1>
+              <p>Track all stock additions (Admin) and deductions (Staff/Admin) performed in the system.</p>
             </div>
             <div class="search-container">
               <input type="text" id="searchLogs" class="search-input" placeholder="🔍 Search item ID, user or reason..." onkeyup="renderLogsTable()">
@@ -765,13 +767,14 @@
                   <th width="160">Date & Time</th>
                   <th width="110">Item ID</th>
                   <th>Item Description</th>
-                  <th width="90">Qty Deducted</th>
-                  <th width="140">Deducted By (User)</th>
-                  <th>Reason / Remarks</th>
+                  <th width="100">Action Type</th>
+                  <th width="90">Quantity</th>
+                  <th width="130">User</th>
+                  <th>Remarks / Reason</th>
                 </tr>
               </thead>
               <tbody id="logsTableBody">
-                <tr><td colspan="6" style="text-align:center; padding:20px;">No deduction logs recorded yet.</td></tr>
+                <tr><td colspan="7" style="text-align:center; padding:20px;">No logs recorded yet.</td></tr>
               </tbody>
             </table>
           </div>
@@ -813,11 +816,11 @@
   </div>
 
   <script>
-    // APPS SCRIPT WEB APP URL (UPDATED)
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbx2QPY_ILOLtbpAulVjAexzQHqkMM06wrA2qTB1CquYaQ0DclQnc-bH7i9WuVMcOYGqVA/exec';
+    // APPS SCRIPT WEB APP URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyRz9MfEk_yUS6tI4DuvAjmfQFLPlev7MX2HHWphWyiyysocNxa_Uk_8YvEDZylvYfT3w/exec';
 
-    // IN-MEMORY DATA STORAGE
-    let db = {
+    // DEFAULT INITIAL DATA STORAGE
+    const defaultDb = {
       books: [
         { id: 'BK-1001', title: 'Calculus Made Easy', author: 'S. Thompson', price: 450, qty: 12, dateAdded: 'Aug 19, 2026 10:00 AM', totalAdded: 15, totalTaken: 3 },
         { id: 'BK-1002', title: 'World History Volume 1', author: 'J. Roberts', price: 380, qty: 3, dateAdded: 'Aug 20, 2026 01:30 PM', totalAdded: 5, totalTaken: 2 },
@@ -840,11 +843,19 @@
         { id: 'GL-3005', type: 'PE Uniform', size: 'S', price: 400, qty: 30, dateAdded: 'Aug 25, 2026 01:25 PM', totalAdded: 35, totalTaken: 5 }
       ],
       deductionLogs: [
-        { dateTime: 'Aug 21, 2026 03:00 PM', itemId: 'BK-1001', itemDesc: 'Calculus Made Easy', qtyDeducted: 3, user: 'STAFF (STAFF)', reason: 'Counter sale to BSIT student' },
-        { dateTime: 'Aug 22, 2026 10:15 AM', itemId: 'BY-2002', itemDesc: 'PE Uniform (Size L)', qtyDeducted: 2, user: 'ADMINISTRATOR (ADMIN)', reason: 'Uniform distribution for athletes' }
+        { dateTime: 'Aug 21, 2026 03:00 PM', itemId: 'BK-1001', itemDesc: 'Calculus Made Easy', action: 'DEDUCT', qty: 3, user: 'STAFF (STAFF)', reason: 'Counter sale to BSIT student' },
+        { dateTime: 'Aug 22, 2026 10:15 AM', itemId: 'BY-2002', itemDesc: 'PE Uniform (Size L)', action: 'DEDUCT', qty: 2, user: 'ADMINISTRATOR (ADMIN)', reason: 'Uniform distribution for athletes' }
       ],
       recycleBin: []
     };
+
+    // LOAD FROM LOCALSTORAGE OR FALLBACK TO DEFAULT
+    let db = JSON.parse(localStorage.getItem('bookstore_inventory_db')) || defaultDb;
+
+    // SAVE DATABASE FUNCTION TO PERSIST DATA
+    function saveDatabase() {
+      localStorage.setItem('bookstore_inventory_db', JSON.stringify(db));
+    }
 
     let currentUser = { role: 'admin', username: 'Administrator' };
 
@@ -1120,12 +1131,12 @@
         let actionButtons = '';
         if (isAdmin) {
           actionButtons += `
+            <button class="btn-action btn-addstock" onclick="promptAddStock('books', '${b.id}')">➕ Add</button>
             <button class="btn-action btn-edit" onclick="editBook('${b.id}')">✏️ Edit</button>
             <button class="btn-action btn-delete" onclick="moveToRecycleBin('books', '${b.id}')">🗑️ Delete</button>
           `;
-        } else {
-          actionButtons += `<button class="btn-action btn-deduct" onclick="promptDeductStock('books', '${b.id}')">📉 Deduct</button>`;
         }
+        actionButtons += `<button class="btn-action btn-deduct" onclick="promptDeductStock('books', '${b.id}')">📉 Deduct</button>`;
 
         tbody.innerHTML += `
           <tr>
@@ -1168,15 +1179,26 @@
           price, 
           qty, 
           dateAdded: new Date().toLocaleString(), 
-          added: qty,
-          taken: 0,
+          totalAdded: qty,
+          totalTaken: 0,
           sheetName: 'Books Inventory'
         };
         db.books.push(bookObj);
+        
+        db.deductionLogs.unshift({
+          dateTime: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }),
+          itemId: newId,
+          itemDesc: title,
+          action: 'ADD (NEW)',
+          qty: qty,
+          user: `${currentUser.username} (${currentUser.role.toUpperCase()})`,
+          reason: 'Initial creation / stock addition'
+        });
+
         showToast('New book successfully added.', 'success');
       }
 
-      // Sync to Google Sheet
+      saveDatabase();
       sendDataToGoogleSheet({
         id: bookObj.id,
         title: bookObj.title,
@@ -1191,6 +1213,7 @@
       resetBookForm();
       renderBooksTable();
       loadDashboard();
+      renderLogsTable();
     };
 
     function editBook(id) {
@@ -1241,12 +1264,12 @@
         let actionButtons = '';
         if (isAdmin) {
           actionButtons += `
+            <button class="btn-action btn-addstock" onclick="promptAddStock('${key}', '${u.id}')">➕ Add</button>
             <button class="btn-action btn-edit" onclick="editUniform('${category}', '${u.id}')">✏️ Edit</button>
             <button class="btn-action btn-delete" onclick="moveToRecycleBin('${key}', '${u.id}')">🗑️ Delete</button>
           `;
-        } else {
-          actionButtons += `<button class="btn-action btn-deduct" onclick="promptDeductStock('${key}', '${u.id}')">📉 Deduct</button>`;
         }
+        actionButtons += `<button class="btn-action btn-deduct" onclick="promptDeductStock('${key}', '${u.id}')">📉 Deduct</button>`;
 
         tbody.innerHTML += `
           <tr>
@@ -1294,15 +1317,26 @@
             price, 
             qty, 
             dateAdded: new Date().toLocaleString(), 
-            added: qty, 
-            taken: 0,
+            totalAdded: qty, 
+            totalTaken: 0,
             sheetName: sheetTabName
           };
           db[key].push(uniformObj);
+          
+          db.deductionLogs.unshift({
+            dateTime: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }),
+            itemId: newId,
+            itemDesc: `${type} (Size ${size})`,
+            action: 'ADD (NEW)',
+            qty: qty,
+            user: `${currentUser.username} (${currentUser.role.toUpperCase()})`,
+            reason: 'Initial uniform creation / stock addition'
+          });
+
           showToast(`New ${category.toLowerCase()} uniform successfully added.`, 'success');
         }
 
-        // Sync to Google Sheet
+        saveDatabase();
         sendDataToGoogleSheet({
           id: uniformObj.id,
           type: uniformObj.type,
@@ -1317,6 +1351,7 @@
         resetUniformForm(category);
         renderUniformTable(category);
         loadDashboard();
+        renderLogsTable();
       };
     }
 
@@ -1349,6 +1384,93 @@
       document.getElementById(`cancel${category}Btn`).style.display = 'none';
     }
 
+    // ADMIN STOCK ADDITION FUNCTIONALITY (➕ Add Button)
+    function promptAddStock(categoryKey, id) {
+      let itemList = db[categoryKey];
+      let item = itemList.find(i => i.id === id);
+      if (!item) return;
+
+      let itemDesc = item.title ? item.title : `${item.type} (Size ${item.size})`;
+
+      const modalBox = document.getElementById('customModal');
+      document.getElementById('modalIcon').innerText = '📦';
+      document.getElementById('modalTitle').innerText = `Add Stock: ${id}`;
+      document.getElementById('modalMessage').innerHTML = `
+        <div style="text-align: left; font-size: 13px; margin-bottom: 12px;">
+          <b>Item:</b> ${itemDesc}<br>
+          <b>Current Stock:</b> <span style="color:var(--success); font-weight:bold;">${item.qty} pcs</span>
+        </div>
+        <div style="text-align: left; display: flex; flex-direction: column; gap: 10px;">
+          <div>
+            <label style="font-size:11px; font-weight:bold; color:#475569; display:block; margin-bottom:4px;">Quantity to Add:</label>
+            <input type="number" id="addQtyInput" value="1" min="1" style="width:100%; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px;">
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:bold; color:#475569; display:block; margin-bottom:4px;">Remarks / Supplier Ref:</label>
+            <input type="text" id="addReasonInput" placeholder="e.g. New delivery from supplier" style="width:100%; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px;">
+          </div>
+        </div>
+      `;
+
+      const actions = document.getElementById('modalActions');
+      actions.innerHTML = `
+        <button class="btn-modal btn-modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-modal btn-modal-primary" onclick="confirmAddStock('${categoryKey}', '${id}')">Confirm Add Stock</button>
+      `;
+
+      modalBox.classList.add('active');
+    }
+
+    function confirmAddStock(categoryKey, id) {
+      let qtyToAdd = parseInt(document.getElementById('addQtyInput').value);
+      let reason = document.getElementById('addReasonInput').value.trim() || 'Stock replenishment / addition';
+
+      let item = db[categoryKey].find(i => i.id === id);
+      if (!item) return;
+
+      if (isNaN(qtyToAdd) || qtyToAdd <= 0) {
+        showToast('Please enter a valid stock quantity to add.', 'danger');
+        return;
+      }
+
+      item.qty += qtyToAdd;
+      item.totalAdded = (item.totalAdded || item.qty) + qtyToAdd;
+
+      let itemDesc = item.title ? item.title : `${item.type} (Size ${item.size})`;
+      let targetSheetName = categoryKey === 'books' ? 'Books Inventory' : (categoryKey === 'boys' ? 'Boys Uniforms' : 'Girls Uniforms');
+
+      db.deductionLogs.unshift({
+        dateTime: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }),
+        itemId: id,
+        itemDesc: itemDesc,
+        action: 'ADD',
+        qty: qtyToAdd,
+        user: `${currentUser.username} (${currentUser.role.toUpperCase()})`,
+        reason: reason
+      });
+
+      saveDatabase();
+      sendDataToGoogleSheet({
+        id: item.id,
+        title: item.title,
+        type: item.type,
+        size: item.size,
+        author: item.author,
+        price: item.price,
+        added: item.qty,
+        taken: item.totalTaken || 0,
+        sheetName: targetSheetName
+      });
+
+      closeModal();
+      showToast(`Successfully added ${qtyToAdd} pcs to item ${id}.`, 'success');
+
+      loadDashboard();
+      if (categoryKey === 'books') renderBooksTable();
+      else renderUniformTable(categoryKey === 'boys' ? 'Boys' : 'Girls');
+      renderLogsTable();
+    }
+
     // STOCK DEDUCTION FUNCTIONALITY
     function promptDeductStock(categoryKey, id) {
       let itemList = db[categoryKey];
@@ -1372,7 +1494,7 @@
           </div>
           <div>
             <label style="font-size:11px; font-weight:bold; color:#475569; display:block; margin-bottom:4px;">Reason / Remarks:</label>
-            <input type="text" id="deductReasonInput" placeholder="e.g. Sold to student / Issued for event" style="width:100%; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px;">
+            <input type="text" id="deductReasonInput" placeholder="e.g. Counter sale to student" style="width:100%; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px;">
           </div>
         </div>
       `;
@@ -1409,7 +1531,17 @@
       let itemDesc = item.title ? item.title : `${item.type} (Size ${item.size})`;
       let targetSheetName = categoryKey === 'books' ? 'Books Inventory' : (categoryKey === 'boys' ? 'Boys Uniforms' : 'Girls Uniforms');
 
-      // Sync deduction / taken update to Google Sheet (Main Inventory Sheet)
+      db.deductionLogs.unshift({
+        dateTime: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }),
+        itemId: id,
+        itemDesc: itemDesc,
+        action: 'DEDUCT',
+        qty: qtyToDeduct,
+        user: `${currentUser.username} (${currentUser.role.toUpperCase()})`,
+        reason: reason
+      });
+
+      saveDatabase();
       sendDataToGoogleSheet({
         id: item.id,
         title: item.title,
@@ -1418,27 +1550,8 @@
         author: item.author,
         price: item.price,
         added: item.qty + item.totalTaken,
-        takenToAdd: qtyToDeduct,
+        taken: item.totalTaken,
         sheetName: targetSheetName
-      });
-
-      // Also send a record to "Deduction Logs" sheet
-      sendDataToGoogleSheet({
-        id: item.id,
-        name: itemDesc,
-        quantity: qtyToDeduct,
-        dateAdded: new Date().toLocaleString(),
-        remarks: `${currentUser.username} (${currentUser.role.toUpperCase()}) - ${reason}`,
-        sheetName: 'Deduction Logs'
-      });
-
-      db.deductionLogs.unshift({
-        dateTime: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }),
-        itemId: id,
-        itemDesc: itemDesc,
-        qtyDeducted: qtyToDeduct,
-        user: `${currentUser.username} (${currentUser.role.toUpperCase()})`,
-        reason: reason
       });
 
       closeModal();
@@ -1459,21 +1572,31 @@
         log.itemId.toLowerCase().includes(search) || 
         log.itemDesc.toLowerCase().includes(search) || 
         log.user.toLowerCase().includes(search) || 
-        log.reason.toLowerCase().includes(search)
+        log.reason.toLowerCase().includes(search) ||
+        log.action.toLowerCase().includes(search)
       );
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color: var(--text-muted);">No deduction records match your search.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color: var(--text-muted);">No activity logs match your search.</td></tr>`;
         return;
       }
 
       filtered.forEach(log => {
+        let actionBadgeClass = 'badge-amber';
+        let qtyDisplay = `-${log.qty} pcs`;
+
+        if (log.action.includes('ADD')) {
+          actionBadgeClass = 'badge-green';
+          qtyDisplay = `+${log.qty} pcs`;
+        }
+
         tbody.innerHTML += `
           <tr>
             <td style="font-size:12px; color:var(--text-muted);">${log.dateTime}</td>
             <td class="id-col">${log.itemId}</td>
             <td><b>${log.itemDesc}</b></td>
-            <td><span class="badge badge-red">-${log.qtyDeducted} pcs</span></td>
+            <td><span class="badge ${actionBadgeClass}">${log.action}</span></td>
+            <td><b>${qtyDisplay}</b></td>
             <td><span class="badge badge-amber">${log.user}</span></td>
             <td>${log.reason}</td>
           </tr>
@@ -1481,7 +1604,7 @@
       });
     }
 
-    // RECYCLE BIN SYSTEM (Admin Only) - NO LONGER ADDS TO DEDUCTION LOGS
+    // RECYCLE BIN SYSTEM (Admin Only) - TRACKS DELETIONS
     function moveToRecycleBin(categoryKey, id) {
       showModal('Move to Recycle Bin', `Are you sure you want to move record (${id}) to the recycle bin?`, 'Move', () => {
         const itemIdx = db[categoryKey].findIndex(item => item.id === id);
@@ -1492,6 +1615,20 @@
         deletedItem.originalCategory = categoryKey;
         db.recycleBin.push(deletedItem);
 
+        let itemDesc = deletedItem.title ? deletedItem.title : `${deletedItem.type} (Size ${deletedItem.size})`;
+
+        db.deductionLogs.unshift({
+          dateTime: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }),
+          itemId: id,
+          itemDesc: `[DELETED] ${itemDesc}`,
+          action: 'DELETE',
+          qty: deletedItem.qty,
+          user: `${currentUser.username} (${currentUser.role.toUpperCase()})`,
+          reason: 'Item moved to Recycle Bin (Deleted)'
+        });
+
+        saveDatabase();
+
         closeModal();
         showToast(`Record ${id} successfully moved to recycle bin.`, 'warning');
 
@@ -1499,6 +1636,7 @@
         else renderUniformTable(categoryKey === 'boys' ? 'Boys' : 'Girls');
 
         loadDashboard();
+        renderLogsTable();
       }, true);
     }
 
@@ -1558,6 +1696,8 @@
 
       db[catKey].push(item);
 
+      saveDatabase();
+
       showToast(`Record ${id} successfully restored.`, 'success');
       renderRecycleBinTable();
       loadDashboard();
@@ -1571,6 +1711,7 @@
         const itemIdx = db.recycleBin.findIndex(item => item.id === id);
         if (itemIdx !== -1) {
           db.recycleBin.splice(itemIdx, 1);
+          saveDatabase();
           showToast(`Record ${id} permanently deleted.`, 'danger');
         }
         closeModal();
