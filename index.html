@@ -529,7 +529,7 @@
                 </tr>
               </thead>
               <tbody id="lowStockTableBody">
-                <tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding:20px;">Checking stock levels...</td></tr>
+                <tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding:20px;">No low stock items found.</td></tr>
               </tbody>
             </table>
           </div>
@@ -592,7 +592,7 @@
                 </tr>
               </thead>
               <tbody id="booksTableBody">
-                <tr><td colspan="6" style="text-align:center; padding:20px;">Loading data...</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No records found. Admin can add items above.</td></tr>
               </tbody>
             </table>
           </div>
@@ -667,7 +667,7 @@
                 </tr>
               </thead>
               <tbody id="boysTableBody">
-                <tr><td colspan="6" style="text-align:center; padding:20px;">Loading data...</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No records found. Admin can add items above.</td></tr>
               </tbody>
             </table>
           </div>
@@ -742,7 +742,7 @@
                 </tr>
               </thead>
               <tbody id="girlsTableBody">
-                <tr><td colspan="6" style="text-align:center; padding:20px;">Loading data...</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-muted);">No records found. Admin can add items above.</td></tr>
               </tbody>
             </table>
           </div>
@@ -819,37 +819,16 @@
     // APPS SCRIPT WEB APP URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyRz9MfEk_yUS6tI4DuvAjmfQFLPlev7MX2HHWphWyiyysocNxa_Uk_8YvEDZylvYfT3w/exec';
 
-    // DEFAULT INITIAL DATA STORAGE
+    // EMPTY DEFAULT DATABASE (NO SAMPLE DATA)
     const defaultDb = {
-      books: [
-        { id: 'BK-1001', title: 'Calculus Made Easy', author: 'S. Thompson', price: 450, qty: 12, dateAdded: 'Aug 19, 2026 10:00 AM', totalAdded: 15, totalTaken: 3 },
-        { id: 'BK-1002', title: 'World History Volume 1', author: 'J. Roberts', price: 380, qty: 3, dateAdded: 'Aug 20, 2026 01:30 PM', totalAdded: 5, totalTaken: 2 },
-        { id: 'BK-1003', title: 'Data Structures & Algorithms', author: 'C. Miller', price: 620, qty: 25, dateAdded: 'Aug 21, 2026 08:15 AM', totalAdded: 30, totalTaken: 5 },
-        { id: 'BK-1004', title: 'General Chemistry 2nd Ed.', author: 'A. Einstein', price: 550, qty: 4, dateAdded: 'Aug 22, 2026 09:40 AM', totalAdded: 10, totalTaken: 6 },
-        { id: 'BK-1005', title: 'Philippine Constitution & Laws', author: 'M. Leonen', price: 300, qty: 18, dateAdded: 'Aug 23, 2026 11:20 AM', totalAdded: 20, totalTaken: 2 }
-      ],
-      boys: [
-        { id: 'BY-2001', type: 'Type A', size: 'M', price: 550, qty: 15, dateAdded: 'Aug 18, 2026 09:15 AM', totalAdded: 20, totalTaken: 5 },
-        { id: 'BY-2002', type: 'PE Uniform', size: 'L', price: 400, qty: 4, dateAdded: 'Aug 21, 2026 11:00 AM', totalAdded: 10, totalTaken: 6 },
-        { id: 'BY-2003', type: 'Type B', size: 'S', price: 520, qty: 22, dateAdded: 'Aug 22, 2026 01:10 PM', totalAdded: 25, totalTaken: 3 },
-        { id: 'BY-2004', type: 'Type A', size: 'XL', price: 580, qty: 2, dateAdded: 'Aug 23, 2026 03:00 PM', totalAdded: 8, totalTaken: 6 },
-        { id: 'BY-2005', type: 'PE Uniform', size: 'XXL', price: 430, qty: 14, dateAdded: 'Aug 24, 2026 10:30 AM', totalAdded: 15, totalTaken: 1 }
-      ],
-      girls: [
-        { id: 'GL-3001', type: 'Type A', size: 'S', price: 550, qty: 2, dateAdded: 'Aug 18, 2026 02:45 PM', totalAdded: 10, totalTaken: 8 },
-        { id: 'GL-3002', type: 'PE Uniform', size: 'M', price: 400, qty: 20, dateAdded: 'Aug 22, 2026 08:30 AM', totalAdded: 25, totalTaken: 5 },
-        { id: 'GL-3003', type: 'Type B', size: 'L', price: 520, qty: 11, dateAdded: 'Aug 23, 2026 09:50 AM', totalAdded: 15, totalTaken: 4 },
-        { id: 'GL-3004', type: 'Type A', size: 'XL', price: 580, qty: 5, dateAdded: 'Aug 24, 2026 11:15 AM', totalAdded: 10, totalTaken: 5 },
-        { id: 'GL-3005', type: 'PE Uniform', size: 'S', price: 400, qty: 30, dateAdded: 'Aug 25, 2026 01:25 PM', totalAdded: 35, totalTaken: 5 }
-      ],
-      deductionLogs: [
-        { dateTime: 'Aug 21, 2026 03:00 PM', itemId: 'BK-1001', itemDesc: 'Calculus Made Easy', action: 'DEDUCT', qty: 3, user: 'STAFF (STAFF)', reason: 'Counter sale to BSIT student' },
-        { dateTime: 'Aug 22, 2026 10:15 AM', itemId: 'BY-2002', itemDesc: 'PE Uniform (Size L)', action: 'DEDUCT', qty: 2, user: 'ADMINISTRATOR (ADMIN)', reason: 'Uniform distribution for athletes' }
-      ],
+      books: [],
+      boys: [],
+      girls: [],
+      deductionLogs: [],
       recycleBin: []
     };
 
-    // LOAD FROM LOCALSTORAGE OR FALLBACK TO DEFAULT
+    // LOAD FROM LOCALSTORAGE OR FALLBACK TO EMPTY DEFAULT
     let db = JSON.parse(localStorage.getItem('bookstore_inventory_db')) || defaultDb;
 
     // SAVE DATABASE FUNCTION TO PERSIST DATA
@@ -928,6 +907,11 @@
             availableStock: g.qty
           });
         });
+      }
+
+      if (itemsToPrint.length === 0) {
+        showToast('No records available to print or export.', 'warning');
+        return;
       }
 
       itemsToPrint.forEach(item => {
@@ -1091,7 +1075,7 @@
       db.girls.filter(g => g.qty <= 5).forEach(g => lowStockItems.push({ cat: '👗 Girls Uniform', id: g.id, name: `${g.type} - Size ${g.size}`, price: g.price, qty: g.qty }));
 
       if (lowStockItems.length === 0) {
-        lowStockTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--success); padding:20px; font-weight:600;">All stock levels are sufficient.</td></tr>`;
+        lowStockTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding:20px;">No low stock items found.</td></tr>`;
         return;
       }
 
@@ -1121,7 +1105,7 @@
       );
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color: var(--text-muted);">No records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color: var(--text-muted);">No records found. Admin can add items above.</td></tr>`;
         return;
       }
 
@@ -1254,7 +1238,7 @@
       );
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color: var(--text-muted);">No records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color: var(--text-muted);">No records found. Admin can add items above.</td></tr>`;
         return;
       }
 
