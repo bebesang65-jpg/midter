@@ -1481,7 +1481,7 @@
       });
     }
 
-    // RECYCLE BIN SYSTEM (Admin Only) - TRACKS DELETIONS
+    // RECYCLE BIN SYSTEM (Admin Only) - TRACKS DELETIONS WITHOUT LOGGING TO DEDUCTION LOGS
     function moveToRecycleBin(categoryKey, id) {
       showModal('Move to Recycle Bin', `Are you sure you want to move record (${id}) to the recycle bin?`, 'Move', () => {
         const itemIdx = db[categoryKey].findIndex(item => item.id === id);
@@ -1492,17 +1492,6 @@
         deletedItem.originalCategory = categoryKey;
         db.recycleBin.push(deletedItem);
 
-        let itemDesc = deletedItem.title ? deletedItem.title : `${deletedItem.type} (Size ${deletedItem.size})`;
-
-        db.deductionLogs.unshift({
-          dateTime: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }),
-          itemId: id,
-          itemDesc: `[DELETED] ${itemDesc}`,
-          qtyDeducted: deletedItem.qty,
-          user: `${currentUser.username} (${currentUser.role.toUpperCase()})`,
-          reason: 'Item moved to Recycle Bin (Deleted)'
-        });
-
         closeModal();
         showToast(`Record ${id} successfully moved to recycle bin.`, 'warning');
 
@@ -1510,7 +1499,6 @@
         else renderUniformTable(categoryKey === 'boys' ? 'Boys' : 'Girls');
 
         loadDashboard();
-        renderLogsTable();
       }, true);
     }
 
