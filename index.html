@@ -813,8 +813,8 @@
   </div>
 
   <script>
-    // APPS SCRIPT WEB APP URL (Updated)
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbz3Eev_eVCBbBYn6vSdpsiADea-QLi8gQeJiJn9NzOJDjeANNxl1rRJyRupigJ-D2JI8A/exec';
+    // APPS SCRIPT WEB APP URL (Updated with your deployed URL)
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyRz9MfEk_yUS6tI4DuvAjmfQFLPlev7MX2HHWphWyiyysocNxa_Uk_8YvEDZylvYfT3w/exec';
 
     // IN-MEMORY DATA STORAGE
     let db = {
@@ -1170,7 +1170,7 @@
           dateAdded: new Date().toLocaleString(), 
           added: qty,
           taken: 0,
-          sheetName: 'Books'
+          sheetName: 'Books Inventory'
         };
         db.books.push(bookObj);
         showToast('New book successfully added.', 'success');
@@ -1185,7 +1185,7 @@
         dateAdded: bookObj.dateAdded,
         added: bookObj.qty,
         taken: bookObj.totalTaken || 0,
-        sheetName: 'Books'
+        sheetName: 'Books Inventory'
       });
 
       resetBookForm();
@@ -1272,7 +1272,7 @@
         const qty = parseInt(document.getElementById(`${key}Qty`).value);
 
         let uniformObj;
-        let sheetTabName = category === 'Boys' ? 'Boys' : 'Girls';
+        let sheetTabName = category === 'Boys' ? 'Boys Uniforms' : 'Girls Uniforms';
 
         if (id) {
           const idx = db[key].findIndex(u => u.id === id);
@@ -1407,9 +1407,9 @@
       item.totalTaken = (item.totalTaken || 0) + qtyToDeduct;
 
       let itemDesc = item.title ? item.title : `${item.type} (Size ${item.size})`;
-      let targetSheetName = categoryKey === 'books' ? 'Books' : (categoryKey === 'boys' ? 'Boys' : 'Girls');
+      let targetSheetName = categoryKey === 'books' ? 'Books Inventory' : (categoryKey === 'boys' ? 'Boys Uniforms' : 'Girls Uniforms');
 
-      // Sync deduction / taken update to Google Sheet
+      // Sync deduction / taken update to Google Sheet (Main Inventory Sheet)
       sendDataToGoogleSheet({
         id: item.id,
         title: item.title,
@@ -1420,6 +1420,16 @@
         added: item.qty + item.totalTaken,
         takenToAdd: qtyToDeduct,
         sheetName: targetSheetName
+      });
+
+      // Also send a record to "Deduction Logs" sheet
+      sendDataToGoogleSheet({
+        id: item.id,
+        name: itemDesc,
+        quantity: qtyToDeduct,
+        dateAdded: new Date().toLocaleString(),
+        remarks: `${currentUser.username} (${currentUser.role.toUpperCase()}) - ${reason}`,
+        sheetName: 'Deduction Logs'
       });
 
       db.deductionLogs.unshift({
