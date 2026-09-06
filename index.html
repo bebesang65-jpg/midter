@@ -813,8 +813,8 @@
   </div>
 
   <script>
-    // APPS SCRIPT WEB APP URL CONFIGURATION
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhbZjgGNCGvtymIV2C8sMBDwhA1fSU5mzZGL1yBj5oybzIHdia4x76FBn2ri4i8OUTsA/exec";
+    // APPS SCRIPT WEB APP URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwp4hPQ_YrkPEIb-_YvG5qqqxR-NVFWZXJDOio50c46QBahY7GXtQPk0LU07ovEA1Uozg/exec';
 
     // IN-MEMORY DATA STORAGE
     let db = {
@@ -847,6 +847,23 @@
     };
 
     let currentUser = { role: 'admin', username: 'Administrator' };
+
+    // FUNCTION TO SEND DATA TO GOOGLE SHEETS VIA APPS SCRIPT
+    function sendDataToGoogleSheet(payload) {
+      if (!scriptURL) return;
+      fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        console.log('Data successfully synced to Google Sheet.');
+      })
+      .catch(error => {
+        console.error('Error syncing to Google Sheet:', error);
+      });
+    }
 
     // EXPORT ALL / PRINT FULL REPORT
     function exportFullInventoryReport(categoryType, reportName) {
@@ -1131,6 +1148,7 @@
       const price = parseFloat(document.getElementById('bookPrice').value);
       const qty = parseInt(document.getElementById('bookQty').value);
 
+      let bookObj;
       if (id) {
         const idx = db.books.findIndex(b => b.id === id);
         if (idx !== -1) {
@@ -1138,22 +1156,37 @@
           db.books[idx].author = author;
           db.books[idx].price = price;
           db.books[idx].qty = qty;
+          bookObj = db.books[idx];
           showToast('Book details successfully updated.', 'success');
         }
       } else {
         const newId = `BK-${Math.floor(1000 + Math.random() * 9000)}`;
-        db.books.push({ 
+        bookObj = { 
           id: newId, 
           title, 
           author, 
           price, 
           qty, 
           dateAdded: new Date().toLocaleString(), 
-          totalAdded: qty, 
-          totalTaken: 0 
-        });
+          added: qty,
+          taken: 0,
+          sheetName: 'Books'
+        };
+        db.books.push(bookObj);
         showToast('New book successfully added.', 'success');
       }
+
+      // Sync to Google Sheet
+      sendDataToGoogleSheet({
+        id: bookObj.id,
+        title: bookObj.title,
+        author: bookObj.author,
+        price: bookObj.price,
+        dateAdded: bookObj.dateAdded,
+        added: bookObj.qty,
+        taken: bookObj.totalTaken || 0,
+        sheetName: 'Books'
+      });
 
       resetBookForm();
       renderBooksTable();
@@ -1238,6 +1271,9 @@
         const price = parseFloat(document.getElementById(`${key}Price`).value);
         const qty = parseInt(document.getElementById(`${key}Qty`).value);
 
+        let uniformObj;
+        let sheetTabName = category === 'Boys' ? 'Boys' : 'Girls';
+
         if (id) {
           const idx = db[key].findIndex(u => u.id === id);
           if (idx !== -1) {
@@ -1245,23 +1281,38 @@
             db[key][idx].size = size;
             db[key][idx].price = price;
             db[key][idx].qty = qty;
+            uniformObj = db[key][idx];
             showToast(`${category} uniform successfully updated.`, 'success');
           }
         } else {
           const prefix = category === 'Boys' ? 'BY' : 'GL';
           const newId = `${prefix}-${Math.floor(1000 + Math.random() * 9000)}`;
-          db[key].push({ 
+          uniformObj = { 
             id: newId, 
             type, 
             size, 
             price, 
             qty, 
             dateAdded: new Date().toLocaleString(), 
-            totalAdded: qty, 
-            totalTaken: 0 
-          });
+            added: qty, 
+            taken: 0,
+            sheetName: sheetTabName
+          };
+          db[key].push(uniformObj);
           showToast(`New ${category.toLowerCase()} uniform successfully added.`, 'success');
         }
+
+        // Sync to Google Sheet
+        sendDataToGoogleSheet({
+          id: uniformObj.id,
+          type: uniformObj.type,
+          size: uniformObj.size,
+          price: uniformObj.price,
+          dateAdded: uniformObj.dateAdded,
+          added: uniformObj.qty,
+          taken: uniformObj.totalTaken || 0,
+          sheetName: sheetTabName
+        });
 
         resetUniformForm(category);
         renderUniformTable(category);
@@ -1356,6 +1407,20 @@
       item.totalTaken = (item.totalTaken || 0) + qtyToDeduct;
 
       let itemDesc = item.title ? item.title : `${item.type} (Size ${item.size})`;
+      let targetSheetName = categoryKey === 'books' ? 'Books' : (categoryKey === 'boys' ? 'Boys' : 'Girls');
+
+      // Sync deduction / taken update to Google Sheet
+      sendDataToGoogleSheet({
+        id: item.id,
+        title: item.title,
+        type: item.type,
+        size: item.size,
+        author: item.author,
+        price: item.price,
+        added: item.qty + item.totalTaken,
+        takenToAdd: qtyToDeduct,
+        sheetName: targetSheetName
+      });
 
       db.deductionLogs.unshift({
         dateTime: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }),
