@@ -813,6 +813,9 @@
   </div>
 
   <script>
+    // GOOGLE APPS SCRIPT WEB APP URL INTEGRATED DIRECTLY
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxiYc5GGkPI98-dSRepJX681rQl3PMxHk2r-lKDc_sYpYPF-JRfFBeq9UEf17b87NWN/exec";
+
     // IN-MEMORY DATA STORAGE (Puno na daan og daghang records)
     let db = {
       books: [
@@ -844,6 +847,24 @@
     };
 
     let currentUser = { role: 'admin', username: 'Administrator' };
+
+    // FUNCTION TO SYNC DATA TO GOOGLE SCRIPT / GOOGLE SHEET
+    function syncToGoogleSheet(payload) {
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        console.log("Data successfully synced to Google Sheet!");
+      })
+      .catch(error => {
+        console.error("Error syncing to Google Sheet:", error);
+      });
+    }
 
     // EXPORT ALL / PRINT FULL REPORT
     function exportFullInventoryReport(categoryType, reportName) {
@@ -1128,6 +1149,7 @@
       const price = parseFloat(document.getElementById('bookPrice').value);
       const qty = parseInt(document.getElementById('bookQty').value);
 
+      let bookData;
       if (id) {
         const idx = db.books.findIndex(b => b.id === id);
         if (idx !== -1) {
@@ -1135,11 +1157,12 @@
           db.books[idx].author = author;
           db.books[idx].price = price;
           db.books[idx].qty = qty;
+          bookData = db.books[idx];
           showToast('Book details successfully updated.', 'success');
         }
       } else {
         const newId = `BK-${Math.floor(1000 + Math.random() * 9000)}`;
-        db.books.push({ 
+        bookData = { 
           id: newId, 
           title, 
           author, 
@@ -1148,9 +1171,12 @@
           dateAdded: new Date().toLocaleString(), 
           totalAdded: qty, 
           totalTaken: 0 
-        });
+        };
+        db.books.push(bookData);
         showToast('New book successfully added.', 'success');
       }
+
+      syncToGoogleSheet({ action: "saveBook", data: bookData });
 
       resetBookForm();
       renderBooksTable();
@@ -1235,6 +1261,7 @@
         const price = parseFloat(document.getElementById(`${key}Price`).value);
         const qty = parseInt(document.getElementById(`${key}Qty`).value);
 
+        let uniformData;
         if (id) {
           const idx = db[key].findIndex(u => u.id === id);
           if (idx !== -1) {
@@ -1242,23 +1269,29 @@
             db[key][idx].size = size;
             db[key][idx].price = price;
             db[key][idx].qty = qty;
+            uniformData = db[key][idx];
+            uniformData.category = category;
             showToast(`${category} uniform successfully updated.`, 'success');
           }
         } else {
           const prefix = category === 'Boys' ? 'BY' : 'GL';
           const newId = `${prefix}-${Math.floor(1000 + Math.random() * 9000)}`;
-          db[key].push({ 
+          uniformData = { 
             id: newId, 
             type, 
             size, 
             price, 
             qty, 
+            category: category,
             dateAdded: new Date().toLocaleString(), 
             totalAdded: qty, 
             totalTaken: 0 
-          });
+          };
+          db[key].push(uniformData);
           showToast(`New ${category.toLowerCase()} uniform successfully added.`, 'success');
         }
+
+        syncToGoogleSheet({ action: "saveUniform", data: uniformData });
 
         resetUniformForm(category);
         renderUniformTable(category);
@@ -1363,6 +1396,13 @@
         reason: reason
       });
 
+      // Sync deduction / update to Apps Script backend
+      if (categoryKey === 'books') {
+        syncToGoogleSheet({ action: "saveBook", data: { ...item, takenToAdd: qtyToDeduct } });
+      } else {
+        syncToGoogleSheet({ action: "saveUniform", data: { ...item, category: categoryKey === 'boys' ? 'Boys' : 'Girls', takenToAdd: qtyToDeduct } });
+      }
+
       closeModal();
       showToast(`Successfully deducted ${qtyToDeduct} pcs from item ${id}.`, 'success');
 
@@ -1424,6 +1464,10 @@
           user: `${currentUser.username} (${currentUser.role.toUpperCase()})`,
           reason: 'Item moved to Recycle Bin (Deleted)'
         });
+
+        // Send delete request to Apps Script
+        let sheetName = categoryKey === 'books' ? 'Books' : (categoryKey === 'boys' ? 'Boys Uniforms' : 'Girls Uniforms');
+        syncToGoogleSheet({ action: "deleteItem", sheetName: sheetName, id: id });
 
         closeModal();
         showToast(`Record ${id} successfully moved to recycle bin.`, 'warning');
@@ -1491,6 +1535,12 @@
       delete item.originalCategory;
 
       db[catKey].push(item);
+
+      if (catKey === 'books') {
+        syncToGoogleSheet({ action: "saveBook", data: item });
+      } else {
+        syncToGoogleSheet({ action: "saveUniform", data: { ...item, category: catKey === 'boys' ? 'Boys' : 'Girls' } });
+      }
 
       showToast(`Record ${id} successfully restored.`, 'success');
       renderRecycleBinTable();
