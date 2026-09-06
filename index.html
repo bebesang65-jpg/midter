@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -814,6 +813,24 @@
   </div>
 
   <script>
+    // APPS SCRIPT WEB APP URL INTEGRATION
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbypb0gDYXt4_MIaPhTlGmTmQQ532m_st0zDN7jOjUZET5_ah6Rh-B1jdOddFo27-UejjA/exec';
+
+    // Function to sync data with Google Sheets via Apps Script (Optional use)
+    async function syncDataToCloud(actionType, payloadData) {
+      if (!APPS_SCRIPT_URL) return;
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Standard workaround for simple Apps Script POST triggers
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: actionType, data: payloadData })
+        });
+      } catch (error) {
+        console.error('Cloud sync error:', error);
+      }
+    }
+
     // IN-MEMORY DATA STORAGE (Puno na daan og daghang records)
     let db = {
       books: [
@@ -1136,11 +1153,12 @@
           db.books[idx].author = author;
           db.books[idx].price = price;
           db.books[idx].qty = qty;
+          syncDataToCloud('update_book', db.books[idx]);
           showToast('Book details successfully updated.', 'success');
         }
       } else {
         const newId = `BK-${Math.floor(1000 + Math.random() * 9000)}`;
-        db.books.push({ 
+        const newBook = { 
           id: newId, 
           title, 
           author, 
@@ -1149,7 +1167,9 @@
           dateAdded: new Date().toLocaleString(), 
           totalAdded: qty, 
           totalTaken: 0 
-        });
+        };
+        db.books.push(newBook);
+        syncDataToCloud('add_book', newBook);
         showToast('New book successfully added.', 'success');
       }
 
@@ -1243,12 +1263,13 @@
             db[key][idx].size = size;
             db[key][idx].price = price;
             db[key][idx].qty = qty;
+            syncDataToCloud(`update_${key}`, db[key][idx]);
             showToast(`${category} uniform successfully updated.`, 'success');
           }
         } else {
           const prefix = category === 'Boys' ? 'BY' : 'GL';
           const newId = `${prefix}-${Math.floor(1000 + Math.random() * 9000)}`;
-          db[key].push({ 
+          const newUniform = { 
             id: newId, 
             type, 
             size, 
@@ -1257,7 +1278,9 @@
             dateAdded: new Date().toLocaleString(), 
             totalAdded: qty, 
             totalTaken: 0 
-          });
+          };
+          db[key].push(newUniform);
+          syncDataToCloud(`add_${key}`, newUniform);
           showToast(`New ${category.toLowerCase()} uniform successfully added.`, 'success');
         }
 
@@ -1355,14 +1378,17 @@
 
       let itemDesc = item.title ? item.title : `${item.type} (Size ${item.size})`;
 
-      db.deductionLogs.unshift({
+      const newLog = {
         dateTime: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }),
         itemId: id,
         itemDesc: itemDesc,
         qtyDeducted: qtyToDeduct,
         user: `${currentUser.username} (${currentUser.role.toUpperCase()})`,
         reason: reason
-      });
+      };
+
+      db.deductionLogs.unshift(newLog);
+      syncDataToCloud('deduct_stock', { item, log: newLog });
 
       closeModal();
       showToast(`Successfully deducted ${qtyToDeduct} pcs from item ${id}.`, 'success');
@@ -1417,14 +1443,17 @@
 
         let itemDesc = deletedItem.title ? deletedItem.title : `${deletedItem.type} (Size ${deletedItem.size})`;
 
-        db.deductionLogs.unshift({
+        const deleteLog = {
           dateTime: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }),
           itemId: id,
           itemDesc: `[DELETED] ${itemDesc}`,
           qtyDeducted: deletedItem.qty,
           user: `${currentUser.username} (${currentUser.role.toUpperCase()})`,
           reason: 'Item moved to Recycle Bin (Deleted)'
-        });
+        };
+
+        db.deductionLogs.unshift(deleteLog);
+        syncDataToCloud('delete_item', { deletedItem, log: deleteLog });
 
         closeModal();
         showToast(`Record ${id} successfully moved to recycle bin.`, 'warning');
@@ -1492,6 +1521,7 @@
       delete item.originalCategory;
 
       db[catKey].push(item);
+      syncDataToCloud('restore_item', item);
 
       showToast(`Record ${id} successfully restored.`, 'success');
       renderRecycleBinTable();
@@ -1506,6 +1536,7 @@
         const itemIdx = db.recycleBin.findIndex(item => item.id === id);
         if (itemIdx !== -1) {
           db.recycleBin.splice(itemIdx, 1);
+          syncDataToCloud('permanent_delete', { id });
           showToast(`Record ${id} permanently deleted.`, 'danger');
         }
         closeModal();
