@@ -816,29 +816,11 @@
     // APPS SCRIPT WEB APP URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyRz9MfEk_yUS6tI4DuvAjmfQFLPlev7MX2HHWphWyiyysocNxa_Uk_8YvEDZylvYfT3w/exec';
 
-    // IN-MEMORY DATA STORAGE (Zeroed Out)
+    // IN-MEMORY DATA STORAGE (Completely Cleared / Zero Records on Start)
     let db = {
-      books: [
-        { id: 'BK-1001', title: 'Calculus Made Easy', author: 'S. Thompson', price: 450, qty: 0, dateAdded: 'Aug 19, 2026 10:00 AM', totalAdded: 0, totalTaken: 0 },
-        { id: 'BK-1002', title: 'World History Volume 1', author: 'J. Roberts', price: 380, qty: 0, dateAdded: 'Aug 20, 2026 01:30 PM', totalAdded: 0, totalTaken: 0 },
-        { id: 'BK-1003', title: 'Data Structures & Algorithms', author: 'C. Miller', price: 620, qty: 0, dateAdded: 'Aug 21, 2026 08:15 AM', totalAdded: 0, totalTaken: 0 },
-        { id: 'BK-1004', title: 'General Chemistry 2nd Ed.', author: 'A. Einstein', price: 550, qty: 0, dateAdded: 'Aug 22, 2026 09:40 AM', totalAdded: 0, totalTaken: 0 },
-        { id: 'BK-1005', title: 'Philippine Constitution & Laws', author: 'M. Leonen', price: 300, qty: 0, dateAdded: 'Aug 23, 2026 11:20 AM', totalAdded: 0, totalTaken: 0 }
-      ],
-      boys: [
-        { id: 'BY-2001', type: 'Type A', size: 'M', price: 550, qty: 0, dateAdded: 'Aug 18, 2026 09:15 AM', totalAdded: 0, totalTaken: 0 },
-        { id: 'BY-2002', type: 'PE Uniform', size: 'L', price: 400, qty: 0, dateAdded: 'Aug 21, 2026 11:00 AM', totalAdded: 0, totalTaken: 0 },
-        { id: 'BY-2003', type: 'Type B', size: 'S', price: 520, qty: 0, dateAdded: 'Aug 22, 2026 01:10 PM', totalAdded: 0, totalTaken: 0 },
-        { id: 'BY-2004', type: 'Type A', size: 'XL', price: 580, qty: 0, dateAdded: 'Aug 23, 2026 03:00 PM', totalAdded: 0, totalTaken: 0 },
-        { id: 'BY-2005', type: 'PE Uniform', size: 'XXL', price: 430, qty: 0, dateAdded: 'Aug 24, 2026 10:30 AM', totalAdded: 0, totalTaken: 0 }
-      ],
-      girls: [
-        { id: 'GL-3001', type: 'Type A', size: 'S', price: 550, qty: 0, dateAdded: 'Aug 18, 2026 02:45 PM', totalAdded: 0, totalTaken: 0 },
-        { id: 'GL-3002', type: 'PE Uniform', size: 'M', price: 400, qty: 0, dateAdded: 'Aug 22, 2026 08:30 AM', totalAdded: 0, totalTaken: 0 },
-        { id: 'GL-3003', type: 'Type B', size: 'L', price: 520, qty: 0, dateAdded: 'Aug 23, 2026 09:50 AM', totalAdded: 0, totalTaken: 0 },
-        { id: 'GL-3004', type: 'Type A', size: 'XL', price: 580, qty: 0, dateAdded: 'Aug 24, 2026 11:15 AM', totalAdded: 0, totalTaken: 0 },
-        { id: 'GL-3005', type: 'PE Uniform', size: 'S', price: 400, qty: 0, dateAdded: 'Aug 25, 2026 01:25 PM', totalAdded: 0, totalTaken: 0 }
-      ],
+      books: [],
+      boys: [],
+      girls: [],
       deductionLogs: [],
       recycleBin: []
     };
@@ -1107,7 +1089,7 @@
       );
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color: var(--text-muted);">No records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color: var(--text-muted);">No records found. Add a book using the form above.</td></tr>`;
         return;
       }
 
@@ -1227,7 +1209,7 @@
       );
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color: var(--text-muted);">No records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color: var(--text-muted);">No records found. Add a uniform using the form above.</td></tr>`;
         return;
       }
 
