@@ -932,8 +932,10 @@
   </div>
 
   <script>
-    // Updated Apps Script Web App URL
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwq3UJIIgPzXt8PKdWbja2sAPq_y0w0xHfcwIvXNN5x3nV2jxSv6bwyDmZEhfCP0_Jaig/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyRz9MfEk_yUS6tI4DuvAjmfQFLPlev7MX2HHWphWyiyysocNxa_Uk_8YvEDZylvYfT3w/exec';
+    
+    // Google Apps Script Web App URL for OTP Registration Email Verification
+    const registrationWebAppUrl = 'https://script.google.com/macros/s/AKfycby0jLuGzowfrCILyUdpYSnxdB6B1yAhQ4HE3HkmDt_-kf4KMD-0gYEFGSxQJ50rixk/exec';
 
     let db = {
       books: [],
@@ -952,7 +954,6 @@
     ];
 
     let pendingRegistrationData = null;
-    let generatedVerificationCode = null;
 
     function sendDataToGoogleSheet(payload) {
       if (!scriptURL) return;
@@ -1150,6 +1151,7 @@
       }
     }
 
+    // 1. REGISTRATION FORM SUBMISSION (Triggers Google Apps Script to send OTP)
     document.getElementById('registerForm').onsubmit = (e) => {
       e.preventDefault();
       const role = document.getElementById('regRole').value;
@@ -1176,41 +1178,78 @@
       }
 
       pendingRegistrationData = { role, fullName, username, email, password };
-      generatedVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-      console.log(`[SIMULATED EMAIL] To: ${email} | Verification Code: ${generatedVerificationCode}`);
-      showToast(`Verification code sent to ${email}. (Code: ${generatedVerificationCode})`, 'success');
+      const payload = {
+        action: "sendCode",
+        name: fullName,
+        username: username,
+        email: email,
+        password: password
+      };
 
-      document.getElementById('registerForm').style.display = 'none';
-      document.getElementById('verificationForm').style.display = 'block';
-      document.getElementById('verificationSentNotice').innerText = `6-digit verification code sent to ${email}`;
+      showToast(`Sending verification code to ${email}...`, 'warning');
+
+      fetch(registrationWebAppUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        showToast(`Verification code sent successfully to ${email}!`, 'success');
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('verificationForm').style.display = 'block';
+        document.getElementById('verificationSentNotice').innerText = `Gipadala na ang verification code sa ${email}`;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Naay problema sa pagpadala.', 'danger');
+      });
     };
 
     function cancelVerification() {
       pendingRegistrationData = null;
-      generatedVerificationCode = null;
       document.getElementById('verificationForm').style.display = 'none';
       document.getElementById('registerForm').style.display = 'block';
     }
 
+    // 2. VERIFY OTP CODE VIA GOOGLE APPS SCRIPT WEB APP
     function verifyAndCompleteRegistration(e) {
       e.preventDefault();
-      const enteredCode = document.getElementById('verificationCodeInput').value.trim();
+      const email = pendingRegistrationData ? pendingRegistrationData.email : document.getElementById('regEmail').value.trim();
+      const code = document.getElementById('verificationCodeInput').value.trim();
 
-      if (enteredCode !== generatedVerificationCode) {
-        showToast('Invalid verification code. Please check your email.', 'danger');
-        return;
-      }
+      const payload = {
+        action: "verifyCode",
+        email: email,
+        code: code
+      };
 
-      registeredUsers.push(pendingRegistrationData);
-      localStorage.setItem('bookstore_registered_users', JSON.stringify(registeredUsers));
+      showToast('Verifying code...', 'warning');
 
-      showToast('Account successfully created & verified!', 'success');
-      
-      document.getElementById('registerForm').reset();
-      document.getElementById('verificationForm').reset();
-      cancelVerification();
-      switchToLogin();
+      fetch(registrationWebAppUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        if (pendingRegistrationData) {
+          registeredUsers.push(pendingRegistrationData);
+          localStorage.setItem('bookstore_registered_users', JSON.stringify(registeredUsers));
+        }
+
+        showToast('Na-verify na ang imong account ug nasekreto na sa Sheet!', 'success');
+        
+        document.getElementById('registerForm').reset();
+        document.getElementById('verificationForm').reset();
+        cancelVerification();
+        switchToLogin();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Sayop o na-expire ang code.', 'danger');
+      });
     }
 
     document.getElementById('loginForm').onsubmit = (e) => {
