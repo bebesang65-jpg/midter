@@ -888,11 +888,24 @@
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyRz9MfEk_yUS6tI4DuvAjmfQFLPlev7MX2HHWphWyiyysocNxa_Uk_8YvEDZylvYfT3w/exec';
 
+    // Pre-populated initial mock data for seamless testing
     let db = {
-      books: [],
-      boys: [],
-      girls: [],
-      deductionLogs: [],
+      books: [
+        { id: 'BK-1001', title: 'Calculus & Analytic Geometry', author: 'Leithold', price: 650.00, qty: 15, dateAdded: 'Aug 01, 2026', totalAdded: 20, totalTaken: 5 },
+        { id: 'BK-1002', title: 'Data Structures & Algorithms', author: 'Mark Allen Weiss', price: 780.00, qty: 3, dateAdded: 'Aug 03, 2026', totalAdded: 15, totalTaken: 12 },
+        { id: 'BK-1003', title: 'Introduction to Web Programming', author: 'Jon Duckett', price: 590.00, qty: 25, dateAdded: 'Aug 05, 2026', totalAdded: 30, totalTaken: 5 }
+      ],
+      boys: [
+        { id: 'BY-2001', type: 'Type A', size: 'M', price: 450.00, qty: 20, dateAdded: 'Aug 02, 2026', totalAdded: 30, totalTaken: 10 },
+        { id: 'BY-2002', type: 'PE Uniform', size: 'L', price: 380.00, qty: 4, dateAdded: 'Aug 04, 2026', totalAdded: 20, totalTaken: 16 }
+      ],
+      girls: [
+        { id: 'GL-3001', type: 'Type A', size: 'S', price: 460.00, qty: 18, dateAdded: 'Aug 02, 2026', totalAdded: 25, totalTaken: 7 },
+        { id: 'GL-3002', type: 'PE Uniform', size: 'M', price: 380.00, qty: 2, dateAdded: 'Aug 04, 2026', totalAdded: 15, totalTaken: 13 }
+      ],
+      deductionLogs: [
+        { dateTime: 'Aug 10, 2026, 02:15 PM', itemId: 'BK-1002', itemDesc: 'Data Structures & Algorithms', qtyDeducted: 2, user: 'staff (STAFF)', reason: 'Sold to BSIT student' }
+      ],
       recycleBin: []
     };
 
