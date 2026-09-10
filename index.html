@@ -123,6 +123,12 @@
 
     .password-hint { font-size: 11px; color: var(--text-muted); margin-top: 3px; display: block; }
 
+    /* PASSWORD STRENGTH METER UI */
+    .password-strength-meter {
+      height: 5px; width: 100%; background: #e2e8f0; border-radius: 3px; margin-top: 6px; overflow: hidden; display: flex;
+    }
+    .strength-bar { height: 100%; width: 0%; transition: width 0.3s ease, background-color 0.3s ease; }
+
     @media (max-width: 768px) {
       .login-container-hero { flex-direction: column; }
       .login-hero-text { display: none; }
@@ -443,6 +449,13 @@
                 <option value="admin">System Admin</option>
               </select>
             </div>
+            
+            <!-- FULL NAME FIELD -->
+            <div class="form-group-login">
+              <label>Full Name (Formal)</label>
+              <input type="text" id="regFullName" class="login-input" placeholder="e.g. Maria Santos Jarcia" required>
+            </div>
+
             <div class="form-group-login">
               <label>Username</label>
               <input type="text" id="regUsername" class="login-input" placeholder="Choose a username" required>
@@ -452,17 +465,20 @@
               <input type="email" id="regEmail" class="login-input" placeholder="e.g. yourname@gmail.com" required>
             </div>
 
-            <!-- PASSWORD FIELD -->
+            <!-- PASSWORD FIELD WITH LIVE METER -->
             <div class="form-group-login">
               <label>Password</label>
               <div class="login-input-wrapper">
                 <input type="password" id="regPassword" class="login-input" placeholder="Enter strong password" required onkeyup="checkPasswordStandard()">
                 <button type="button" class="password-toggle-btn" id="toggleRegPassBtn" onclick="togglePasswordVisibility('regPassword', 'toggleRegPassBtn')">👁️</button>
               </div>
+              <div class="password-strength-meter">
+                <div id="passwordStrengthBar" class="strength-bar"></div>
+              </div>
               <span id="passwordStandardHint" class="password-hint" style="color: var(--danger);">Min. 8 chars, 1 uppercase, 1 number & 1 special char.</span>
             </div>
 
-            <!-- CONFIRM PASSWORD FIELD WITH PASOK NA INDICATOR -->
+            <!-- CONFIRM PASSWORD FIELD -->
             <div class="form-group-login">
               <label>Confirm Password (Re-type Password)</label>
               <div class="login-input-wrapper">
@@ -926,12 +942,12 @@
       recycleBin: []
     };
 
-    let currentUser = { role: 'admin', username: 'Bebe Jarcia' };
+    let currentUser = { role: 'admin', username: 'Bebe Jarcia', fullName: 'Bebe Jarcia' };
 
     let registeredUsers = JSON.parse(localStorage.getItem('bookstore_registered_users')) || [
-      { role: 'admin', username: 'admin', email: 'admin@gmail.com', password: 'Admin@123' },
-      { role: 'staff', username: 'staff', email: 'staff@gmail.com', password: 'Staff@123' },
-      { role: 'admin', username: 'bebe', email: 'bebejarcia@gmail.com', password: 'Bebe@123' }
+      { role: 'admin', fullName: 'System Administrator', username: 'admin', email: 'admin@gmail.com', password: 'Admin@123' },
+      { role: 'staff', fullName: 'Staff Assistant', username: 'staff', email: 'staff@gmail.com', password: 'Staff@123' },
+      { role: 'admin', fullName: 'Bebe Jarcia', username: 'bebe', email: 'bebejarcia@gmail.com', password: 'Bebe@123' }
     ];
 
     let pendingRegistrationData = null;
@@ -1073,15 +1089,34 @@
     function checkPasswordStandard() {
       const pwd = document.getElementById('regPassword').value;
       const hint = document.getElementById('passwordStandardHint');
+      const bar = document.getElementById('passwordStrengthBar');
       
       const minLength = pwd.length >= 8;
       const hasUppercase = /[A-Z]/.test(pwd);
       const hasNumber = /[0-9]/.test(pwd);
       const hasSpecial = /[\W_]/.test(pwd);
 
+      let score = 0;
+      if (pwd.length > 0) score++;
+      if (minLength) score++;
+      if (hasUppercase && hasNumber) score++;
+      if (hasSpecial) score++;
+
+      // Update Meter Bar Color & Width
+      if (score === 1) { bar.style.width = '25%'; bar.style.background = 'var(--danger)'; }
+      else if (score === 2) { bar.style.width = '50%'; bar.style.background = 'var(--warning)'; }
+      else if (score === 3) { bar.style.width = '75%'; bar.style.background = 'var(--primary)'; }
+      else if (score >= 4 && minLength && hasUppercase && hasNumber && hasSpecial) { 
+        bar.style.width = '100%'; 
+        bar.style.background = 'var(--success)'; 
+      } else {
+        bar.style.width = '0%';
+        bar.style.background = 'transparent';
+      }
+
       if (minLength && hasUppercase && hasNumber && hasSpecial) {
         hint.style.color = 'var(--success)';
-        hint.innerText = '✓ Password meets standard security requirements.';
+        hint.innerText = '✓ Secure password! Meets all requirements.';
         checkPasswordMatch();
         return true;
       } else {
@@ -1117,13 +1152,14 @@
     document.getElementById('registerForm').onsubmit = (e) => {
       e.preventDefault();
       const role = document.getElementById('regRole').value;
+      const fullName = document.getElementById('regFullName').value.trim();
       const username = document.getElementById('regUsername').value.trim();
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
       const confirmPassword = document.getElementById('regConfirmPassword').value;
 
       if (!checkPasswordStandard()) {
-        showToast('Password does not meet the standard requirements.', 'danger');
+        showToast('Password does not meet the standard security requirements.', 'danger');
         return;
       }
 
@@ -1138,7 +1174,7 @@
         return;
       }
 
-      pendingRegistrationData = { role, username, email, password };
+      pendingRegistrationData = { role, fullName, username, email, password };
       generatedVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
       console.log(`[SIMULATED EMAIL] To: ${email} | Verification Code: ${generatedVerificationCode}`);
@@ -1195,15 +1231,16 @@
 
       currentUser = {
         role: foundUser.role,
-        username: foundUser.username
+        username: foundUser.username,
+        fullName: foundUser.fullName || foundUser.username
       };
 
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('mainSystem').style.display = 'block';
 
-      document.getElementById('userNameDisplay').innerText = currentUser.username;
+      document.getElementById('userNameDisplay').innerText = currentUser.fullName;
       document.getElementById('userRoleDisplay').innerText = currentUser.role === 'admin' ? 'BSIT 3A Admin' : 'Staff Member';
-      document.getElementById('welcomeGreeting').innerText = `Welcome, ${currentUser.username}! 👋`;
+      document.getElementById('welcomeGreeting').innerText = `Welcome, ${currentUser.fullName}! 👋`;
       document.getElementById('userAvatar').innerText = currentUser.role === 'admin' ? '👑' : '👤';
 
       applyRoleUIPermissions();
