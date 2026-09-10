@@ -94,7 +94,7 @@
     }
     .login-hero-text h1 { font-size: 34px; font-weight: 800; margin-bottom: 16px; line-height: 1.2; }
     .login-hero-text p { font-size: 14px; color: #cbd5e1; line-height: 1.6; }
-    .login-card { width: 420px; background: #ffffff; padding: 35px 30px; display: flex; flex-direction: column; justify-content: center; max-height: 90vh; overflow-y: auto; }
+    .login-card { width: 440px; background: #ffffff; padding: 35px 30px; display: flex; flex-direction: column; justify-content: center; max-height: 90vh; overflow-y: auto; }
     .login-card h2 { margin-bottom: 4px; font-size: 22px; color: var(--text-main); font-weight: 700; text-align: center; }
     .login-card p.sub { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 20px; }
     
@@ -212,7 +212,6 @@
     .search-input { padding: 10px 16px; border: 1px solid var(--border-color); border-radius: 10px; width: 260px; font-size: 13px; outline: none; background-color: #fff; }
     .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
 
-    /* PDF EXPORT BUTTON */
     .btn-pdf {
       padding: 10px 16px; background: #dc2626; color: white; border: none; border-radius: 10px;
       font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;
@@ -267,7 +266,6 @@
     .btn-cancel { background-color: #f1f5f9; color: var(--text-muted); border: 1px solid var(--border-color); }
     .btn-cancel:hover { background-color: #e2e8f0; color: var(--text-main); }
 
-    /* ACTION BUTTONS DESIGN */
     .action-cell { display: flex; gap: 6px; justify-content: center; align-items: center; }
     .btn-action {
       padding: 6px 12px; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 4px;
@@ -302,7 +300,6 @@
     .badge-red { background-color: #fee2e2; color: #991b1b; }
     .badge-amber { background-color: #fef3c7; color: #92400e; }
 
-    /* PRINT / PDF STYLING */
     #printReportTemplate { display: none; }
 
     @media print {
@@ -453,8 +450,9 @@
             <div class="form-group-login">
               <label>Email Address</label>
               <input type="email" id="regEmail" class="login-input" placeholder="e.g. yourname@gmail.com" required>
-              <span class="password-hint">A 6-digit verification code will be sent/simulated here.</span>
             </div>
+
+            <!-- PASSWORD FIELD -->
             <div class="form-group-login">
               <label>Password</label>
               <div class="login-input-wrapper">
@@ -463,6 +461,17 @@
               </div>
               <span id="passwordStandardHint" class="password-hint" style="color: var(--danger);">Min. 8 chars, 1 uppercase, 1 number & 1 special char.</span>
             </div>
+
+            <!-- CONFIRM PASSWORD FIELD WITH PASOK NA INDICATOR -->
+            <div class="form-group-login">
+              <label>Confirm Password (Re-type Password)</label>
+              <div class="login-input-wrapper">
+                <input type="password" id="regConfirmPassword" class="login-input" placeholder="Re-enter password" required onkeyup="checkPasswordMatch()">
+                <button type="button" class="password-toggle-btn" id="toggleRegConfirmPassBtn" onclick="togglePasswordVisibility('regConfirmPassword', 'toggleRegConfirmPassBtn')">👁️</button>
+              </div>
+              <span id="passwordMatchHint" class="password-hint" style="color: var(--danger);">Passwords do not match yet.</span>
+            </div>
+
             <button type="submit" class="btn-login" id="btnSendCode">Send Verification Code</button>
           </form>
 
@@ -877,10 +886,8 @@
   </div>
 
   <script>
-    // APPS SCRIPT WEB APP URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyRz9MfEk_yUS6tI4DuvAjmfQFLPlev7MX2HHWphWyiyysocNxa_Uk_8YvEDZylvYfT3w/exec';
 
-    // IN-MEMORY DATA STORAGE
     let db = {
       books: [],
       boys: [],
@@ -891,7 +898,6 @@
 
     let currentUser = { role: 'admin', username: 'Administrator' };
 
-    // REGISTERED ACCOUNTS DATABASE (Stored in localStorage)
     let registeredUsers = JSON.parse(localStorage.getItem('bookstore_registered_users')) || [
       { role: 'admin', username: 'admin', email: 'admin@gmail.com', password: 'Admin@123' },
       { role: 'staff', username: 'staff', email: 'staff@gmail.com', password: 'Staff@123' }
@@ -900,7 +906,6 @@
     let pendingRegistrationData = null;
     let generatedVerificationCode = null;
 
-    // FUNCTION TO SEND DATA TO GOOGLE SHEETS VIA APPS SCRIPT
     function sendDataToGoogleSheet(payload) {
       if (!scriptURL) return;
       fetch(scriptURL, {
@@ -917,7 +922,6 @@
       });
     }
 
-    // EXPORT ALL / PRINT FULL REPORT
     function exportFullInventoryReport(categoryType, reportName) {
       const tbody = document.getElementById('printTableBody');
       tbody.innerHTML = "";
@@ -1005,7 +1009,6 @@
       showToast('Inventory report successfully generated.', 'success');
     }
 
-    // PASSWORD SHOW/HIDE TOGGLE
     function togglePasswordVisibility(inputId, btnId) {
       const passwordInput = document.getElementById(inputId);
       const toggleBtn = document.getElementById(btnId);
@@ -1018,7 +1021,6 @@
       }
     }
 
-    // LOGIN & AUTH SYSTEM
     function setRole(role) {
       document.getElementById('selectedRole').value = role;
       document.getElementById('btnRoleAdmin').classList.toggle('active', role === 'admin');
@@ -1037,7 +1039,6 @@
       document.getElementById('loginCardView').style.display = 'block';
     }
 
-    // PASSWORD STANDARD VALIDATION (Min 8 chars, 1 Uppercase, 1 Number, 1 Special Char)
     function checkPasswordStandard() {
       const pwd = document.getElementById('regPassword').value;
       const hint = document.getElementById('passwordStandardHint');
@@ -1050,44 +1051,67 @@
       if (minLength && hasUppercase && hasNumber && hasSpecial) {
         hint.style.color = 'var(--success)';
         hint.innerText = '✓ Password meets standard security requirements.';
+        checkPasswordMatch();
         return true;
       } else {
         hint.style.color = 'var(--danger)';
         hint.innerText = 'Min. 8 chars, 1 uppercase, 1 number & 1 special char.';
+        checkPasswordMatch();
         return false;
       }
     }
 
-    // HANDLE REGISTRATION & EMAIL VERIFICATION CODE
+    // REAL-TIME PASSWORD MATCH / "PASOK NA" VALIDATION
+    function checkPasswordMatch() {
+      const pwd = document.getElementById('regPassword').value;
+      const confirmPwd = document.getElementById('regConfirmPassword').value;
+      const matchHint = document.getElementById('passwordMatchHint');
+
+      if (confirmPwd === '') {
+        matchHint.style.color = 'var(--text-muted)';
+        matchHint.innerText = 'Please re-enter your password to confirm.';
+        return false;
+      }
+
+      if (pwd === confirmPwd) {
+        matchHint.style.color = 'var(--success)';
+        matchHint.innerText = '✓ Pasok na! Passwords match perfectly.';
+        return true;
+      } else {
+        matchHint.style.color = 'var(--danger)';
+        matchHint.innerText = '❌ Passwords do not match yet.';
+        return false;
+      }
+    }
+
     document.getElementById('registerForm').onsubmit = (e) => {
       e.preventDefault();
       const role = document.getElementById('regRole').value;
       const username = document.getElementById('regUsername').value.trim();
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
+      const confirmPassword = document.getElementById('regConfirmPassword').value;
 
       if (!checkPasswordStandard()) {
         showToast('Password does not meet the standard requirements.', 'danger');
         return;
       }
 
-      // Check if username exists
+      if (password !== confirmPassword) {
+        showToast('Passwords do not match. Please check.', 'danger');
+        return;
+      }
+
       const existing = registeredUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
       if (existing) {
         showToast('Username is already taken. Please choose another.', 'danger');
         return;
       }
 
-      // Save pending data
       pendingRegistrationData = { role, username, email, password };
-
-      // Generate 6-digit verification code
       generatedVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-      // Simulate sending email verification code
       console.log(`[SIMULATED EMAIL] To: ${email} | Verification Code: ${generatedVerificationCode}`);
-      
-      // Show code in Toast/Alert for convenient testing
       showToast(`Verification code sent to ${email}. (Code: ${generatedVerificationCode})`, 'success');
 
       document.getElementById('registerForm').style.display = 'none';
@@ -1111,13 +1135,11 @@
         return;
       }
 
-      // Save user to array and localStorage
       registeredUsers.push(pendingRegistrationData);
       localStorage.setItem('bookstore_registered_users', JSON.stringify(registeredUsers));
 
       showToast('Account successfully created & verified!', 'success');
       
-      // Reset & switch to login
       document.getElementById('registerForm').reset();
       document.getElementById('verificationForm').reset();
       cancelVerification();
@@ -1130,7 +1152,6 @@
       const usernameInput = document.getElementById('username').value.trim();
       const passwordInput = document.getElementById('password').value;
 
-      // Find user in registered list
       const foundUser = registeredUsers.find(u => 
         u.username.toLowerCase() === usernameInput.toLowerCase() && 
         u.role === role && 
@@ -1184,7 +1205,6 @@
       }, true);
     }
 
-    // NAVIGATION
     function switchView(viewId, element) {
       document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -1211,7 +1231,6 @@
       if (currentUser.role === 'admin') renderRecycleBinTable();
     }
 
-    // DASHBOARD CALCULATIONS
     function loadDashboard() {
       const totalBooks = db.books.reduce((acc, b) => acc + Number(b.qty), 0);
       const totalBoys = db.boys.reduce((acc, b) => acc + Number(b.qty), 0);
@@ -1252,7 +1271,6 @@
       });
     }
 
-    // BOOKS INVENTORY MANAGEMENT
     function renderBooksTable() {
       const tbody = document.getElementById('booksTableBody');
       const search = document.getElementById('searchBook').value.toLowerCase();
@@ -1373,7 +1391,6 @@
       document.getElementById('cancelBookBtn').style.display = 'none';
     }
 
-    // UNIFORMS MANAGEMENT (BOYS & GIRLS)
     function renderUniformTable(category) {
       const key = category.toLowerCase();
       const tbody = document.getElementById(`${key}TableBody`);
@@ -1506,7 +1523,6 @@
       document.getElementById(`cancel${category}Btn`).style.display = 'none';
     }
 
-    // STOCK DEDUCTION FUNCTIONALITY
     function promptDeductStock(categoryKey, id) {
       let itemList = db[categoryKey];
       let item = itemList.find(i => i.id === id);
@@ -1636,7 +1652,6 @@
       });
     }
 
-    // RECYCLE BIN SYSTEM
     function moveToRecycleBin(categoryKey, id) {
       showModal('Move to Recycle Bin', `Are you sure you want to move record (${id}) to the recycle bin?`, 'Move', () => {
         const itemIdx = db[categoryKey].findIndex(item => item.id === id);
@@ -1733,7 +1748,6 @@
       }, true);
     }
 
-    // UTILITY UI HELPERS
     function showToast(msg, type = 'primary') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
