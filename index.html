@@ -80,7 +80,7 @@
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.85)), 
                   url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
-      display: flex; justify-content: center; align-items: center; z-index: 999; padding: 20px;
+      display: flex; justify-content: center; align-items: center; z-index: 999; padding: 20px; overflow-y: auto;
     }
     .login-container-hero {
       display: flex; width: 100%; max-width: 950px;
@@ -94,18 +94,18 @@
     }
     .login-hero-text h1 { font-size: 34px; font-weight: 800; margin-bottom: 16px; line-height: 1.2; }
     .login-hero-text p { font-size: 14px; color: #cbd5e1; line-height: 1.6; }
-    .login-card { width: 400px; background: #ffffff; padding: 40px 32px; display: flex; flex-direction: column; justify-content: center; }
-    .login-card h2 { margin-bottom: 6px; font-size: 22px; color: var(--text-main); font-weight: 700; text-align: center; }
-    .login-card p.sub { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 24px; }
+    .login-card { width: 420px; background: #ffffff; padding: 35px 30px; display: flex; flex-direction: column; justify-content: center; max-height: 90vh; overflow-y: auto; }
+    .login-card h2 { margin-bottom: 4px; font-size: 22px; color: var(--text-main); font-weight: 700; text-align: center; }
+    .login-card p.sub { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 20px; }
     
-    .role-selector { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 20px; }
+    .role-selector { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 16px; }
     .role-btn { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 8px; font-weight: 600; font-size: 13px; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
     .role-btn.active { background: #ffffff; color: var(--primary); box-shadow: var(--shadow-sm); }
 
-    .form-group-login { margin-bottom: 16px; text-align: left; }
-    .form-group-login label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px; }
+    .form-group-login { margin-bottom: 14px; text-align: left; }
+    .form-group-login label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px; }
     .login-input-wrapper { position: relative; }
-    .login-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 14px; outline: none; transition: all 0.2s; }
+    .login-input { width: 100%; padding: 11px 14px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 14px; outline: none; transition: all 0.2s; }
     .login-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
     
     .password-toggle-btn {
@@ -114,8 +114,14 @@
     }
     .password-toggle-btn:hover { color: var(--text-main); }
 
-    .btn-login { width: 100%; padding: 12px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 15px; transition: 0.2s; margin-top: 8px; }
+    .btn-login { width: 100%; padding: 12px; background-color: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 15px; transition: 0.2s; margin-top: 6px; }
     .btn-login:hover { background-color: var(--primary-hover); }
+
+    .auth-switch { text-align: center; margin-top: 14px; font-size: 13px; color: var(--text-muted); }
+    .auth-switch a { color: var(--primary); font-weight: 600; text-decoration: none; cursor: pointer; }
+    .auth-switch a:hover { text-decoration: underline; }
+
+    .password-hint { font-size: 11px; color: var(--text-muted); margin-top: 3px; display: block; }
 
     @media (max-width: 768px) {
       .login-container-hero { flex-direction: column; }
@@ -387,7 +393,7 @@
     </div>
   </div>
 
-  <!-- LOGIN SECTION -->
+  <!-- LOGIN & REGISTER SECTION -->
   <div id="loginSection">
     <div class="login-container-hero">
       <div class="login-hero-text">
@@ -395,29 +401,87 @@
         <p>Manage stock levels, keep track of book inventories, uniform stock allocations, and print reports with ease.</p>
       </div>
       <div class="login-card">
-        <h2>Welcome Back</h2>
-        <p class="sub">Select role and log in to your portal</p>
         
-        <div class="role-selector">
-          <button type="button" class="role-btn active" id="btnRoleAdmin" onclick="setRole('admin')">🛡️ Admin</button>
-          <button type="button" class="role-btn" id="btnRoleStaff" onclick="setRole('staff')">👤 Staff</button>
+        <!-- LOGIN FORM CONTAINER -->
+        <div id="loginCardView">
+          <h2 id="loginCardTitle">Welcome Back</h2>
+          <p class="sub" id="loginCardSub">Select role and log in to your portal</p>
+          
+          <div class="role-selector" id="roleSelectorDiv">
+            <button type="button" class="role-btn active" id="btnRoleAdmin" onclick="setRole('admin')">🛡️ Admin</button>
+            <button type="button" class="role-btn" id="btnRoleStaff" onclick="setRole('staff')">👤 Staff</button>
+          </div>
+
+          <form id="loginForm">
+            <input type="hidden" id="selectedRole" value="admin">
+            <div class="form-group-login">
+              <label>Username</label>
+              <input type="text" id="username" class="login-input" placeholder="Enter username" required>
+            </div>
+            <div class="form-group-login">
+              <label>Password</label>
+              <div class="login-input-wrapper">
+                <input type="password" id="password" class="login-input" placeholder="Enter password" required>
+                <button type="button" class="password-toggle-btn" id="togglePasswordBtn" onclick="togglePasswordVisibility('password', 'togglePasswordBtn')">👁️</button>
+              </div>
+            </div>
+            <button type="submit" class="btn-login">Sign In</button>
+          </form>
+
+          <div class="auth-switch">
+            Don't have an account? <a onclick="switchToRegister()">Create Account</a>
+          </div>
         </div>
 
-        <form id="loginForm">
-          <input type="hidden" id="selectedRole" value="admin">
-          <div class="form-group-login">
-            <label>Username</label>
-            <input type="text" id="username" class="login-input" placeholder="Enter username" required>
-          </div>
-          <div class="form-group-login">
-            <label>Password</label>
-            <div class="login-input-wrapper">
-              <input type="password" id="password" class="login-input" placeholder="Enter password" required>
-              <button type="button" class="password-toggle-btn" id="togglePasswordBtn" onclick="togglePasswordVisibility()">👁️</button>
+        <!-- REGISTER FORM CONTAINER -->
+        <div id="registerCardView" style="display: none;">
+          <h2>Create Account</h2>
+          <p class="sub">Sign up for a new system portal account</p>
+
+          <form id="registerForm">
+            <div class="form-group-login">
+              <label>Select Role</label>
+              <select id="regRole" class="login-input" required>
+                <option value="staff">Staff Member</option>
+                <option value="admin">System Admin</option>
+              </select>
             </div>
+            <div class="form-group-login">
+              <label>Username</label>
+              <input type="text" id="regUsername" class="login-input" placeholder="Choose a username" required>
+            </div>
+            <div class="form-group-login">
+              <label>Email Address</label>
+              <input type="email" id="regEmail" class="login-input" placeholder="e.g. yourname@gmail.com" required>
+              <span class="password-hint">A 6-digit verification code will be sent/simulated here.</span>
+            </div>
+            <div class="form-group-login">
+              <label>Password</label>
+              <div class="login-input-wrapper">
+                <input type="password" id="regPassword" class="login-input" placeholder="Enter strong password" required onkeyup="checkPasswordStandard()">
+                <button type="button" class="password-toggle-btn" id="toggleRegPassBtn" onclick="togglePasswordVisibility('regPassword', 'toggleRegPassBtn')">👁️</button>
+              </div>
+              <span id="passwordStandardHint" class="password-hint" style="color: var(--danger);">Min. 8 chars, 1 uppercase, 1 number & 1 special char.</span>
+            </div>
+            <button type="submit" class="btn-login" id="btnSendCode">Send Verification Code</button>
+          </form>
+
+          <!-- EMAIL VERIFICATION STEP -->
+          <form id="verificationForm" style="display: none; margin-top: 10px;" onsubmit="verifyAndCompleteRegistration(event)">
+            <div class="form-group-login">
+              <label>Enter Email Verification Code</label>
+              <input type="text" id="verificationCodeInput" class="login-input" placeholder="Enter 6-digit code" required style="text-align: center; font-size: 18px; letter-spacing: 3px;" maxlength="6">
+              <span class="password-hint" style="text-align:center;" id="verificationSentNotice">Code sent to your email.</span>
+            </div>
+            <button type="submit" class="btn-login">Verify & Create Account</button>
+            <button type="button" class="btn-modal btn-modal-cancel" style="width: 100%; margin-top: 8px;" onclick="cancelVerification()">Cancel</button>
+          </form>
+
+          <div class="auth-switch" style="margin-top: 14px;">
+            Already have an account? <a onclick="switchToLogin()">Sign In</a>
           </div>
-          <button type="submit" class="btn-login">Sign In</button>
-        </form>
+        </div>
+
       </div>
     </div>
   </div>
@@ -816,7 +880,7 @@
     // APPS SCRIPT WEB APP URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyRz9MfEk_yUS6tI4DuvAjmfQFLPlev7MX2HHWphWyiyysocNxa_Uk_8YvEDZylvYfT3w/exec';
 
-    // IN-MEMORY DATA STORAGE (Completely Cleared / Zero Records on Start)
+    // IN-MEMORY DATA STORAGE
     let db = {
       books: [],
       boys: [],
@@ -826,6 +890,15 @@
     };
 
     let currentUser = { role: 'admin', username: 'Administrator' };
+
+    // REGISTERED ACCOUNTS DATABASE (Stored in localStorage)
+    let registeredUsers = JSON.parse(localStorage.getItem('bookstore_registered_users')) || [
+      { role: 'admin', username: 'admin', email: 'admin@gmail.com', password: 'Admin@123' },
+      { role: 'staff', username: 'staff', email: 'staff@gmail.com', password: 'Staff@123' }
+    ];
+
+    let pendingRegistrationData = null;
+    let generatedVerificationCode = null;
 
     // FUNCTION TO SEND DATA TO GOOGLE SHEETS VIA APPS SCRIPT
     function sendDataToGoogleSheet(payload) {
@@ -933,9 +1006,9 @@
     }
 
     // PASSWORD SHOW/HIDE TOGGLE
-    function togglePasswordVisibility() {
-      const passwordInput = document.getElementById('password');
-      const toggleBtn = document.getElementById('togglePasswordBtn');
+    function togglePasswordVisibility(inputId, btnId) {
+      const passwordInput = document.getElementById(inputId);
+      const toggleBtn = document.getElementById(btnId);
       if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
         toggleBtn.innerText = '🙈';
@@ -952,36 +1025,139 @@
       document.getElementById('btnRoleStaff').classList.toggle('active', role === 'staff');
     }
 
+    function switchToRegister() {
+      document.getElementById('loginCardView').style.display = 'none';
+      document.getElementById('registerCardView').style.display = 'block';
+      document.getElementById('registerForm').style.display = 'block';
+      document.getElementById('verificationForm').style.display = 'none';
+    }
+
+    function switchToLogin() {
+      document.getElementById('registerCardView').style.display = 'none';
+      document.getElementById('loginCardView').style.display = 'block';
+    }
+
+    // PASSWORD STANDARD VALIDATION (Min 8 chars, 1 Uppercase, 1 Number, 1 Special Char)
+    function checkPasswordStandard() {
+      const pwd = document.getElementById('regPassword').value;
+      const hint = document.getElementById('passwordStandardHint');
+      
+      const minLength = pwd.length >= 8;
+      const hasUppercase = /[A-Z]/.test(pwd);
+      const hasNumber = /[0-9]/.test(pwd);
+      const hasSpecial = /[\W_]/.test(pwd);
+
+      if (minLength && hasUppercase && hasNumber && hasSpecial) {
+        hint.style.color = 'var(--success)';
+        hint.innerText = '✓ Password meets standard security requirements.';
+        return true;
+      } else {
+        hint.style.color = 'var(--danger)';
+        hint.innerText = 'Min. 8 chars, 1 uppercase, 1 number & 1 special char.';
+        return false;
+      }
+    }
+
+    // HANDLE REGISTRATION & EMAIL VERIFICATION CODE
+    document.getElementById('registerForm').onsubmit = (e) => {
+      e.preventDefault();
+      const role = document.getElementById('regRole').value;
+      const username = document.getElementById('regUsername').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+
+      if (!checkPasswordStandard()) {
+        showToast('Password does not meet the standard requirements.', 'danger');
+        return;
+      }
+
+      // Check if username exists
+      const existing = registeredUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
+      if (existing) {
+        showToast('Username is already taken. Please choose another.', 'danger');
+        return;
+      }
+
+      // Save pending data
+      pendingRegistrationData = { role, username, email, password };
+
+      // Generate 6-digit verification code
+      generatedVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+      // Simulate sending email verification code
+      console.log(`[SIMULATED EMAIL] To: ${email} | Verification Code: ${generatedVerificationCode}`);
+      
+      // Show code in Toast/Alert for convenient testing
+      showToast(`Verification code sent to ${email}. (Code: ${generatedVerificationCode})`, 'success');
+
+      document.getElementById('registerForm').style.display = 'none';
+      document.getElementById('verificationForm').style.display = 'block';
+      document.getElementById('verificationSentNotice').innerText = `6-digit verification code sent to ${email}`;
+    };
+
+    function cancelVerification() {
+      pendingRegistrationData = null;
+      generatedVerificationCode = null;
+      document.getElementById('verificationForm').style.display = 'none';
+      document.getElementById('registerForm').style.display = 'block';
+    }
+
+    function verifyAndCompleteRegistration(e) {
+      e.preventDefault();
+      const enteredCode = document.getElementById('verificationCodeInput').value.trim();
+
+      if (enteredCode !== generatedVerificationCode) {
+        showToast('Invalid verification code. Please check your email.', 'danger');
+        return;
+      }
+
+      // Save user to array and localStorage
+      registeredUsers.push(pendingRegistrationData);
+      localStorage.setItem('bookstore_registered_users', JSON.stringify(registeredUsers));
+
+      showToast('Account successfully created & verified!', 'success');
+      
+      // Reset & switch to login
+      document.getElementById('registerForm').reset();
+      document.getElementById('verificationForm').reset();
+      cancelVerification();
+      switchToLogin();
+    }
+
     document.getElementById('loginForm').onsubmit = (e) => {
       e.preventDefault();
       const role = document.getElementById('selectedRole').value;
       const usernameInput = document.getElementById('username').value.trim();
       const passwordInput = document.getElementById('password').value;
 
-      let validUsername = role === 'admin' ? 'admin' : 'staff';
-      let validPassword = role === 'admin' ? 'admin123' : 'staff123';
+      // Find user in registered list
+      const foundUser = registeredUsers.find(u => 
+        u.username.toLowerCase() === usernameInput.toLowerCase() && 
+        u.role === role && 
+        u.password === passwordInput
+      );
 
-      if (usernameInput !== validUsername || passwordInput !== validPassword) {
-        showToast('Authentication failed: Invalid username or password.', 'danger');
+      if (!foundUser) {
+        showToast('Authentication failed: Invalid credentials or role selected.', 'danger');
         return; 
       }
 
       currentUser = {
-        role: role,
-        username: usernameInput
+        role: foundUser.role,
+        username: foundUser.username
       };
 
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('mainSystem').style.display = 'block';
 
       document.getElementById('userNameDisplay').innerText = currentUser.username;
-      document.getElementById('userRoleDisplay').innerText = role === 'admin' ? 'System Admin' : 'Staff Member';
+      document.getElementById('userRoleDisplay').innerText = currentUser.role === 'admin' ? 'System Admin' : 'Staff Member';
       document.getElementById('welcomeGreeting').innerText = `Welcome, ${currentUser.username}! 👋`;
-      document.getElementById('userAvatar').innerText = role === 'admin' ? '👑' : '👤';
+      document.getElementById('userAvatar').innerText = currentUser.role === 'admin' ? '👑' : '👤';
 
       applyRoleUIPermissions();
       loadAllData();
-      showToast(`Successfully logged in as ${role.toUpperCase()}`, 'success');
+      showToast(`Successfully logged in as ${currentUser.role.toUpperCase()}`, 'success');
     };
 
     function applyRoleUIPermissions() {
@@ -1082,7 +1258,6 @@
       const search = document.getElementById('searchBook').value.toLowerCase();
       tbody.innerHTML = '';
 
-      // Filter out items where qty <= 0 so they immediately disappear once stock runs out
       const filtered = db.books.filter(b => 
         b.qty > 0 && (
           b.id.toLowerCase().includes(search) || 
@@ -1205,7 +1380,6 @@
       const search = document.getElementById(`search${category}`).value.toLowerCase();
       tbody.innerHTML = '';
 
-      // Filter out items where qty <= 0 so they immediately disappear once stock runs out
       const filtered = db[key].filter(u => 
         u.qty > 0 && (
           u.id.toLowerCase().includes(search) || 
