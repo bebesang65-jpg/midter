@@ -147,7 +147,7 @@
     
     .brand {
       padding: 8px 12px 20px 12px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       display: flex;
       align-items: center;
@@ -378,7 +378,7 @@
 
     <div style="display: flex; justify-content: space-between; margin-top: 50px; font-size: 12px;">
         <div>
-            <p>Prepared By: (Inventory In-charge)</p>
+            <p>Prepared By: Bebe Jarcia (BSIT 3A)</p>
             <br><br>
             <hr style="border: 0.5px solid black; width: 200px;">
         </div>
@@ -395,7 +395,7 @@
     <div class="login-container-hero">
       <div class="login-hero-text">
         <h1>BOOKSTORE & UNIFORM SYSTEM</h1>
-        <p>Manage stock levels, keep track of book inventories, uniform stock allocations, and print reports with ease.</p>
+        <p>Developed by Bebe Jarcia (BSIT 3A) — Manage stock levels, keep track of book inventories, uniform stock allocations, and print reports with ease.</p>
       </div>
       <div class="login-card">
         
@@ -502,13 +502,13 @@
       <!-- SIDEBAR -->
       <div class="sidebar">
         <div>
-          <div class="brand">📚 BOOKSTORE INVENTORY</div>
+          <div class="brand">📚 INVENTORY SYSTEM (BSIT 3A)</div>
           
           <div class="user-profile-card">
             <div class="profile-avatar" id="userAvatar">👑</div>
             <div class="profile-info">
-              <div class="profile-name" id="userNameDisplay">Administrator</div>
-              <div class="profile-role"><span class="status-dot"></span> <span id="userRoleDisplay">System Admin</span></div>
+              <div class="profile-name" id="userNameDisplay">Bebe Jarcia</div>
+              <div class="profile-role"><span class="status-dot"></span> <span id="userRoleDisplay">BSIT 3A Developer</span></div>
             </div>
           </div>
 
@@ -519,6 +519,7 @@
             <li class="nav-item" id="nav-girls" onclick="switchView('girls', this)"><span>👗</span> Girls Uniforms</li>
             <li class="nav-item" id="nav-logs" onclick="switchView('logs', this)"><span>📋</span> Deduction Logs</li>
             <li class="nav-item" id="nav-recycle" onclick="switchView('recycle', this)"><span>🗑️</span> Recycle Bin</li>
+            <li class="nav-item" id="nav-credits" onclick="switchView('credits', this)"><span>⚙️</span> Developer Info</li>
           </ul>
         </div>
         
@@ -533,8 +534,8 @@
           
           <div class="hero-banner">
             <div>
-              <h1 id="welcomeGreeting">Welcome, Administrator! 👋</h1>
-              <p>Here is an overview of your bookstore & uniform stock counts today.</p>
+              <h1 id="welcomeGreeting">Welcome, Bebe Jarcia! 👋</h1>
+              <p>BSIT 3A System Cohort — Here is an overview of your bookstore & uniform stock counts today.</p>
             </div>
             <div style="display: flex; gap: 10px;">
               <button class="btn-shortcut" style="background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.2);" onclick="loadAllData()">
@@ -581,6 +582,7 @@
             <button class="btn-shortcut" onclick="quickNav('girls')">👗 Go to Girls Uniforms</button>
             <button class="btn-shortcut" onclick="quickNav('logs')">📋 View Deduction Logs</button>
             <button class="btn-shortcut" id="dashRecycleShortcut" onclick="quickNav('recycle')">🗑️ View Recycle Bin</button>
+            <button class="btn-shortcut" onclick="quickNav('credits')">⚙️ View Developer Credits</button>
           </div>
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
@@ -881,6 +883,34 @@
           </div>
         </div>
 
+        <!-- DEVELOPER CREDITS VIEW -->
+        <div id="credits" class="view-panel">
+          <div class="page-header">
+            <div>
+              <h1>Developer & Project Information</h1>
+              <p>System credentials, project stack, and academic information.</p>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom: 20px;">
+            <h3 style="color:var(--primary); font-size:16px; margin-bottom:12px;">👤 Developer Profile</h3>
+            <p style="font-size:14px; line-height:1.6; margin-bottom:8px;"><strong>Name:</strong> Bebe Jarcia</p>
+            <p style="font-size:14px; line-height:1.6; margin-bottom:8px;"><strong>Cohort / Section:</strong> BSIT 3A (Information Technology)</p>
+            <p style="font-size:14px; line-height:1.6; margin-bottom:8px;"><strong>Social Handle:</strong> @BebeJarcia (X / Twitter)</p>
+          </div>
+
+          <div class="card" style="margin-bottom: 20px;">
+            <h3 style="color:var(--primary); font-size:16px; margin-bottom:12px;">🛠️ Technical Stack & Tools</h3>
+            <ul style="margin-left: 20px; font-size:13.5px; line-height:1.8; color: var(--text-main);">
+              <li><strong>Database & Backend Work:</strong> PHP Data Objects (PDO), XAMPP, phpMyAdmin, and local htdocs environment for IM 102 coursework (CRUD operations & User Account Management Systems).</li>
+              <li><strong>Hosting & Deployment:</strong> InfinityFree & Vercel (Account: bebesang65-5250).</li>
+              <li><strong>Version Control:</strong> GitHub (Account: bebesang65-jpg on Linux).</li>
+              <li><strong>App Development Tools:</strong> Firebase, Kodular, and Canva graphics integration.</li>
+              <li><strong>AI Assistant:</strong> Gemini on the web.</li>
+            </ul>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -888,32 +918,20 @@
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyRz9MfEk_yUS6tI4DuvAjmfQFLPlev7MX2HHWphWyiyysocNxa_Uk_8YvEDZylvYfT3w/exec';
 
-    // Pre-populated initial mock data for seamless testing
     let db = {
-      books: [
-        { id: 'BK-1001', title: 'Calculus & Analytic Geometry', author: 'Leithold', price: 650.00, qty: 15, dateAdded: 'Aug 01, 2026', totalAdded: 20, totalTaken: 5 },
-        { id: 'BK-1002', title: 'Data Structures & Algorithms', author: 'Mark Allen Weiss', price: 780.00, qty: 3, dateAdded: 'Aug 03, 2026', totalAdded: 15, totalTaken: 12 },
-        { id: 'BK-1003', title: 'Introduction to Web Programming', author: 'Jon Duckett', price: 590.00, qty: 25, dateAdded: 'Aug 05, 2026', totalAdded: 30, totalTaken: 5 }
-      ],
-      boys: [
-        { id: 'BY-2001', type: 'Type A', size: 'M', price: 450.00, qty: 20, dateAdded: 'Aug 02, 2026', totalAdded: 30, totalTaken: 10 },
-        { id: 'BY-2002', type: 'PE Uniform', size: 'L', price: 380.00, qty: 4, dateAdded: 'Aug 04, 2026', totalAdded: 20, totalTaken: 16 }
-      ],
-      girls: [
-        { id: 'GL-3001', type: 'Type A', size: 'S', price: 460.00, qty: 18, dateAdded: 'Aug 02, 2026', totalAdded: 25, totalTaken: 7 },
-        { id: 'GL-3002', type: 'PE Uniform', size: 'M', price: 380.00, qty: 2, dateAdded: 'Aug 04, 2026', totalAdded: 15, totalTaken: 13 }
-      ],
-      deductionLogs: [
-        { dateTime: 'Aug 10, 2026, 02:15 PM', itemId: 'BK-1002', itemDesc: 'Data Structures & Algorithms', qtyDeducted: 2, user: 'staff (STAFF)', reason: 'Sold to BSIT student' }
-      ],
+      books: [],
+      boys: [],
+      girls: [],
+      deductionLogs: [],
       recycleBin: []
     };
 
-    let currentUser = { role: 'admin', username: 'Administrator' };
+    let currentUser = { role: 'admin', username: 'Bebe Jarcia' };
 
     let registeredUsers = JSON.parse(localStorage.getItem('bookstore_registered_users')) || [
       { role: 'admin', username: 'admin', email: 'admin@gmail.com', password: 'Admin@123' },
-      { role: 'staff', username: 'staff', email: 'staff@gmail.com', password: 'Staff@123' }
+      { role: 'staff', username: 'staff', email: 'staff@gmail.com', password: 'Staff@123' },
+      { role: 'admin', username: 'bebe', email: 'bebejarcia@gmail.com', password: 'Bebe@123' }
     ];
 
     let pendingRegistrationData = null;
@@ -1074,7 +1092,6 @@
       }
     }
 
-    // REAL-TIME PASSWORD MATCH / "PASOK NA" VALIDATION
     function checkPasswordMatch() {
       const pwd = document.getElementById('regPassword').value;
       const confirmPwd = document.getElementById('regConfirmPassword').value;
@@ -1185,7 +1202,7 @@
       document.getElementById('mainSystem').style.display = 'block';
 
       document.getElementById('userNameDisplay').innerText = currentUser.username;
-      document.getElementById('userRoleDisplay').innerText = currentUser.role === 'admin' ? 'System Admin' : 'Staff Member';
+      document.getElementById('userRoleDisplay').innerText = currentUser.role === 'admin' ? 'BSIT 3A Admin' : 'Staff Member';
       document.getElementById('welcomeGreeting').innerText = `Welcome, ${currentUser.username}! 👋`;
       document.getElementById('userAvatar').innerText = currentUser.role === 'admin' ? '👑' : '👤';
 
